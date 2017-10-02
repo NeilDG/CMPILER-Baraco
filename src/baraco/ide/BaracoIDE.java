@@ -47,5 +47,7 @@ public class BaracoIDE {
 
         buttonFile.setBorder(null);
         buttonEdit.setBorder(null);
+
+        editor.setTabSize(2);
     }
 }
