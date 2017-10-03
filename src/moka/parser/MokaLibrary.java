@@ -8,8 +8,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class MokaLibrary {
+    public static String printStatement = "";
 
-    public static void print(String input){
+    public static void parsePrint(String input){
 
         CharStream cs = new ANTLRInputStream(input);
 

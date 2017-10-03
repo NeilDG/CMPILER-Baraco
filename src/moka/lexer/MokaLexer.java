@@ -51,7 +51,7 @@ public class MokaLexer extends Lexer {
 	private static final String[] _LITERAL_NAMES = {
 		null, "'int'", "'decimal'", "'string'", "'break'", "'continue'", "'\n'", 
 		"'and'", "'''", "'\"'", "'\\'", "'void'", "'scanInt'", "'scanDecimal'", 
-		"'scanString'", "'print'", "'println'", "'return'", "'if'", "'else'", 
+		"'scanString'", "'parsePrint'", "'println'", "'return'", "'if'", "'else'",
 		"'while'", "'do'", "'for'", "'const'", "'('", "')'", "'{'", "'}'", "'['", 
 		"']'", "';'", "'end'", "','", "'.'", "'='", "'>'", "'<'", "'!'", "'~'", 
 		"'?'", "':'", "'=='", "'<='", "'>='", "'!='", "'&&'", "'or'", "'++'", 
