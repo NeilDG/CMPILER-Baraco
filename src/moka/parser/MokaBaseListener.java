@@ -1,5 +1,5 @@
 // Generated from Moka.g4 by ANTLR 4.7
-
+package moka.parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -281,7 +281,9 @@ public class MokaBaseListener implements MokaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrint_statement(MokaParser.Print_statementContext ctx) { }
+	@Override public void enterPrint_statement(MokaParser.Print_statementContext ctx) {
+
+	}
 	/**
 	 * {@inheritDoc}
 	 *

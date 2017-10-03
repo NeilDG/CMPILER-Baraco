@@ -1,3 +1,5 @@
+package moka.parser;
+
 // Generated from Moka.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -72,7 +74,7 @@ public class MokaParser extends Parser {
 		"'>>>='"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-	    null, "INT", "DECIMAL", "STRING", "BREAK", "CONTINUE", "NEWLINE", "AND", null, null, null, "VOID",
+        null, "INT", "DECIMAL", "STRING", "BREAK", "CONTINUE", "NEWLINE", "AND", "SQUOTE", "DQUOTE", "BSLASH", "VOID",
 		"SCANINT", "SCANDEC", "SCANSTR", "PRINT", "PRINTLN", "RETURN", "IF", "ELSE", 
 		"WHILE", "DO", "FOR", "CONST", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
 		"LBRACK", "RBRACK", "SEMI", "END", "COMMA", "DOT", "ASSIGN", "GT", "LT", 
