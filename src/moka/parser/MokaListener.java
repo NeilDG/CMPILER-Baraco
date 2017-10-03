@@ -1,6 +1,5 @@
-// Generated from Moka.g4 by ANTLR 4.7
+// Generated from Moka.G4 by ANTLR 4.7
 package moka.parser;
-import moka.parser.MokaParser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -139,26 +138,6 @@ public interface MokaListener extends ParseTreeListener {
 	 */
 	void exitIdentifier_list(MokaParser.Identifier_listContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MokaParser#identifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterIdentifier(MokaParser.IdentifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#identifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitIdentifier(MokaParser.IdentifierContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#subscript}.
-	 * @param ctx the parse tree
-	 */
-	void enterSubscript(MokaParser.SubscriptContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#subscript}.
-	 * @param ctx the parse tree
-	 */
-	void exitSubscript(MokaParser.SubscriptContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MokaParser#statement}.
 	 * @param ctx the parse tree
 	 */
@@ -168,16 +147,6 @@ public interface MokaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatement(MokaParser.StatementContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#statement_end}.
-	 * @param ctx the parse tree
-	 */
-	void enterStatement_end(MokaParser.Statement_endContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#statement_end}.
-	 * @param ctx the parse tree
-	 */
-	void exitStatement_end(MokaParser.Statement_endContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MokaParser#assignment_statement}.
 	 * @param ctx the parse tree
@@ -468,124 +437,4 @@ public interface MokaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConstant(MokaParser.ConstantContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#integer}.
-	 * @param ctx the parse tree
-	 */
-	void enterInteger(MokaParser.IntegerContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#integer}.
-	 * @param ctx the parse tree
-	 */
-	void exitInteger(MokaParser.IntegerContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#sign}.
-	 * @param ctx the parse tree
-	 */
-	void enterSign(MokaParser.SignContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#sign}.
-	 * @param ctx the parse tree
-	 */
-	void exitSign(MokaParser.SignContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#floating_point}.
-	 * @param ctx the parse tree
-	 */
-	void enterFloating_point(MokaParser.Floating_pointContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#floating_point}.
-	 * @param ctx the parse tree
-	 */
-	void exitFloating_point(MokaParser.Floating_pointContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#floating}.
-	 * @param ctx the parse tree
-	 */
-	void enterFloating(MokaParser.FloatingContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#floating}.
-	 * @param ctx the parse tree
-	 */
-	void exitFloating(MokaParser.FloatingContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#character}.
-	 * @param ctx the parse tree
-	 */
-	void enterCharacter(MokaParser.CharacterContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#character}.
-	 * @param ctx the parse tree
-	 */
-	void exitCharacter(MokaParser.CharacterContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#string}.
-	 * @param ctx the parse tree
-	 */
-	void enterString(MokaParser.StringContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#string}.
-	 * @param ctx the parse tree
-	 */
-	void exitString(MokaParser.StringContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#characters}.
-	 * @param ctx the parse tree
-	 */
-	void enterCharacters(MokaParser.CharactersContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#characters}.
-	 * @param ctx the parse tree
-	 */
-	void exitCharacters(MokaParser.CharactersContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#ascii_charplus}.
-	 * @param ctx the parse tree
-	 */
-	void enterAscii_charplus(MokaParser.Ascii_charplusContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#ascii_charplus}.
-	 * @param ctx the parse tree
-	 */
-	void exitAscii_charplus(MokaParser.Ascii_charplusContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#ascii_char}.
-	 * @param ctx the parse tree
-	 */
-	void enterAscii_char(MokaParser.Ascii_charContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#ascii_char}.
-	 * @param ctx the parse tree
-	 */
-	void exitAscii_char(MokaParser.Ascii_charContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#digitsplus}.
-	 * @param ctx the parse tree
-	 */
-	void enterDigitsplus(MokaParser.DigitsplusContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#digitsplus}.
-	 * @param ctx the parse tree
-	 */
-	void exitDigitsplus(MokaParser.DigitsplusContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#letterplus}.
-	 * @param ctx the parse tree
-	 */
-	void enterLetterplus(MokaParser.LetterplusContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#letterplus}.
-	 * @param ctx the parse tree
-	 */
-	void exitLetterplus(MokaParser.LetterplusContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MokaParser#letter_or_digitplus}.
-	 * @param ctx the parse tree
-	 */
-	void enterLetter_or_digitplus(MokaParser.Letter_or_digitplusContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MokaParser#letter_or_digitplus}.
-	 * @param ctx the parse tree
-	 */
-	void exitLetter_or_digitplus(MokaParser.Letter_or_digitplusContext ctx);
 }

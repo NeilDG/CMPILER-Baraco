@@ -15,6 +15,10 @@ public class Controller {
     public void run(String input, JTextArea console) {
         // Perform interpretation
 
+        console.setText("");
+        console.append("Console:");
+        console.append("\n");
+
         CharStream cs = new ANTLRInputStream(input);
 
         MokaLexer mokaLexer = new MokaLexer(cs);

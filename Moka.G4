@@ -1,15 +1,14 @@
 grammar Moka;
 
 //start point of program
-program 
+program
     :   constdecl_list funcdecl_list statement_list
     ;
 
 //function declarations
 
 funcdecl_list
-    :   function_declaration funcdecl_list?
-    ;
+    :   function_declaration funcdecl_list?;
 
 function_declaration
     :   function_return
@@ -25,7 +24,7 @@ function_noreturn
     ;
 
 function_name
-    :   letterplus
+    :   Identifier
     ;
 
 parameter_list
@@ -44,7 +43,7 @@ function_content
 //variable declarations
 
 vardecl_list
-    :   var_decl statement_end vardecl_list
+    :   var_decl STMTEND vardecl_list
     |   var_decl
     ;
 
@@ -59,44 +58,36 @@ data_type
     ;
 
 identifier_list
-    :   identifier ',' identifier_list
-    |   identifier
-    ;
-
-identifier
-    :   Letter letter_or_digitplus subscript*
-    ;
-
-subscript
-    :   '[' integer ']'?
+    :   Identifier ',' identifier_list
+    |   Identifier
     ;
 
 //statements
 
 statement
-    :   assignment_statement statement_end
-    |   funccall_statement statement_end
-    |   if_statement statement_end
-    |   while_statement statement_end
-    |   do_while_statement statement_end
-    |   for_statement statement_end
-    |   return_statement statement_end
-    |   print_statement statement_end
-    |   scan_statement statement_end
-    |   'break' statement_end
-    |   'continue' statement_end
+    :   assignment_statement STMTEND
+    |   funccall_statement STMTEND
+    |   if_statement STMTEND
+    |   while_statement STMTEND
+    |   do_while_statement STMTEND
+    |   for_statement STMTEND
+    |   return_statement STMTEND
+    |   print_statement STMTEND
+    |   scan_statement STMTEND
+    |   'break' STMTEND
+    |   'continue' STMTEND
     ;
 
-statement_end
-    :   '\n'
-    ;
+STMTEND : NEWLINE+;
+
+fragment NEWLINE   : '\r' '\n' | '\n' | '\r';
 
 assignment_statement
-    :   identifier '=' expression
+    :   Identifier '=' expression
     ;
 
 funccall_statement
-    :   function_name '(' actual_parameter_list ')' statement_end
+    :   function_name '(' actual_parameter_list ')' STMTEND
     ;
 
 actual_parameter_list
@@ -104,14 +95,14 @@ actual_parameter_list
     ;
 
 actual_params
-    :   identifier ',' actual_params
-    |   identifier
+    :   Identifier ',' actual_params
+    |   Identifier
     ;
 
 scan_statement
-    :   identifier '=' 'scanInt' '(' integer ')'
-    |   identifier '=' 'scanDecimal' '(' floating_point ')'
-    |   identifier '=' 'scanString' '(' string ')'
+    :   Identifier '=' 'scanInt' '(' IntegerLiteral ')'
+    |   Identifier '=' 'scanDecimal' '(' FloatingPointLiteral ')'
+    |   Identifier '=' 'scanString' '(' StringLiteral ')'
     ;
 
 print_statement
@@ -120,7 +111,7 @@ print_statement
     ;
 
 return_statement
-    :   'return' expression statement_end
+    :   'return' expression STMTEND
     ;
 
 if_statement
@@ -141,7 +132,7 @@ for_statement
     ;
 
 statement_list
-    :   statement statement_end statement_list?
+    :   statement STMTEND statement_list?
     ;
 
 // Expressions
@@ -155,9 +146,9 @@ expression
 
 string_expression
     :   string_identifier '+' string_expression
-    |   string '+' string_expression
+    |   StringLiteral '+' string_expression
     |   string_identifier
-    |   string
+    |   StringLiteral
     ;
 
 num_expression
@@ -175,18 +166,18 @@ num_term
 
 num_factor
     :   '(' num_expression ')'
-    |   character
-    |   integer
-    |   floating_point
+    |   CharacterLiteral
+    |   IntegerLiteral
+    |   FloatingPointLiteral
     |   num_identifier
     ;
 
 num_identifier
-    :   identifier
+    :   Identifier
     ;
 
 string_identifier
-    :   identifier
+    :   Identifier
     ;
 
 bool_expression
@@ -224,7 +215,7 @@ bool_factor
     ;
 
 bool_identifier
-    :   identifier
+    :   Identifier
     ;
 
 // Lexer
@@ -240,41 +231,14 @@ const_statement
     ;
 
 const_identifier
-    :   Letter letter_or_digitplus
+    :   Identifier
     ;
 
 constant
-    :   integer
-    |   floating_point
-    |   character
-    |   string
-    ;
-
-integer
-    :   sign digitsplus
-    ;
-
-sign
-    :   '+'?
-    |   '-'?
-    ;
-
-floating_point
-    :   floating
-    ;
-
-floating
-    :   digitsplus '.'
-    |   '.' digitsplus
-    |   digitsplus '.' digitsplus
-    ;
-
-character
-    :   '\'' character '\''
-    ;
-
-string
-    :   '"' ascii_charplus '"'
+    :   IntegerLiteral
+    |   FloatingPointLiteral
+    |   CharacterLiteral
+    |   StringLiteral
     ;
 
 // Keywords
@@ -292,6 +256,7 @@ WHILE           : 'while';
 DO              : 'do';
 FOR             : 'for';
 CONST           : 'const';
+NULL            : 'null';
 
 // Separators
 
@@ -344,45 +309,291 @@ LSHIFT_ASSIGN   : '<<=';
 RSHIFT_ASSIGN   : '>>=';
 URSHIFT_ASSIGN  : '>>>=';
 
-// Others
+// Integer Literals
 
-characters        
-    :   ascii_char
-    |   '\n'
-    |   '\\'
-    |   '\''
-    |   '"'
+IntegerLiteral
+    :   DecimalIntegerLiteral
+    |   HexIntegerLiteral
+    |   OctalIntegerLiteral
+    |   BinaryIntegerLiteral
     ;
 
-ascii_charplus
-    :   ascii_char ascii_charplus
-    |   ascii_char
+fragment
+DecimalIntegerLiteral
+    :   DecimalNumeral IntegerTypeSuffix?
     ;
 
-ascii_char
-    :   Letter
-    |   Digit
+fragment
+HexIntegerLiteral
+    :   HexNumeral IntegerTypeSuffix?
     ;
 
-Letter
-    :    [a-zA-Z$_]
+fragment
+OctalIntegerLiteral
+    :   OctalNumeral IntegerTypeSuffix?
     ;
 
+fragment
+BinaryIntegerLiteral
+    :   BinaryNumeral IntegerTypeSuffix?
+    ;
+
+fragment
+IntegerTypeSuffix
+    :   [lL]
+    ;
+
+fragment
+DecimalNumeral
+    :   '0'
+    |   NonZeroDigit (Digits? | Underscores Digits)
+    ;
+
+fragment
+Digits
+    :   Digit (DigitOrUnderscore* Digit)?
+    ;
+
+fragment
 Digit
-    :   [0-9$_]
+    :   '0'
+    |   NonZeroDigit
     ;
 
-digitsplus
-    :   Digit digitsplus
-    |   Digit
+fragment
+NonZeroDigit
+    :   [1-9]
     ;
 
-letterplus
-    :   Letter letterplus
-    |   Letter
+fragment
+DigitOrUnderscore
+    :   Digit
+    |   '_'
     ;
 
-letter_or_digitplus
-    :   Letter letter_or_digitplus
-    |   Digit letter_or_digitplus
+fragment
+Underscores
+    :   '_'+
+    ;
+
+fragment
+HexNumeral
+    :   '0' [xX] HexDigits
+    ;
+
+fragment
+HexDigits
+    :   HexDigit (HexDigitOrUnderscore* HexDigit)?
+    ;
+
+fragment
+HexDigit
+    :   [0-9a-fA-F]
+    ;
+
+fragment
+HexDigitOrUnderscore
+    :   HexDigit
+    |   '_'
+    ;
+
+fragment
+OctalNumeral
+    :   '0' Underscores? OctalDigits
+    ;
+
+fragment
+OctalDigits
+    :   OctalDigit (OctalDigitOrUnderscore* OctalDigit)?
+    ;
+
+fragment
+OctalDigit
+    :   [0-7]
+    ;
+
+fragment
+OctalDigitOrUnderscore
+    :   OctalDigit
+    |   '_'
+    ;
+
+fragment
+BinaryNumeral
+    :   '0' [bB] BinaryDigits
+    ;
+
+fragment
+BinaryDigits
+    :   BinaryDigit (BinaryDigitOrUnderscore* BinaryDigit)?
+    ;
+
+fragment
+BinaryDigit
+    :   [01]
+    ;
+
+fragment
+BinaryDigitOrUnderscore
+    :   BinaryDigit
+    |   '_'
+    ;
+
+// Boolean Literals
+
+BooleanLiteral
+    :   'true'
+    |   'false'
+    ;
+
+// §3.10.2 Floating-Point Literals
+
+FloatingPointLiteral
+    :   DecimalFloatingPointLiteral
+    |   HexadecimalFloatingPointLiteral
+    ;
+
+fragment
+DecimalFloatingPointLiteral
+    :   Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    |   '.' Digits ExponentPart? FloatTypeSuffix?
+    |   Digits ExponentPart FloatTypeSuffix?
+    |   Digits FloatTypeSuffix
+    ;
+
+fragment
+ExponentPart
+    :   ExponentIndicator SignedInteger
+    ;
+
+fragment
+ExponentIndicator
+    :   [eE]
+    ;
+
+fragment
+SignedInteger
+    :   Sign? Digits
+    ;
+
+fragment
+Sign
+    :   [+-]
+    ;
+
+fragment
+FloatTypeSuffix
+    :   [fFdD]
+    ;
+
+fragment
+HexadecimalFloatingPointLiteral
+    :   HexSignificand BinaryExponent FloatTypeSuffix?
+    ;
+
+fragment
+HexSignificand
+    :   HexNumeral '.'?
+    |   '0' [xX] HexDigits? '.' HexDigits
+    ;
+
+fragment
+BinaryExponent
+    :   BinaryExponentIndicator SignedInteger
+    ;
+
+fragment
+BinaryExponentIndicator
+    :   [pP]
+    ;
+
+// Character Literals
+
+CharacterLiteral
+    :   '\'' SingleCharacter '\''
+    |   '\'' EscapeSequence '\''
+    ;
+
+fragment
+SingleCharacter
+    :   ~['\\\r]
+    ;
+
+
+// String Literals
+StringLiteral
+    :   '"' StringCharacters? '"'
+    ;
+fragment
+StringCharacters
+    :   StringCharacter+
+    ;
+fragment
+StringCharacter
+    :   ~["\\]
+    |   EscapeSequence
+    ;
+
+// Escape Sequences for Character and String Literals
+fragment
+EscapeSequence
+    :   '\\' [btnfr"'\\]
+    |   OctalEscape
+    |   UnicodeEscape
+    ;
+
+fragment
+OctalEscape
+    :   '\\' OctalDigit
+    |   '\\' OctalDigit OctalDigit
+    |   '\\' ZeroToThree OctalDigit OctalDigit
+    ;
+
+fragment
+UnicodeEscape
+    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    ;
+
+fragment
+ZeroToThree
+    :   [0-3]
+    ;
+
+// Identifiers
+
+Identifier
+    :   Letter LetterOrDigit*
+    ;
+
+fragment
+Letter
+    :   [a-zA-Z$_] // these are the "java letters" below 0x7F
+    |   // covers all characters above 0x7F which are not a surrogate
+        ~[\u0000-\u007F\uD800-\uDBFF]
+    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+    ;
+
+fragment
+LetterOrDigit
+    :   [a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
+    |   // covers all characters above 0x7F which are not a surrogate
+        ~[\u0000-\u007F\uD800-\uDBFF]
+    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+    ;
+
+//
+// Whitespace and comments
+//
+
+WS  :  [ \t\r\u000C]+ -> skip
+    ;
+
+COMMENT
+    :   '/*' .*? '*/' -> channel(HIDDEN)
+    ;
+
+LINE_COMMENT
+    :   '//' ~[\r]* -> channel(HIDDEN)
     ;
