@@ -72,7 +72,7 @@ public class MokaParser extends Parser {
 		"'>>>='"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, null, null, null, "VOID", 
+	    null, "INT", "DECIMAL", "STRING", "BREAK", "CONTINUE", "NEWLINE", "AND", null, null, null, "VOID",
 		"SCANINT", "SCANDEC", "SCANSTR", "PRINT", "PRINTLN", "RETURN", "IF", "ELSE", 
 		"WHILE", "DO", "FOR", "CONST", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
 		"LBRACK", "RBRACK", "SEMI", "END", "COMMA", "DOT", "ASSIGN", "GT", "LT", 
