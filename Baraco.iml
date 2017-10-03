@@ -7,6 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+<<<<<<< HEAD
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -17,5 +18,8 @@
         <jarDirectory url="file://$MODULE_DIR$/../intellij-plugin-v4/lib" recursive="false" />
       </library>
     </orderEntry>
+=======
+    <orderEntry type="library" name="antlr-4.7-complete" level="project" />
+>>>>>>> master
   </component>
 </module>

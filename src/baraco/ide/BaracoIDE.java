@@ -1,5 +1,7 @@
 package baraco.ide;
 
+import baraco.controller.Controller;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -18,13 +20,16 @@ public class BaracoIDE {
     private JButton buttonFile;
     private JButton buttonEdit;
     private JTextArea lineNumbers;
+    private Controller controller;
 
 
     public BaracoIDE() {
+        controller = new Controller();
         buttonRun.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Run clicked");
+                String code = editor.getText().trim();
+                controller.run(code, console);
             }
         });
 
