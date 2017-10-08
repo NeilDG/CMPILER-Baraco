@@ -41,8 +41,8 @@ public class Controller {
         console.append("\n" + output);
 
         //TESTED PRINT FUNCTION
-        /*
-        console.setText("");
+
+        /*console.setText("");
         console.append("Console:");
         console.append("\n");
 
@@ -51,7 +51,7 @@ public class Controller {
         if(MokaLibrary.printStatement != null)
             console.append(MokaLibrary.printStatement);
 
-        MokaLibrary.printStatement = "";
-        */
+        MokaLibrary.printStatement = "";*/
+
     }
 }

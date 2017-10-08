@@ -25,9 +25,9 @@ public class MokaPrintListener extends MokaBaseListener{
         //System.out.println(ctx.getChild(1).getText());
 
         for(int i = 0; i < tokens.size(); i++){
-            if(tokens.get(i).getType() == 68) {
+            if(MokaLexer.VOCABULARY.getSymbolicName(tokens.get(i).getType()).equals("StringLiteral")) {
                 //System.out.print(tokens.get(i).getText());
-                MokaLibrary.printStatement += tokens.get(i).getText();
+                MokaLibrary.printStatement += tokens.get(i).getText().substring(1, tokens.get(i).getText().length() - 1);
             }
         }
     }
