@@ -1,5 +1,4 @@
 // Generated from Moka.g4 by ANTLR 4.7
-package moka.lexer;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

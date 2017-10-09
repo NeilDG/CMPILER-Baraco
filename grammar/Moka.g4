@@ -6,11 +6,11 @@ compilationUnit
     ;
 
 packageDeclaration
-    :   annotation* 'package' qualifiedName ';'
+    :   annotation* 'package' qualifiedName STMTEND
     ;
 
 importDeclaration
-    :   'import' 'static'? qualifiedName ('.' '*')? ';'
+    :   'import' 'static'? qualifiedName ('.' '*')? STMTEND
     ;
 
 typeDeclaration
@@ -18,7 +18,7 @@ typeDeclaration
     |   classOrInterfaceModifier* enumDeclaration
     |   classOrInterfaceModifier* interfaceDeclaration
     |   classOrInterfaceModifier* annotationTypeDeclaration
-    |   ';'
+    |   STMTEND
     ;
 
 modifier
@@ -80,7 +80,7 @@ enumConstant
     ;
 
 enumBodyDeclarations
-    :   ';' classBodyDeclaration*
+    :   STMTEND classBodyDeclaration*
     ;
 
 interfaceDeclaration
@@ -100,7 +100,7 @@ interfaceBody
     ;
 
 classBodyDeclaration
-    :   ';'
+    :   STMTEND
     |   'static'? block
     |   modifier* memberDeclaration
     ;
@@ -126,7 +126,7 @@ methodDeclaration
     :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
-        |   ';'
+        |   STMTEND
         )
     ;
 
@@ -144,12 +144,12 @@ genericConstructorDeclaration
     ;
 
 fieldDeclaration
-    :   typeType variableDeclarators ';'
+    :   typeType variableDeclarators STMTEND
     ;
 
 interfaceBodyDeclaration
     :   modifier* interfaceMemberDeclaration
-    |   ';'
+    |   STMTEND
     ;
 
 interfaceMemberDeclaration
@@ -163,7 +163,7 @@ interfaceMemberDeclaration
     ;
 
 constDeclaration
-    :   typeType constantDeclarator (',' constantDeclarator)* ';'
+    :   typeType constantDeclarator (',' constantDeclarator)* STMTEND
     ;
 
 constantDeclarator
@@ -174,7 +174,7 @@ constantDeclarator
 interfaceMethodDeclaration
     :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
-        ';'
+        STMTEND
     ;
 
 genericInterfaceMethodDeclaration
@@ -222,7 +222,7 @@ primitiveType
     |   'short'
     |   'int'
     |   'long'
-    |   'float'
+    |   'decimal'
     |   'double'
     ;
 
@@ -313,15 +313,15 @@ annotationTypeBody
 
 annotationTypeElementDeclaration
     :   modifier* annotationTypeElementRest
-    |   ';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
+    |   STMTEND // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
 
 annotationTypeElementRest
-    :   typeType annotationMethodOrConstantRest ';'
-    |   classDeclaration ';'?
-    |   interfaceDeclaration ';'?
-    |   enumDeclaration ';'?
-    |   annotationTypeDeclaration ';'?
+    :   typeType annotationMethodOrConstantRest STMTEND
+    |   classDeclaration STMTEND?
+    |   interfaceDeclaration STMTEND?
+    |   enumDeclaration STMTEND?
+    |   annotationTypeDeclaration STMTEND?
     ;
 
 annotationMethodOrConstantRest
@@ -344,7 +344,7 @@ defaultValue
 // STATEMENTS / BLOCKS
 
 block
-    :    '{' blockStatement* '}'
+    :    ':' blockStatement* 'end'
     ;
 
 blockStatement
@@ -354,7 +354,7 @@ blockStatement
     ;
 
 localVariableDeclarationStatement
-    :    localVariableDeclaration ';'
+    :    localVariableDeclaration STMTEND
     ;
 
 localVariableDeclaration
@@ -363,22 +363,34 @@ localVariableDeclaration
 
 statement
     :   block
-    |   ASSERT expression (':' expression)? ';'
+    |   ASSERT expression (':' expression)? STMTEND
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
-    |   'do' statement 'while' parExpression ';'
+    |   'do' statement 'while' parExpression STMTEND
     |   'try' block (catchClause+ finallyBlock? | finallyBlock)
     |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
-    |   'return' expression? ';'
-    |   'throw' expression ';'
-    |   'break' Identifier? ';'
-    |   'continue' Identifier? ';'
-    |   ';'
-    |   statementExpression ';'
+    |   'return' expression? STMTEND
+    |   'throw' expression STMTEND
+    |   'break' Identifier? STMTEND
+    |   'continue' Identifier? STMTEND
+    |   STMTEND
+    |   statementExpression STMTEND
     |   Identifier ':' statement
+    |   scanStatement
+    |   printStatement
+    ;
+
+scanStatement
+    :   Identifier '=' 'scanInt' '(' IntegerLiteral ')'
+    |   Identifier '=' 'scanDecimal' '(' FloatingPointLiteral ')'
+    |   Identifier '=' 'scanString' '(' StringLiteral ')'
+    ;
+printStatement
+    :   'print' '(' StringLiteral ')'
+    |   'println' '(' StringLiteral ')'
     ;
 
 catchClause
@@ -477,7 +489,7 @@ expression
     |   expression '&' expression
     |   expression '^' expression
     |   expression '|' expression
-    |   expression '&&' expression
+    |   expression 'and' expression
     |   expression 'or' expression
     |   expression '?' expression ':' expression
     |   <assoc=right> expression
@@ -588,7 +600,7 @@ ENUM          : 'enum';
 EXTENDS       : 'extends';
 FINAL         : 'final';
 FINALLY       : 'finally';
-FLOAT         : 'float';
+DECIMAL       : 'decimal';
 FOR           : 'for';
 IF            : 'if';
 GOTO          : 'goto';
@@ -619,6 +631,13 @@ TRY           : 'try';
 VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
+SCANINT       : 'scanInt';
+SCANDEC       : 'scanDecimal';
+SCANSTR       : 'scanString';
+PRINT         : 'print';
+PRINTLN       : 'println';
+END           : 'end';
+
 
 // �3.10.1 Integer Literals
 
@@ -884,6 +903,7 @@ RBRACK          : ']';
 SEMI            : ';';
 COMMA           : ',';
 DOT             : '.';
+STMTEND         : '\n';
 
 // �3.12 Operators
 
@@ -898,7 +918,7 @@ EQUAL           : '==';
 LE              : '<=';
 GE              : '>=';
 NOTEQUAL        : '!=';
-AND             : '&&';
+AND             : 'and';
 OR              : 'or';
 INC             : '++';
 DEC             : '--';

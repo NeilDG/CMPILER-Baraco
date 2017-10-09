@@ -1,5 +1,4 @@
 // Generated from Moka.g4 by ANTLR 4.7
-package moka.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
