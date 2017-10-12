@@ -1,7 +1,6 @@
-package moka.parser;
+/*package moka.parser;
 
 import moka.lexer.MokaLexer;
-import moka.parser.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -25,3 +24,4 @@ public class MokaLibrary {
         walker.walk(mokaPrintlistener, printStatementContext);
     }
 }
+*/

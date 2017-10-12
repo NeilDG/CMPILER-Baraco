@@ -1,7 +1,6 @@
 package baraco.controller;
 
 import moka.lexer.MokaLexer;
-import moka.parser.MokaLibrary;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,11 +31,15 @@ public class Controller {
         String output = "";
         for(int i = 0; i < tokens.size(); i++) {
             //output += tokens.get(i).getText() + "\n";
-            if (i == tokens.size() - 1)
+            if (i == tokens.size() - 1) {
                 output += MokaLexer.VOCABULARY.getSymbolicName(tokens.get(i).getType());
-            else
+            }
+            else {
                 output += MokaLexer.VOCABULARY.getSymbolicName(tokens.get(i).getType()) + ", ";
+            }
         }
+
+        System.out.print(output);
 
         console.append("\n" + output);
 

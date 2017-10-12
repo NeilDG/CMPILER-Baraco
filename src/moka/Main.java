@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.*;
 import java.io.IOException;
 import java.util.List;
 
-import static moka.parser.MokaLibrary.parsePrint;
 
 public class Main {
 
@@ -28,6 +27,6 @@ public class Main {
             //System.out.println(tokens.get(i).getType());
         }
 
-       parsePrint("print(\"amazing\")");
+       //parsePrint("print(\"amazing\")");
     }
 }

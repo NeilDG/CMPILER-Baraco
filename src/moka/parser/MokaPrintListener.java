@@ -1,4 +1,4 @@
-package moka.parser;
+/*package moka.parser;
 
 import moka.lexer.MokaLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 
-public class MokaPrintListener extends MokaBaseListener{
+public class MokaPrintListener extends MokaBaseListener {
 
     @Override
     public void enterPrint_statement(MokaParser.Print_statementContext ctx) {
@@ -37,3 +37,4 @@ public class MokaPrintListener extends MokaBaseListener{
         System.out.print(MokaLibrary.printStatement);
     }
 }
+*/
