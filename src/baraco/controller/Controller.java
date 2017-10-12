@@ -1,10 +1,12 @@
 package baraco.controller;
 
 import moka.lexer.MokaLexer;
+import moka.parser.MokaParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import javax.swing.*;
 import java.util.List;
@@ -28,7 +30,7 @@ public class Controller {
 
         List<Token> tokens = tokenStream.getTokens();
 
-        String output = "";
+        /*String output = "";
         for(int i = 0; i < tokens.size(); i++) {
             //output += tokens.get(i).getText() + "\n";
             if (i == tokens.size() - 1) {
@@ -41,7 +43,12 @@ public class Controller {
 
         System.out.print(output);
 
-        console.append("\n" + output);
+        console.append("\n" + output);*/
+
+        MokaParser parser = new MokaParser(tokenStream);
+
+        ParseTree tree = parser.compilationUnit();
+
 
         //TESTED PRINT FUNCTION
 
