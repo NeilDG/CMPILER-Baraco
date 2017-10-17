@@ -1,6 +1,6 @@
 package moka;
 
-import moka.lexer.MokaLexer;
+import moka.lexer.BaracoLexer;
 import org.antlr.v4.runtime.*;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class Main {
 
         CharStream cs = new ANTLRInputStream(input);
 
-        MokaLexer mokaLexer = new MokaLexer(cs);
+        BaracoLexer mokaLexer = new BaracoLexer(cs);
 
         CommonTokenStream tokenStream = new CommonTokenStream(mokaLexer);
 
@@ -23,7 +23,7 @@ public class Main {
         List<Token> tokens = tokenStream.getTokens();
 
         for(int i = 0; i < tokens.size(); i++) {
-            System.out.println(MokaLexer.VOCABULARY.getSymbolicName(tokens.get(i).getType()));
+            System.out.println(BaracoLexer.VOCABULARY.getSymbolicName(tokens.get(i).getType()));
             //System.out.println(tokens.get(i).getType());
         }
 
