@@ -1,4 +1,4 @@
-grammar Moka;
+grammar Baraco;
 
 // starting point for parsing a java file
 compilationUnit
