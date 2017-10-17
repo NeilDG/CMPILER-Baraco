@@ -1,7 +1,7 @@
 package baraco.controller;
 
-import moka.lexer.MokaLexer;
-import moka.parser.MokaParser;
+import moka.lexer.BaracoLexer;
+import moka.parser.BaracoParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,7 +22,7 @@ public class Controller {
 
         CharStream cs = new ANTLRInputStream(input);
 
-        MokaLexer mokaLexer = new MokaLexer(cs);
+        BaracoLexer mokaLexer = new BaracoLexer(cs);
 
         CommonTokenStream tokenStream = new CommonTokenStream(mokaLexer);
 
@@ -45,7 +45,7 @@ public class Controller {
 
         console.append("\n" + output);*/
 
-        MokaParser parser = new MokaParser(tokenStream);
+        BaracoLexer parser = new BaracoLexer(tokenStream);
 
         ParseTree tree = parser.compilationUnit();
 

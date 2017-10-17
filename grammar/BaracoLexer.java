@@ -1,5 +1,4 @@
-// Generated from Moka.g4 by ANTLR 4.7
-package moka.lexer;
+// Generated from Baraco.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -10,7 +9,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class MokaLexer extends Lexer {
+public class BaracoLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -139,13 +138,13 @@ public class MokaLexer extends Lexer {
 	}
 
 
-	public MokaLexer(CharStream input) {
+	public BaracoLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Moka.g4"; }
+	public String getGrammarFileName() { return "Baraco.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
