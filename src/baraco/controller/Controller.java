@@ -1,5 +1,6 @@
 package baraco.controller;
 
+import moka.error.BaracoErrorListener;
 import moka.lexer.BaracoLexer;
 import moka.parser.BaracoBaseListener;
 import moka.parser.BaracoListener;
@@ -36,9 +37,12 @@ public class Controller {
 
         List<Token> tokens = tokenStream.getTokens();
 
-
-
         BaracoParser parser = new BaracoParser(tokenStream);
+
+        BaracoErrorListener baracoErrorListener = new BaracoErrorListener();
+
+        parser.removeErrorListeners();
+        parser.addErrorListener(baracoErrorListener);
 
         ParseTree tree = parser.compilationUnit();
 
