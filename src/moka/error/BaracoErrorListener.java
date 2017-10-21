@@ -14,13 +14,34 @@ import java.util.List;
  */
 public class BaracoErrorListener extends BaseErrorListener {
 
+    private ArrayList<BaracoError> errors;
+
+    public BaracoErrorListener () {
+        errors = new ArrayList<BaracoError>();
+    }
+
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
         //System.err.println("Syntax Error @ Line " + i + " : " + i1 + " " + s);
 
+        // TODO :
+        // IDENTIFY ERRORS FROM String s
+        //  - Extraneous Input
+        //  - Mismatched Input
+        //  - No viable alternative
+        //  - Missing
+        //  - Token Recognition
+        // CREATE OWN ERROR MESSAGES AND SUGGESTIONS
+        // THEN ADD THEM TO ERRORS LIST
+        // USE getErrors() IN PRINTING THE ERRORS IN CONSOLE
+
         List<String> stack = ((Parser)recognizer).getRuleInvocationStack(); Collections.reverse(stack);
         System.err.println("rule stack: "+stack);
         System.err.println("line "+i+":"+i1+" at "+": "+s);
+    }
+
+    public ArrayList<BaracoError> getErrors () {
+        return this.errors;
     }
 
     /*@Override
