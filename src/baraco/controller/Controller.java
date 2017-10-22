@@ -39,7 +39,7 @@ public class Controller {
 
         BaracoParser parser = new BaracoParser(tokenStream);
 
-        BaracoErrorListener baracoErrorListener = new BaracoErrorListener();
+        BaracoErrorListener baracoErrorListener = new BaracoErrorListener(console);
 
         parser.removeErrorListeners();
         parser.addErrorListener(baracoErrorListener);

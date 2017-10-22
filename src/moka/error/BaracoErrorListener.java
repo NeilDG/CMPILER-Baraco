@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -15,8 +16,11 @@ import java.util.List;
 public class BaracoErrorListener extends BaseErrorListener {
 
     private ArrayList<BaracoError> errors;
+    private JTextArea console;
 
-    public BaracoErrorListener () {
+    public BaracoErrorListener (JTextArea console) {
+        this.console = console;
+
         errors = new ArrayList<BaracoError>();
     }
 
@@ -36,7 +40,7 @@ public class BaracoErrorListener extends BaseErrorListener {
         // USE getErrors() IN PRINTING THE ERRORS IN CONSOLE
 
         List<String> stack = ((Parser)recognizer).getRuleInvocationStack(); Collections.reverse(stack);
-        System.err.println("rule stack: "+stack);
+        //System.err.println("rule stack: "+stack);
         System.err.println("line "+i+":"+i1+" at "+": "+s);
 
         BaracoError error = new BaracoError();
@@ -55,6 +59,9 @@ public class BaracoErrorListener extends BaseErrorListener {
         } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
             error.setType(BaracoError.ErrorType.TOKEN_RECOGNITION);
         }
+
+        console.append("line "+i+":"+i1+" at "+": "+s);
+        console.append("\n");
     }
 
     public ArrayList<BaracoError> getErrors () {
