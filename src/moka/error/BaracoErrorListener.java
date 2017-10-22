@@ -38,6 +38,23 @@ public class BaracoErrorListener extends BaseErrorListener {
         List<String> stack = ((Parser)recognizer).getRuleInvocationStack(); Collections.reverse(stack);
         System.err.println("rule stack: "+stack);
         System.err.println("line "+i+":"+i1+" at "+": "+s);
+
+        BaracoError error = new BaracoError();
+
+        error.setLineNumber(i);
+        error.setCharNumber(i1);
+
+        if (s.contains(BaracoError.MISSING_KEY)) {
+            error.setType(BaracoError.ErrorType.MISSING);
+        } else if (s.contains(BaracoError.NO_VIABLE_ALT_KEY)) {
+            error.setType(BaracoError.ErrorType.NO_VIABLE_ALTERNATIVE);
+        } else if (s.contains(BaracoError.MISMATCHED_INPUT_KEY)) {
+            error.setType(BaracoError.ErrorType.MISMATCHED_INPUT);
+        } else if (s.contains(BaracoError.EXTRANEOUS_INPUT_KEY)) {
+            error.setType(BaracoError.ErrorType.EXTRANEOUS_INPUT);
+        } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
+            error.setType(BaracoError.ErrorType.TOKEN_RECOGNITION);
+        }
     }
 
     public ArrayList<BaracoError> getErrors () {
