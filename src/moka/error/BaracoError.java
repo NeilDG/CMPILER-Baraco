@@ -9,7 +9,7 @@ public class BaracoError {
     public static final String MISSING_KEY = "missing";
     public static final String MISMATCHED_INPUT_KEY = "mismatched input";
     public static final String EXTRANEOUS_INPUT_KEY = "extraneous input";
-    public static final String TOKEN_RECOGNITION_KEY = "token recognition";
+    public static final String TOKEN_RECOGNITION_KEY = "token recognition error";
 
     private int lineNumber;
     private int charNumber;

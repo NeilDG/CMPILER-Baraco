@@ -7,11 +7,11 @@ compilationUnit
     ;
 
 packageDeclaration
-    :   annotation* 'package' qualifiedName STMTEND
+    :   annotation* 'package' qualifiedName ';'
     ;
 
 importDeclaration
-    :   'import' 'static'? qualifiedName ('.' '*')? STMTEND
+    :   'import' 'static'? qualifiedName ('.' '*')? ';'
     ;
 
 typeDeclaration
@@ -19,7 +19,7 @@ typeDeclaration
     |   classOrInterfaceModifier* enumDeclaration
     |   classOrInterfaceModifier* interfaceDeclaration
     |   classOrInterfaceModifier* annotationTypeDeclaration
-    |   STMTEND
+    |   ';'
     ;
 
 modifier
@@ -81,7 +81,7 @@ enumConstant
     ;
 
 enumBodyDeclarations
-    :   STMTEND classBodyDeclaration*
+    :   ';' classBodyDeclaration*
     ;
 
 interfaceDeclaration
@@ -101,7 +101,7 @@ interfaceBody
     ;
 
 classBodyDeclaration
-    :   STMTEND
+    :   ';'
     |   'static'? block
     |   modifier* memberDeclaration
     ;
@@ -127,7 +127,7 @@ methodDeclaration
     :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
-        |   STMTEND
+        |   ';'
         )
     ;
 
@@ -145,12 +145,12 @@ genericConstructorDeclaration
     ;
 
 fieldDeclaration
-    :   typeType variableDeclarators STMTEND
+    :   typeType variableDeclarators ';'
     ;
 
 interfaceBodyDeclaration
     :   modifier* interfaceMemberDeclaration
-    |   STMTEND
+    |   ';'
     ;
 
 interfaceMemberDeclaration
@@ -164,7 +164,7 @@ interfaceMemberDeclaration
     ;
 
 constDeclaration
-    :   typeType constantDeclarator (',' constantDeclarator)* STMTEND
+    :   typeType constantDeclarator (',' constantDeclarator)* ';'
     ;
 
 constantDeclarator
@@ -175,7 +175,7 @@ constantDeclarator
 interfaceMethodDeclaration
     :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
-        STMTEND
+        ';'
     ;
 
 genericInterfaceMethodDeclaration
@@ -314,15 +314,15 @@ annotationTypeBody
 
 annotationTypeElementDeclaration
     :   modifier* annotationTypeElementRest
-    |   STMTEND // this is not allowed by the grammar, but apparently allowed by the actual compiler
+    |   ';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
 
 annotationTypeElementRest
-    :   typeType annotationMethodOrConstantRest STMTEND
-    |   classDeclaration STMTEND?
-    |   interfaceDeclaration STMTEND?
-    |   enumDeclaration STMTEND?
-    |   annotationTypeDeclaration STMTEND?
+    :   typeType annotationMethodOrConstantRest ';'
+    |   classDeclaration ';'?
+    |   interfaceDeclaration ';'?
+    |   enumDeclaration ';'?
+    |   annotationTypeDeclaration ';'?
     ;
 
 annotationMethodOrConstantRest
@@ -355,7 +355,7 @@ blockStatement
     ;
 
 localVariableDeclarationStatement
-    :    localVariableDeclaration STMTEND
+    :    localVariableDeclaration ';'
     ;
 
 localVariableDeclaration
@@ -364,34 +364,34 @@ localVariableDeclaration
 
 statement
     :   block
-    |   ASSERT expression (':' expression)? STMTEND
+    |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
-    |   'do' statement 'while' parExpression STMTEND
+    |   'do' statement 'while' parExpression ';'
     |   'try' block (catchClause+ finallyBlock? | finallyBlock)
     |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
-    |   'return' expression? STMTEND
-    |   'throw' expression STMTEND
-    |   'break' Identifier? STMTEND
-    |   'continue' Identifier? STMTEND
-    |   STMTEND
-    |   statementExpression STMTEND
+    |   'return' expression? ';'
+    |   'throw' expression ';'
+    |   'break' Identifier? ';'
+    |   'continue' Identifier? ';'
+    |   ';'
+    |   statementExpression ';'
     |   Identifier ':' statement
-    |   scanStatement
-    |   printStatement
+    |   scanStatement ';'
+    |   printStatement ';'
     ;
 
 scanStatement
-    :   Identifier '=' 'scanInt' '(' IntegerLiteral ')'
-    |   Identifier '=' 'scanDecimal' '(' FloatingPointLiteral ')'
-    |   Identifier '=' 'scanString' '(' StringLiteral ')'
+    :   Identifier '=' 'scanInt' '(' ')'
+    |   Identifier '=' 'scanDecimal' '(' ')'
+    |   Identifier '=' 'scanString' '(' ')'
     ;
 printStatement
-    :   'print' '(' StringLiteral ')'
-    |   'println' '(' StringLiteral ')'
+    :   'print' '(' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier) ('+' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier))* ')'
+    |   'println' '(' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier) ('+' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier))* ')'
     ;
 
 catchClause
@@ -904,7 +904,6 @@ RBRACK          : ']';
 SEMI            : ';';
 COMMA           : ',';
 DOT             : '.';
-STMTEND         : '\n';
 
 // �3.12 Operators
 
