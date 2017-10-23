@@ -5,7 +5,7 @@ package moka.error;
  */
 public class BaracoError {
 
-    public static final String NO_VIABLE_ALT_KEY = "no viable alternative";
+    public static final String NO_VIABLE_ALT_KEY = "no viable alternative at input";
     public static final String MISSING_KEY = "missing";
     public static final String MISMATCHED_INPUT_KEY = "mismatched input";
     public static final String EXTRANEOUS_INPUT_KEY = "extraneous input";

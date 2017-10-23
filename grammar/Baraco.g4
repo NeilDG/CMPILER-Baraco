@@ -213,7 +213,7 @@ typeType
     ;
 
 classOrInterfaceType
-    :   Identifier typeArguments? ('.' Identifier typeArguments? )*
+    :   Identifier typeArguments? //('.' Identifier typeArguments? )*
     ;
 
 primitiveType
@@ -266,7 +266,7 @@ constructorBody
     ;
 
 qualifiedName
-    :   Identifier ('.' Identifier)*
+    :   Identifier // ('.' Identifier)*
     ;
 
 literal
@@ -390,8 +390,8 @@ scanStatement
     |   Identifier '=' 'scanString' '(' ')'
     ;
 printStatement
-    :   'print' '(' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier) ('+' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier))* ')'
-    |   'println' '(' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier) ('+' (StringLiteral | IntegerLiteral | FloatingPointLiteral | BooleanLiteral | Identifier))* ')'
+    :   'print' '(' expression ')'
+    |   'println' '(' expression ')'
     ;
 
 catchClause
@@ -469,11 +469,11 @@ constantExpression
 
 expression
     :   primary
-    |   expression '.' Identifier
-    |   expression '.' 'this'
-    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
-    |   expression '.' 'super' superSuffix
-    |   expression '.' explicitGenericInvocation
+    //|   expression '.' Identifier
+    //|   expression '.' 'this'
+    //|   expression '.' 'new' nonWildcardTypeArguments? innerCreator
+    //|   expression '.' 'super' superSuffix
+    //|   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
     |   expression '(' expressionList? ')'
     |   'new' creator
@@ -516,8 +516,8 @@ primary
     |   'super'
     |   literal
     |   Identifier
-    |   typeType '.' 'class'
-    |   'void' '.' 'class'
+    //|   typeType '.' 'class'
+    //|   'void' '.' 'class'
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;
 
@@ -527,7 +527,7 @@ creator
     ;
 
 createdName
-    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
+    :   Identifier typeArgumentsOrDiamond? //('.' Identifier typeArgumentsOrDiamond?)*
     |   primitiveType
     ;
 

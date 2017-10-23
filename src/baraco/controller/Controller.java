@@ -50,6 +50,8 @@ public class Controller {
         BaracoListener listener = new BaracoBaseListener();
         walker.walk(listener, tree);
 
+        String s;
+
         /*String output = "";
         for(int i = 0; i < tokens.size(); i++) {
             //output += tokens.get(i).getText() + "\n";
@@ -79,4 +81,5 @@ public class Controller {
         MokaLibrary.printStatement = "";*/
 
     }
+
 }

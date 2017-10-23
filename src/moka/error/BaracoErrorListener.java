@@ -48,20 +48,72 @@ public class BaracoErrorListener extends BaseErrorListener {
         error.setLineNumber(i);
         error.setCharNumber(i1);
 
+        String resultedMessage = "";
+
         if (s.contains(BaracoError.MISSING_KEY)) {
             error.setType(BaracoError.ErrorType.MISSING);
+
+            String split[] = s.split(BaracoError.MISSING_KEY);
+
+            String tokens[] = split[1].split("at");
+
+            resultedMessage = "Missing " + tokens[0] + " before " + tokens[1] + " at line " + i + " @ " + i1 + ". Try adding " + tokens[0] + " before " + tokens[1] + ".";
+
         } else if (s.contains(BaracoError.NO_VIABLE_ALT_KEY)) {
             error.setType(BaracoError.ErrorType.NO_VIABLE_ALTERNATIVE);
+
+            String split[] = s.split(BaracoError.NO_VIABLE_ALT_KEY);
+
+            resultedMessage = "Could not resolve the token " + split[1] + " at line " + i + " @ " + i1 + ".";
         } else if (s.contains(BaracoError.MISMATCHED_INPUT_KEY)) {
             error.setType(BaracoError.ErrorType.MISMATCHED_INPUT);
+
+            String split[] = s.split(BaracoError.MISMATCHED_INPUT_KEY);
+
+            String str[] = new String[1];
+
+            if (split[1].contains("expecting")) {
+                str = split[1].split("expecting");
+            }
+
+            if (str[1].contains("IntegerLiteral") && str[1].contains("FloatingPointLiteral") && str[1].contains("BooleanLiteral") && str[1].contains("CharacterLiteral")
+                    && str[1].contains("StringLiteral") && str[1].contains("Identifier")) {
+                resultedMessage = "Mismatched input " + str[0] + " try replacing it with an expression at line " + i + " @ " + i1;
+            } else if (str[1].contains("Identifier"))
+                resultedMessage = "Expected identifier at line " + i + " @ " + i1;
+            else
+                resultedMessage = "Mismatched input " + str[0] + " try replacing it with " + str[1] + ".";
+
         } else if (s.contains(BaracoError.EXTRANEOUS_INPUT_KEY)) {
             error.setType(BaracoError.ErrorType.EXTRANEOUS_INPUT);
+
+            String split[] = s.split(BaracoError.EXTRANEOUS_INPUT_KEY);
+
+            String str[] = new String[1];
+            for (int k = 0; k < split.length; k++) { // test
+                //System.out.print("k: ");
+                split[k] = split[k].trim();
+
+                if (split[k].contains("expecting")) {
+                    str = split[k].split("expecting");
+                }
+            }
+
+            if(str[1].contains("'end'")) {
+                resultedMessage = "Missing 'end' statement at line " + i + " @ " + i1;
+            } else {
+                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " before " + str[1];
+            }
+
+
         } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
             error.setType(BaracoError.ErrorType.TOKEN_RECOGNITION);
         }
 
-        console.append("line "+i+":"+i1+" at "+": "+s);
-        console.append("\n");
+        console.append(resultedMessage);
+        //console.append("line "+i+":"+i1+" at "+": "+s);
+        if (!resultedMessage.isEmpty())
+            console.append("\n");
     }
 
     public ArrayList<BaracoError> getErrors () {
