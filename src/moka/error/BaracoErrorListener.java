@@ -112,12 +112,18 @@ public class BaracoErrorListener extends BaseErrorListener {
 
                 resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with an expression.";
 
+            } else if (str[1].contains("Identifier"))  {
+
+                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with an identifier.";
+
             } else {
                 resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with " + str[1] + ".";
             }
 
         } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
             error.setType(BaracoError.ErrorType.TOKEN_RECOGNITION);
+
+            resultedMessage = "Token recognition error at line " + i + " @ " + i1 + ".";
         }
 
         /*console.append(resultedMessage);
