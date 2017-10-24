@@ -24,7 +24,7 @@ public class BaracoIDE {
 
 
     public BaracoIDE() {
-        controller = new Controller();
+        controller = new Controller(null);
         buttonRun.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

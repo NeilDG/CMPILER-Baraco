@@ -1,12 +1,10 @@
 package baraco.controller;
 
+import baraco.ide.View;
 import moka.lexer.BaracoLexer;
 import moka.parser.BaracoBaseListener;
 import moka.parser.BaracoListener;
 import moka.parser.BaracoParser;
-import org.antlr.v4.runtime.CharStream;
-
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -18,6 +16,12 @@ import javax.swing.*;
 import java.util.List;
 
 public class Controller {
+
+    private View view;
+
+    public Controller(View view) {
+        this.view = view;
+    }
 
     public void run(String input, JTextArea console) {
         // Perform interpretation

@@ -63,7 +63,7 @@ public class View extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         executor = Executors.newSingleThreadExecutor();
-        controller = new Controller();
+        controller = new Controller(this);
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
         primaryStage.show();
@@ -78,8 +78,6 @@ public class View extends Application {
         Scene scene = new Scene(gridPane, 1024, 768);
         scene.getStylesheets().add(View.class.getResource("java-keywords.css").toExternalForm());
 
-        View.class.getResource("java-keywords.css")
-                .toExternalForm();
 
         // Set column constraints
         /*ColumnConstraints col1 = new ColumnConstraints();
@@ -145,7 +143,7 @@ public class View extends Application {
         Button runButton = new Button("Run");
         runButton.setDefaultButton(true);
         runButton.setOnAction(event -> {
-            // Set run action for controller here
+            // Add controller run event here
         });
 
 
@@ -154,8 +152,19 @@ public class View extends Application {
         return toolBar;
     }
 
+    public void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
+        int startPos = editor.position(startRow, startCol).toOffset();
+        int endPos = editor.position(endRow, endCol).toOffset();
 
-    // Start of code for editor highlighting
+        editor.selectRange(startPos, endPos);
+    }
+
+    public void printInConsole(TextFlow textFlow) {
+
+    }
+
+
+    // Start of code for editor keyword highlighting
     @Override
     public void stop() {
         executor.shutdown();
