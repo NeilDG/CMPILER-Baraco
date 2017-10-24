@@ -36,16 +36,12 @@ public class Controller {
 
     public void printErrorInConsole (BaracoError error) {
 
-        view.appendErrorInConsole(error.getErrorMsg());
+        view.appendErrorInConsole(error);
 
     }
 
     public void run(String input) {
         // Perform interpretation
-
-        /*console.setText("");
-        console.append("Console:");
-        console.append("\n");*/
 
         view.resetConsole();
 

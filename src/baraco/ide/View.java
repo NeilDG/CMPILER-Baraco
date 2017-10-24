@@ -30,6 +30,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import moka.error.BaracoError;
+
 public class View extends Application {
 
     Controller controller;
@@ -166,10 +168,15 @@ public class View extends Application {
         console.getChildren().add(error);
     }
 
-    public void appendErrorInConsole(String text) {
+    public void appendErrorInConsole(BaracoError e) {
 
-        Text error = new Text("\n" + text);
+        Text error = new Text("\n" + e.getErrorMsg());
         error.setFill(Color.RED);
+
+        error.setOnMouseClicked(event -> {
+            highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
+        });
+
         console.getChildren().add(error);
 
     }

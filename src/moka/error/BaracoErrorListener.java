@@ -105,10 +105,15 @@ public class BaracoErrorListener extends BaseErrorListener {
                 }
             }
 
-            if(str[1].contains("'end'")) {
+            if (str[1].contains("'end'")) {
                 resultedMessage = "Missing 'end' statement at line " + i + " @ " + i1;
+            } else if (str[1].contains("IntegerLiteral") && str[1].contains("FloatingPointLiteral") && str[1].contains("BooleanLiteral") && str[1].contains("CharacterLiteral")
+                    && str[1].contains("StringLiteral") && str[1].contains("Identifier")) {
+
+                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with an expression.";
+
             } else {
-                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " before " + str[1];
+                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with " + str[1] + ".";
             }
 
         } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
