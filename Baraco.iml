@@ -18,5 +18,16 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="antlr-4.7-complete" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/resources/richtextfx-fat-0.8.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="flowless-0.6-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="richtextfx-fat-0.8.0" level="project" />
   </component>
 </module>

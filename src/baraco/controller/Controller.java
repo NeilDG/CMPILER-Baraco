@@ -1,13 +1,12 @@
 package baraco.controller;
 
+import moka.error.BaracoError;
 import moka.error.BaracoErrorListener;
+import baraco.ide.View;
 import moka.lexer.BaracoLexer;
 import moka.parser.BaracoBaseListener;
 import moka.parser.BaracoListener;
 import moka.parser.BaracoParser;
-import org.antlr.v4.runtime.CharStream;
-
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,16 +15,39 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Controller {
 
-    public void run(String input, JTextArea console) {
+    private View view;
+
+    public Controller(View view) {
+        this.view = view;
+    }
+
+    public void printErrorsInConsole (ArrayList<BaracoError> errors) {
+
+        for (int i = 0; i < errors.size(); i++) {
+            printErrorInConsole(errors.get(i));
+        }
+
+    }
+
+    public void printErrorInConsole (BaracoError error) {
+
+        view.appendErrorInConsole(error.getErrorMsg());
+
+    }
+
+    public void run(String input) {
         // Perform interpretation
 
-        console.setText("");
+        /*console.setText("");
         console.append("Console:");
-        console.append("\n");
+        console.append("\n");*/
+
+        view.resetConsole();
 
         CharStream cs = new ANTLRInputStream(input);
 
@@ -39,7 +61,7 @@ public class Controller {
 
         BaracoParser parser = new BaracoParser(tokenStream);
 
-        BaracoErrorListener baracoErrorListener = new BaracoErrorListener(console);
+        BaracoErrorListener baracoErrorListener = new BaracoErrorListener(this);
 
         parser.removeErrorListeners();
         parser.addErrorListener(baracoErrorListener);
@@ -49,8 +71,6 @@ public class Controller {
         ParseTreeWalker walker = new ParseTreeWalker();
         BaracoListener listener = new BaracoBaseListener();
         walker.walk(listener, tree);
-
-        String s;
 
         /*String output = "";
         for(int i = 0; i < tokens.size(); i++) {

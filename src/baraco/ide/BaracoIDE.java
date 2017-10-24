@@ -24,12 +24,12 @@ public class BaracoIDE {
 
 
     public BaracoIDE() {
-        controller = new Controller();
+        controller = new Controller(null);
         buttonRun.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String code = editor.getText().trim();
-                controller.run(code, console);
+                controller.run(code);
             }
         });
 
