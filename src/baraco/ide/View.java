@@ -171,7 +171,7 @@ public class View extends Application {
 
     public void appendErrorInConsole(BaracoError e) {
 
-        Text errorPrefix = new Text("\n" + e.getErrorPrefix());
+        Text errorPrefix = new Text(e.getErrorPrefix());
         Hyperlink line = new Hyperlink(e.getLineLayout());
         Text errorSuffix = new Text(e.getErrorSuffix());
         errorPrefix.setFill(Color.RED);
@@ -184,11 +184,12 @@ public class View extends Application {
         console.getChildren().add(errorPrefix);
         console.getChildren().add(line);
         console.getChildren().add(errorSuffix);
+        console.getChildren().add(new Text("\n"));
 
     }
 
     public void resetConsole() {
-        console = new TextFlow(new Text("Console: "));
+        console = new TextFlow(new Text("Console: \n"));
         ScrollPane consoleScroll = new ScrollPane(console);
         gridPane.add(consoleScroll, 0, 2, GridPane.REMAINING, 1);
     }
