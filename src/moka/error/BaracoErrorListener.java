@@ -59,7 +59,11 @@ public class BaracoErrorListener extends BaseErrorListener {
 
             String tokens[] = split[1].split("at");
 
-            resultedMessage = "Missing " + tokens[0] + " before " + tokens[1] + " at line " + i + " @ " + i1 + ". Try adding " + tokens[0] + " before " + tokens[1] + ".";
+            //resultedMessage = "Missing " + tokens[0] + " before " + tokens[1] + " at line " + i + " @ " + i1 + ". Try adding " + tokens[0] + " before " + tokens[1] + ".";
+
+            error.setErrorPrefix("Missing " + tokens[0] + " before " + tokens[1] + " at ");
+            error.setLineLayout("line " + i + " @ " + i1);
+            error.setErrorSuffix(". Try adding " + tokens[0] + " before " + tokens[1] + ".");
 
         } else if (s.contains(BaracoError.NO_VIABLE_ALT_KEY)) {
 
@@ -67,7 +71,11 @@ public class BaracoErrorListener extends BaseErrorListener {
 
             String split[] = s.split(BaracoError.NO_VIABLE_ALT_KEY);
 
-            resultedMessage = "Could not resolve the token " + split[1] + " at line " + i + " @ " + i1 + ".";
+            //resultedMessage = "Could not resolve the token " + split[1] + " at line " + i + " @ " + i1 + ".";
+
+            error.setErrorPrefix("Could not resolve the token " + split[1] + " at ");
+            error.setLineLayout("line " + i + " @ " + i1);
+            error.setErrorSuffix(".");
 
         } else if (s.contains(BaracoError.MISMATCHED_INPUT_KEY)) {
 
@@ -81,19 +89,32 @@ public class BaracoErrorListener extends BaseErrorListener {
                 str = split[1].split("expecting");
             }
 
+            error.setLineLayout("line " + i + " @ " + i1);
+            error.setErrorSuffix(".");
+
             if (str[1].contains("IntegerLiteral") && str[1].contains("FloatingPointLiteral") && str[1].contains("BooleanLiteral") && str[1].contains("CharacterLiteral")
                     && str[1].contains("StringLiteral") && str[1].contains("Identifier")) {
-                resultedMessage = "Mismatched input " + str[0] + " try replacing it with an expression at line " + i + " @ " + i1;
-            } else if (str[1].contains("Identifier"))
-                resultedMessage = "Expected identifier at line " + i + " @ " + i1;
-            else
-                resultedMessage = "Mismatched input " + str[0] + " try replacing it with " + str[1] + " at line " + i + " @ " + i1 + ".";
+                //resultedMessage = "Mismatched input " + str[0] + " try replacing it with an expression at line " + i + " @ " + i1;
+
+                error.setErrorPrefix("Mismatched input " + str[0] + " try replacing it with an expression at ");
+            } else if (str[1].contains("Identifier")) {
+                //resultedMessage = "Expected identifier at line " + i + " @ " + i1;
+
+                error.setErrorPrefix("Expected identifier at ");
+            } else {
+                //resultedMessage = "Mismatched input " + str[0] + " try replacing it with " + str[1] + " at line " + i + " @ " + i1 + ".";
+
+                error.setErrorPrefix("Mismatched input " + str[0] + " try replacing it with " + str[1] + " at ");
+            }
 
         } else if (s.contains(BaracoError.EXTRANEOUS_INPUT_KEY)) {
 
             error.setType(BaracoError.ErrorType.EXTRANEOUS_INPUT);
 
             String split[] = s.split(BaracoError.EXTRANEOUS_INPUT_KEY);
+
+            error.setLineLayout("line " + i + " @ " + i1);
+            error.setErrorPrefix("Extraneous Input at ");
 
             String str[] = new String[1];
             for (int k = 0; k < split.length; k++) { // test
@@ -106,32 +127,40 @@ public class BaracoErrorListener extends BaseErrorListener {
             }
 
             if (str[1].contains("'end'")) {
-                resultedMessage = "Missing 'end' statement at line " + i + " @ " + i1;
+                //resultedMessage = "Missing 'end' statement at line " + i + " @ " + i1;
+
+                error.setErrorPrefix("Missing 'end' statement at ");
+                error.setErrorSuffix(".");
+
             } else if (str[1].contains("IntegerLiteral") && str[1].contains("FloatingPointLiteral") && str[1].contains("BooleanLiteral") && str[1].contains("CharacterLiteral")
                     && str[1].contains("StringLiteral") && str[1].contains("Identifier")) {
 
-                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with an expression.";
+                error.setErrorSuffix(" : Consider removing " + str[0] + " and replacing it with an expression.");
 
             } else if (str[1].contains("Identifier"))  {
 
-                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with an identifier.";
+                error.setErrorSuffix(" : Consider removing " + str[0] + " and replacing it with an identifier.");
 
             } else {
-                resultedMessage = "Extraneous Input at line " + i + " @ " + i1 + " : Consider removing " + str[0] + " and replacing it with " + str[1] + ".";
+
+                error.setErrorSuffix(" : Consider removing " + str[0] + " and replacing it with " + str[1] + ".");
+
             }
 
         } else if (s.contains(BaracoError.TOKEN_RECOGNITION_KEY)) {
             error.setType(BaracoError.ErrorType.TOKEN_RECOGNITION);
 
-            resultedMessage = "Token recognition error at line " + i + " @ " + i1 + ".";
+            //resultedMessage = "Token recognition error at line " + i + " @ " + i1 + ".";
+
+            error.setErrorPrefix("Token recognition error at ");
+            error.setLineLayout("line " + i + " @ " + i1);
+            error.setErrorSuffix(".");
         }
 
         /*console.append(resultedMessage);
         //console.append("line "+i+":"+i1+" at "+": "+s);
         if (!resultedMessage.isEmpty())
             console.append("\n");*/
-
-        error.setErrorMsg(resultedMessage);
 
         controller.printErrorInConsole(error);
         errors.add(error);

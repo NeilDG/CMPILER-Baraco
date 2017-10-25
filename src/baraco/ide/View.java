@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.ColumnConstraints;
@@ -170,14 +171,19 @@ public class View extends Application {
 
     public void appendErrorInConsole(BaracoError e) {
 
-        Text error = new Text("\n" + e.getErrorMsg());
-        error.setFill(Color.RED);
+        Text errorPrefix = new Text("\n" + e.getErrorPrefix());
+        Hyperlink line = new Hyperlink(e.getLineLayout());
+        Text errorSuffix = new Text(e.getErrorSuffix());
+        errorPrefix.setFill(Color.RED);
+        errorSuffix.setFill(Color.RED);
 
-        error.setOnMouseClicked(event -> {
+        line.setOnAction(event -> {
             highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
         });
 
-        console.getChildren().add(error);
+        console.getChildren().add(errorPrefix);
+        console.getChildren().add(line);
+        console.getChildren().add(errorSuffix);
 
     }
 

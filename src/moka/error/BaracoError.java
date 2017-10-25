@@ -13,7 +13,9 @@ public class BaracoError {
 
     private int lineNumber;
     private int charNumber;
-    private String errorMsg;
+    private String errorPrefix;
+    private String lineLayout;
+    private String errorSuffix;
     private ErrorType type;
 
     public enum ErrorType {
@@ -40,12 +42,28 @@ public class BaracoError {
         this.charNumber = charNumber;
     }
 
-    public String getErrorMsg() {
-        return errorMsg;
+    public String getErrorPrefix() {
+        return errorPrefix;
     }
 
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
+    public void setErrorPrefix(String errorPrefix) {
+        this.errorPrefix = errorPrefix;
+    }
+
+    public String getLineLayout() {
+        return lineLayout;
+    }
+
+    public void setLineLayout(String lineLayout) {
+        this.lineLayout = lineLayout;
+    }
+
+    public String getErrorSuffix() {
+        return errorSuffix;
+    }
+
+    public void setErrorSuffix(String errorSuffix) {
+        this.errorSuffix = errorSuffix;
     }
 
     public ErrorType getType() {
