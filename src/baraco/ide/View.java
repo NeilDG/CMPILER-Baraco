@@ -64,7 +64,7 @@ public class View extends Application {
     private CodeArea editor;
     private GridPane gridPane;
     private ExecutorService executor;
-    private TextFlow console;
+    public static TextFlow console;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -163,7 +163,7 @@ public class View extends Application {
         editor.selectRange(startPos, endPos);
     }
 
-    public void printInConsole(String text) {
+    public static void printInConsole(String text) {
         Text error = new Text(text);
 
         console.getChildren().add(error);

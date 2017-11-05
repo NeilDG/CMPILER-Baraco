@@ -1,5 +1,6 @@
 // Generated from Baraco.g4 by ANTLR 4.7
 package moka.parser;
+import baraco.ide.View;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -15,7 +16,9 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCompilationUnit(BaracoParser.CompilationUnitContext ctx) { }
+	@Override public void enterCompilationUnit(BaracoParser.CompilationUnitContext ctx) {
+		//System.out.println(ctx.start.getText());
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -879,7 +882,11 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrintStatement(BaracoParser.PrintStatementContext ctx) { }
+	@Override public void enterPrintStatement(BaracoParser.PrintStatementContext ctx) {
+		//System.out.println(ctx.children.get(2).getText());
+		View.printInConsole(ctx.children.get(2).getText().toString().substring(1, ctx.children.get(2).getText().toString().length() - 1));
+		//ctx.toString()
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -987,7 +994,8 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterForControl(BaracoParser.ForControlContext ctx) { }
+	@Override public void enterForControl(BaracoParser.ForControlContext ctx) {
+	}
 	/**
 	 * {@inheritDoc}
 	 *
