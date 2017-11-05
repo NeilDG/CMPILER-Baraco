@@ -884,7 +884,7 @@ public class BaracoBaseListener implements BaracoListener {
 	 */
 	@Override public void enterPrintStatement(BaracoParser.PrintStatementContext ctx) {
 		//System.out.println(ctx.children.get(2).getText());
-		View.printInConsole(ctx.children.get(2).getText().toString());
+		View.printInConsole(ctx.children.get(2).getText().toString().substring(1, ctx.children.get(2).getText().toString().length() - 1));
 		//ctx.toString()
 	}
 	/**
