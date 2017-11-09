@@ -883,8 +883,11 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterPrintStatement(BaracoParser.PrintStatementContext ctx) {
-		//System.out.println(ctx.children.get(2).getText());
-		View.printInConsole(ctx.children.get(2).getText().toString().substring(1, ctx.children.get(2).getText().toString().length() - 1));
+		System.out.println(ctx.children.get(0).getText());
+		if(ctx.children.get(0).getText().equals("print"))
+			View.printInConsole(ctx.children.get(2).getText().toString().substring(1, ctx.children.get(2).getText().toString().length() - 1));
+		else
+			View.printInConsole(ctx.children.get(2).getText().toString().substring(1, ctx.children.get(2).getText().toString().length() - 1) + '\n');
 		//ctx.toString()
 	}
 	/**
