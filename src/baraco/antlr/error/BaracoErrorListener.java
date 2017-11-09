@@ -1,13 +1,9 @@
-package moka.error;
+package baraco.antlr.error;
 
 import baraco.controller.Controller;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 

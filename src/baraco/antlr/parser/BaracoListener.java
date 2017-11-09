@@ -1,5 +1,4 @@
 // Generated from Baraco.g4 by ANTLR 4.7
-package baraco.antlr.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

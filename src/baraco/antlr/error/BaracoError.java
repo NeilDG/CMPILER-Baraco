@@ -1,4 +1,4 @@
-package moka.error;
+package baraco.antlr.error;
 
 /**
  * Created by patricktobias on 21/10/2017.

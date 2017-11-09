@@ -219,12 +219,9 @@ classOrInterfaceType
 primitiveType
     :   'bool'
     |   'char'
-    |   'byte'
-    |   'short'
     |   'int'
-    |   'long'
     |   'decimal'
-    |   'double'
+    |   'string'
     ;
 
 typeArguments
@@ -584,7 +581,7 @@ arguments
 
 ABSTRACT      : 'abstract';
 ASSERT        : 'assert';
-BOOL       : 'bool';
+BOOL          : 'bool';
 BREAK         : 'break';
 BYTE          : 'byte';
 CASE          : 'case';
@@ -593,6 +590,7 @@ CHAR          : 'char';
 CLASS         : 'class';
 CONST         : 'const';
 CONTINUE      : 'continue';
+DECIMAL       : 'decimal';
 DEFAULT       : 'default';
 DO            : 'do';
 DOUBLE        : 'double';
@@ -601,7 +599,6 @@ ENUM          : 'enum';
 EXTENDS       : 'extends';
 FINAL         : 'final';
 FINALLY       : 'finally';
-DECIMAL       : 'decimal';
 FOR           : 'for';
 IF            : 'if';
 GOTO          : 'goto';
@@ -621,6 +618,7 @@ RETURN        : 'return';
 SHORT         : 'short';
 STATIC        : 'static';
 STRICTFP      : 'strictfp';
+STRING        : 'string';
 SUPER         : 'super';
 SWITCH        : 'switch';
 SYNCHRONIZED  : 'synchronized';

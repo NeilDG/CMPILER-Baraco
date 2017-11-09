@@ -1,4 +1,4 @@
-package moka.error;
+package baraco.antlr.error;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.Parser;
