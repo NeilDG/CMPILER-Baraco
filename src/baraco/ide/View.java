@@ -1,6 +1,7 @@
 package baraco.ide;
 
 import baraco.controller.Controller;
+import baraco.file.FileHandler;
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
@@ -8,9 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -34,8 +33,6 @@ import java.util.regex.Pattern;
 import moka.error.BaracoError;
 
 public class View extends Application {
-
-    Controller controller;
 
     private static final String[] KEYWORDS = new String[] {
             "bool", "break", "case", "const", "do", "else", "decimal", "for",
@@ -61,15 +58,21 @@ public class View extends Application {
                     + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
     );
 
+    private Controller controller;
     private CodeArea editor;
     private GridPane gridPane;
     private ExecutorService executor;
     private TextFlow console;
+    private FileHandler fileHandler;
+    private Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        this.stage = primaryStage;
         executor = Executors.newSingleThreadExecutor();
         controller = new Controller(this);
+
+        this.fileHandler = new FileHandler(primaryStage);
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
         primaryStage.show();
@@ -138,11 +141,21 @@ public class View extends Application {
 
     private ToolBar setupToolbar() {
         // Setup toolbar
-        Button fileButton = new Button("File");
-        fileButton.setBackground(null);
+        Button openButton = new Button("Open");
+        openButton.setOnAction(event -> {
+            String content = this.fileHandler.open();
+            if (content != null) {
+                this.editor.replaceText(content);
+                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+            }
+        });
 
-        Button editButton = new Button("Edit");
-        editButton.setBackground(null);
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(event -> {
+            if (this.fileHandler.save(editor.getText())) {
+                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+            }
+        });
 
         Button runButton = new Button("Run");
         runButton.setDefaultButton(true);
@@ -151,7 +164,7 @@ public class View extends Application {
         });
 
 
-        ToolBar toolBar = new ToolBar(fileButton, editButton, runButton);
+        ToolBar toolBar = new ToolBar(openButton, saveButton, runButton);
 
         return toolBar;
     }
