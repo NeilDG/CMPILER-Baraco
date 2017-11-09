@@ -119,17 +119,17 @@ public class ClassScope implements IScope{
         }
     }
 
-    public void addPrivateMobiFunction(String identifier, BaracoMethod baracoMethod) {
+    public void addPrivateBaracoMethod(String identifier, BaracoMethod baracoMethod) {
         this.privateMethods.put(identifier, baracoMethod);
         System.out.println("Created private function " +identifier+ " with return type " + baracoMethod.getReturnType());
     }
 
-    public void addPublicMobiFunction(String identifier, BaracoMethod baracoMethod) {
+    public void addPublicBaracoMethod(String identifier, BaracoMethod baracoMethod) {
         this.publicMethods.put(identifier, baracoMethod);
         System.out.println("Created public function " +identifier+ " with return type " + baracoMethod.getReturnType());
     }
 
-    public void addMobiValue(String accessControlModifier, String identifier, BaracoValue mobiValue) {
+    public void addBaracoValue(String accessControlModifier, String identifier, BaracoValue mobiValue) {
         boolean isPublic = true;
 
         if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PRIVATE, accessControlModifier)) {
@@ -144,7 +144,7 @@ public class ClassScope implements IScope{
         }
     }
 
-    public BaracoMethod getPublicFunction(String identifier) {
+    public BaracoMethod getPublicMethod(String identifier) {
         if(this.containsPublicFunction(identifier)) {
             return this.publicMethods.get(identifier);
         }
@@ -154,7 +154,7 @@ public class ClassScope implements IScope{
         }
     }
 
-    public BaracoMethod getPrivateFunction(String identifier) {
+    public BaracoMethod getPrivateMethod(String identifier) {
         if(this.containsPublicFunction(identifier)) {
             return this.privateMethods.get(identifier);
         }
@@ -164,7 +164,7 @@ public class ClassScope implements IScope{
         }
     }
 
-    public BaracoMethod searchFunction(String identifier) {
+    public BaracoMethod searchMethod(String identifier) {
         if(this.containsPublicFunction(identifier)) {
             return this.publicMethods.get(identifier);
         }
