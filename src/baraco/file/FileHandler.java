@@ -43,6 +43,17 @@ public class FileHandler {
         return false;
     }
 
+    public boolean saveAs(String content) {
+
+        File file = showFileChooser(false);
+        if (file != null) {
+            this.currentFile = file;
+            return save(content);
+        }
+
+        return false;
+    }
+
     public File showFileChooser(boolean isOpen) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose " + (isOpen ? "Open" : "Save") + " Location");
