@@ -9,6 +9,7 @@ public class BaracoValue {
         INT,
         DECIMAL,
         STRING,
+        CHAR,
         ARRAY
     }
 
@@ -69,6 +70,7 @@ public class BaracoValue {
 
     private Object attemptTypeCast(String value) {
         switch(this.primitiveType) {
+            case CHAR: return Character.valueOf(value.charAt(0));
             case BOOL: return Boolean.valueOf(value);
             case INT: return Integer.valueOf(value);
             case DECIMAL: return Double.valueOf(value);
@@ -88,6 +90,8 @@ public class BaracoValue {
 
     public static boolean checkValueType(Object value, PrimitiveType primitiveType) {
         switch(primitiveType) {
+            case CHAR:
+                return value instanceof Character;
             case BOOL:
                 return value instanceof Boolean;
             case INT:
@@ -114,6 +118,9 @@ public class BaracoValue {
 
         if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_BOOLEAN, primitiveTypeString)) {
             primitiveType = PrimitiveType.BOOL;
+        }
+        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_CHAR, primitiveTypeString)) {
+            primitiveType = PrimitiveType.CHAR;
         }
         else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_DECIMAL, primitiveTypeString)) {
             primitiveType = PrimitiveType.DECIMAL;
