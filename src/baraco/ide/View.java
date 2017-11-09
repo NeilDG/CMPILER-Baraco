@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import moka.error.BaracoError;
+import baraco.antlr.error.BaracoError;
 
 public class View extends Application {
 
