@@ -1,6 +1,9 @@
-package baraco.representation;
+package baraco.representations;
 
 public class RecognizedKeywords {
+
+    public static String CLASS_MODIFIER_PRIVATE = "private";
+    public static String CLASS_MODIFIER_PUBLIC = "public";
 
     public static String PRIMITIVE_TYPE_BOOLEAN = "bool";
     public static String PRIMITIVE_TYPE_INT = "int";

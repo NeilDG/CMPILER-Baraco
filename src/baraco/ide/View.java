@@ -251,4 +251,8 @@ public class View extends Application {
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
     }
+
+    public Controller getController() {
+        return this.controller;
+    }
 }

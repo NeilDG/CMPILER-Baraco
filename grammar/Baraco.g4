@@ -222,6 +222,7 @@ primitiveType
     |   'int'
     |   'decimal'
     |   'string'
+    |   'array'
     ;
 
 typeArguments
@@ -580,6 +581,7 @@ arguments
 // �3.9 Keywords
 
 ABSTRACT      : 'abstract';
+ARRAY         : 'array';
 ASSERT        : 'assert';
 BOOL          : 'bool';
 BREAK         : 'break';

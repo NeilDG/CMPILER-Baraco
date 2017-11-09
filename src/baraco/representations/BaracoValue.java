@@ -1,4 +1,4 @@
-package baraco.representation;
+package baraco.representations;
 
 public class BaracoValue {
 
@@ -52,7 +52,6 @@ public class BaracoValue {
         if(this.primitiveType == PrimitiveType.NOT_YET_IDENTIFIED) {
             System.out.println("Primitive type not yet identified!");
         }
-
         else if(this.primitiveType == PrimitiveType.STRING) {
             value.replace("\"", "");
 
@@ -86,7 +85,6 @@ public class BaracoValue {
     public PrimitiveType getPrimitiveType() {
         return this.primitiveType;
     }
-
 
     public static boolean checkValueType(Object value, PrimitiveType primitiveType) {
         switch(primitiveType) {
