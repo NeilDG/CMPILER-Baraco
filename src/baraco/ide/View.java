@@ -157,6 +157,13 @@ public class View extends Application {
             }
         });
 
+        Button saveAsButton = new Button("Save As");
+        saveAsButton.setOnAction(event -> {
+            if (this.fileHandler.saveAs(editor.getText())) {
+                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+            }
+        });
+
         Button runButton = new Button("Run");
         runButton.setDefaultButton(true);
         runButton.setOnAction(event -> {
@@ -164,7 +171,7 @@ public class View extends Application {
         });
 
 
-        ToolBar toolBar = new ToolBar(openButton, saveButton, runButton);
+        ToolBar toolBar = new ToolBar(openButton, saveButton, saveAsButton, runButton);
 
         return toolBar;
     }
