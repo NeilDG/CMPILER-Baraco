@@ -1,12 +1,12 @@
 package baraco.controller;
 
-import moka.error.BaracoError;
-import moka.error.BaracoErrorListener;
+import baraco.antlr.error.BaracoError;
+import baraco.antlr.error.BaracoErrorListener;
 import baraco.ide.View;
-import moka.lexer.BaracoLexer;
-import moka.parser.BaracoBaseListener;
-import moka.parser.BaracoListener;
-import moka.parser.BaracoParser;
+import baraco.antlr.lexer.BaracoLexer;
+import baraco.antlr.parser.BaracoBaseListener;
+import baraco.antlr.parser.BaracoListener;
+import baraco.antlr.parser.BaracoParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -14,7 +14,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 

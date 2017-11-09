@@ -1,6 +1,6 @@
-package moka;
+package baraco.antlr;
 
-import moka.lexer.BaracoLexer;
+import baraco.antlr.lexer.BaracoLexer;
 import org.antlr.v4.runtime.*;
 
 import java.io.IOException;
