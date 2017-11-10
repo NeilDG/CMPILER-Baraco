@@ -72,8 +72,8 @@ public class UndeclaredChecker implements IErrorChecker, ParseTreeListener{
 
     private void verifyFunctionCall(BaracoParser.ExpressionContext funcExprCtx) {
 
-        ThisKeywordChecker thisChecker = new ThisKeywordChecker(funcExprCtx.expression(0));
-        thisChecker.verify();
+        //ThisKeywordChecker thisChecker = new ThisKeywordChecker(funcExprCtx.expression(0));
+        //thisChecker.verify();
 
         if(funcExprCtx.expression(0).Identifier() == null)
             return;
