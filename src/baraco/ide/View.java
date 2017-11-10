@@ -1,7 +1,13 @@
 package baraco.ide;
 
+import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
+import baraco.execution.ExecutionManager;
+import baraco.execution.MethodTracker;
 import baraco.file.FileHandler;
+import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
@@ -76,6 +82,13 @@ public class View extends Application {
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
         primaryStage.show();
+
+        SymbolTableManager.initialize();
+        BuildChecker.initialize();
+        ExecutionManager.initialize();
+        LocalScopeCreator.initialize();
+        StatementControlOverseer.initialize();
+        MethodTracker.initialize();
     }
 
     public static void main(String[] args) {

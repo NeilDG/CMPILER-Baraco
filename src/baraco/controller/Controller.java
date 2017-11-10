@@ -2,6 +2,9 @@ package baraco.controller;
 
 import baraco.antlr.error.BaracoError;
 import baraco.antlr.error.BaracoErrorListener;
+import baraco.builder.BuildChecker;
+import baraco.builder.ParserHandler;
+import baraco.execution.ExecutionManager;
 import baraco.ide.View;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoBaseListener;
@@ -44,7 +47,11 @@ public class Controller {
 
         view.resetConsole();
 
-        CharStream cs = new ANTLRInputStream(input);
+        System.out.println(input);
+
+        ParserHandler.getInstance().parseText("", input);
+
+        /*CharStream cs = new ANTLRInputStream(input);
 
         BaracoLexer mokaLexer = new BaracoLexer(cs);
 
@@ -65,7 +72,15 @@ public class Controller {
 
         ParseTreeWalker walker = new ParseTreeWalker();
         BaracoListener listener = new BaracoBaseListener();
-        walker.walk(listener, tree);
+        walker.walk(listener, tree);*/
+
+        if(BuildChecker.getInstance().canExecute()) {
+            ExecutionManager.getInstance().executeAllActions();
+            //this.mViewPager.setCurrentItem(1);
+        }
+        else {
+            System.out.println("Fix identified errors before executing!");
+        }
 
         /*String output = "";
         for(int i = 0; i < tokens.size(); i++) {
