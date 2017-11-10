@@ -1,6 +1,8 @@
 package baraco.semantics.analyzers;
 
+import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser;
+import baraco.builder.errorcheckers.ClassNameChecker;
 import baraco.representations.RecognizedKeywords;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
@@ -80,8 +82,8 @@ public class ClassAnalyzer implements ParseTreeListener {
         else if(ctx instanceof BaracoParser.FieldDeclarationContext) {
             BaracoParser.FieldDeclarationContext fieldCtx = (BaracoParser.FieldDeclarationContext) ctx;
 
-            if(fieldCtx.type() != null) {
-                TypeContext typeCtx = fieldCtx.type();
+            if(fieldCtx.typeType() != null) {
+                BaracoParser.TypeTypeContext typeCtx = fieldCtx.typeType();
 
                 //check if its a primitive type
                 if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
@@ -132,10 +134,10 @@ public class ClassAnalyzer implements ParseTreeListener {
         }
     }
 
-    public static boolean isPrimitiveDeclaration(TypeContext typeCtx) {
+    public static boolean isPrimitiveDeclaration(BaracoParser.TypeTypeContext typeCtx) {
         if(typeCtx.primitiveType() != null) {
-            List<TerminalNode> lBrackToken = typeCtx.getTokens(JavaLexer.LBRACK);
-            List<TerminalNode> rBrackToken = typeCtx.getTokens(JavaLexer.RBRACK);
+            List<TerminalNode> lBrackToken = typeCtx.getTokens(BaracoLexer.LBRACK);
+            List<TerminalNode> rBrackToken = typeCtx.getTokens(BaracoLexer.RBRACK);
 
             return (lBrackToken.size() == 0 && rBrackToken.size() == 0);
         }
@@ -143,10 +145,10 @@ public class ClassAnalyzer implements ParseTreeListener {
         return false;
     }
 
-    public static boolean isPrimitiveArrayDeclaration(TypeContext typeCtx) {
+    public static boolean isPrimitiveArrayDeclaration(BaracoParser.TypeTypeContext typeCtx) {
         if(typeCtx.primitiveType() != null) {
-            List<TerminalNode> lBrackToken = typeCtx.getTokens(JavaLexer.LBRACK);
-            List<TerminalNode> rBrackToken = typeCtx.getTokens(JavaLexer.RBRACK);
+            List<TerminalNode> lBrackToken = typeCtx.getTokens(BaracoLexer.LBRACK);
+            List<TerminalNode> rBrackToken = typeCtx.getTokens(BaracoLexer.RBRACK);
 
             return (lBrackToken.size() > 0 && rBrackToken.size() > 0);
         }
@@ -155,16 +157,16 @@ public class ClassAnalyzer implements ParseTreeListener {
     }
 
     private void analyzeModifier(BaracoParser.ClassOrInterfaceModifierContext ctx) {
-        if(ctx.getTokens(JavaLexer.PUBLIC).size() > 0 || ctx.getTokens(JavaLexer.PRIVATE).size() > 0
-                || ctx.getTokens(JavaLexer.PROTECTED).size() > 0) {
+        if(ctx.getTokens(BaracoLexer.PUBLIC).size() > 0 || ctx.getTokens(BaracoLexer.PRIVATE).size() > 0
+                || ctx.getTokens(BaracoLexer.PROTECTED).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected accessor: " +ctx.getText());
             this.identifiedTokens.addToken(ACCESS_CONTROL_KEY, ctx.getText());
         }
-        else if(ctx.getTokens(JavaLexer.FINAL).size() > 0) {
+        else if(ctx.getTokens(BaracoLexer.FINAL).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected const: " +ctx.getText());
             this.identifiedTokens.addToken(CONST_CONTROL_KEY, ctx.getText());
         }
-        else if(ctx.getTokens(JavaLexer.STATIC).size() > 0) {
+        else if(ctx.getTokens(BaracoLexer.STATIC).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected static: " +ctx.getText());
             this.identifiedTokens.addToken(STATIC_CONTROL_KEY, ctx.getText());
         }

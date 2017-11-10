@@ -1,8 +1,11 @@
 package baraco.semantics.analyzers;
 
 import baraco.antlr.parser.BaracoParser;
+import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.builder.errorcheckers.TypeChecker;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.evaluation.MappingCommand;
+import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
@@ -12,8 +15,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import java.io.Console;
 
 public class LocalVariableAnalyzer implements ParseTreeListener {
 
@@ -62,8 +63,8 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
     }
 
     private void analyzeVariables(ParserRuleContext ctx) {
-        if(ctx instanceof TypeContext) {
-            TypeContext typeCtx = (TypeContext) ctx;
+        if(ctx instanceof BaracoParser.TypeTypeContext) {
+            BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
             //clear tokens for reuse
             this.identifiedTokens.clearTokens();
 
@@ -75,7 +76,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 
             //check if its array declaration
             else if(ClassAnalyzer.isPrimitiveArrayDeclaration(typeCtx)) {
-                Console.log(LogType.DEBUG, "Primitive array declaration: " +typeCtx.getText());
+                //Console.log(LogType.DEBUG, "Primitive array declaration: " +typeCtx.getText());
                 ArrayAnalyzer arrayAnalyzer = new ArrayAnalyzer(this.identifiedTokens, LocalScopeCreator.getInstance().getActiveLocalScope());
                 arrayAnalyzer.analyze(typeCtx.getParent());
                 this.hasPassedArrayDeclaration = true;
@@ -103,12 +104,12 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 
             //check for duplicate declarations
             if(this.executeMappingImmediate == false) {
-                MultipleVarDecChecker multipleDeclaredChecker = new MultipleVarDecChecker(varCtx.variableDeclaratorId());
+                MultipleVariableDeclarationChecker multipleDeclaredChecker = new MultipleVariableDeclarationChecker(varCtx.variableDeclaratorId());
                 multipleDeclaredChecker.verify();
             }
 
             this.identifiedTokens.addToken(IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
-            this.createMobiValue();
+            this.createBaracoValue();
 
             if(varCtx.variableInitializer() != null) {
 
@@ -123,10 +124,10 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
                 this.processMapping(varCtx);
 
                 LocalScope localScope = LocalScopeCreator.getInstance().getActiveLocalScope();
-                BaracoValue declaredMobiValue = localScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
+                BaracoValue declaredBaracoValue = localScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
 
                 //type check the mobivalue
-                TypeChecker typeChecker = new TypeChecker(declaredMobiValue, varCtx.variableInitializer().expression());
+                TypeChecker typeChecker = new TypeChecker(declaredBaracoValue, varCtx.variableInitializer().expression());
                 typeChecker.verify();
             }
 
@@ -157,7 +158,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
     /*
      * Attempts to create an intermediate representation of the variable once a sufficient amount of info has been retrieved.
      */
-    private void createMobiValue() {
+    private void createBaracoValue() {
 
         if(this.identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY, IDENTIFIER_KEY)) {
 

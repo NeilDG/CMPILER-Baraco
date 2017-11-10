@@ -2,6 +2,7 @@ package baraco.semantics.analyzers;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.evaluation.ArrayInitializeCommand;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.semantics.symboltable.scopes.ClassScope;

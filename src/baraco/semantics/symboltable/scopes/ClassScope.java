@@ -129,7 +129,7 @@ public class ClassScope implements IScope{
         System.out.println("Created public function " +identifier+ " with return type " + baracoMethod.getReturnType());
     }
 
-    public void addBaracoValue(String accessControlModifier, String identifier, BaracoValue mobiValue) {
+    public void addBaracoValue(String accessControlModifier, String identifier, BaracoValue baracoValue) {
         boolean isPublic = true;
 
         if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PRIVATE, accessControlModifier)) {
@@ -137,10 +137,10 @@ public class ClassScope implements IScope{
         }
 
         if(isPublic){
-            this.publicVariables.put(identifier, mobiValue);
+            this.publicVariables.put(identifier, baracoValue);
         }
         else {
-            this.privateVariables.put(identifier, mobiValue);
+            this.privateVariables.put(identifier, baracoValue);
         }
     }
 
@@ -233,15 +233,15 @@ public class ClassScope implements IScope{
      * Resets all stored variables. This is called after the execution manager finishes
      */
     public void resetValues() {
-        BaracoValue[] publicMobiValues = this.publicVariables.values().toArray(new BaracoValue[this.publicVariables.size()]);
-        BaracoValue[] privateMobiValues = this.privateVariables.values().toArray(new BaracoValue[this.privateVariables.size()]);
+        BaracoValue[] publicBaracoValues = this.publicVariables.values().toArray(new BaracoValue[this.publicVariables.size()]);
+        BaracoValue[] privateBaracoValues = this.privateVariables.values().toArray(new BaracoValue[this.privateVariables.size()]);
 
-        for(int i = 0; i < publicMobiValues.length; i++) {
-            publicMobiValues[i].reset();
+        for(int i = 0; i < publicBaracoValues.length; i++) {
+            publicBaracoValues[i].reset();
         }
 
-        for(int i = 0; i < privateMobiValues.length; i++) {
-            privateMobiValues[i].reset();
+        for(int i = 0; i < privateBaracoValues.length; i++) {
+            privateBaracoValues[i].reset();
         }
     }
 }
