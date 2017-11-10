@@ -267,6 +267,20 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMainDeclaration(BaracoParser.MainDeclarationContext ctx) {
+		System.out.println("main");
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMainDeclaration(BaracoParser.MainDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMethodDeclaration(BaracoParser.MethodDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}

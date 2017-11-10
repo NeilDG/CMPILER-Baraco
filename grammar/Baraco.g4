@@ -123,12 +123,19 @@ memberDeclaration
    renders the [] matching as a context-sensitive issue or a semantic check
    for invalid return type after parsing.
  */
+
+mainDeclaration
+    :   'void' 'main' '(' ')' methodBody
+    ;
+
 methodDeclaration
-    :   (typeType|'void') Identifier formalParameters ('[' ']')*
+    :   ((typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
-        )
+        ))
+        |
+        mainDeclaration
     ;
 
 genericMethodDeclaration
@@ -610,6 +617,7 @@ INSTANCEOF    : 'instanceof';
 INT           : 'int';
 INTERFACE     : 'interface';
 LONG          : 'long';
+MAIN          : 'main';
 NATIVE        : 'native';
 NEW           : 'new';
 PACKAGE       : 'package';

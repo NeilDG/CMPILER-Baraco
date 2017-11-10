@@ -218,6 +218,16 @@ public interface BaracoListener extends ParseTreeListener {
 	 */
 	void exitMemberDeclaration(BaracoParser.MemberDeclarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link BaracoParser#mainDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterMainDeclaration(BaracoParser.MainDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BaracoParser#mainDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitMainDeclaration(BaracoParser.MainDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link BaracoParser#methodDeclaration}.
 	 * @param ctx the parse tree
 	 */
