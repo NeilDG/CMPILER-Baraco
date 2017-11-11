@@ -20,6 +20,7 @@ import java.util.List;
 
 public class StatementExpressionAnalyzer implements ParseTreeListener {
 
+    private int called = 0;
     private ExpressionContext readRightHandExprCtx; //used to avoid mistakenly reading right hand expressions as direct function calls as well.
 
     //TODO: find a way to not rely on tree depth for function calls.
@@ -91,7 +92,9 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
             }
 
             else if(!this.isFunctionCallWithParams(exprCtx)) {
-                this.handleFunctionCallWithNoParams(exprCtx);
+                called++;
+                if(called % 2 == 1)
+                    this.handleFunctionCallWithNoParams(exprCtx);
             }
         }
     }
