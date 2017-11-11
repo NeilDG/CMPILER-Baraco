@@ -49,7 +49,7 @@ public class Controller {
 
         System.out.println(input);
 
-        ParserHandler.getInstance().parseText("", input);
+        ParserHandler.getInstance().parseText("Test", input);
 
         /*CharStream cs = new ANTLRInputStream(input);
 
@@ -76,6 +76,7 @@ public class Controller {
 
         if(BuildChecker.getInstance().canExecute()) {
             ExecutionManager.getInstance().executeAllActions();
+            System.out.println("BuildChecker executed");
             //this.mViewPager.setCurrentItem(1);
         }
         else {

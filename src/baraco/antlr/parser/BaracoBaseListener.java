@@ -102,9 +102,7 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterClassDeclaration(BaracoParser.ClassDeclarationContext ctx) {
-		System.out.println("class detected");
-		ClassAnalyzer classAnalyzer = new ClassAnalyzer();
-		classAnalyzer.analyze(ctx);
+		System.out.println("CLASS_DEC");
 	}
 	/**
 	 * {@inheritDoc}
@@ -261,7 +259,8 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMemberDeclaration(BaracoParser.MemberDeclarationContext ctx) { }
+	@Override public void enterMemberDeclaration(BaracoParser.MemberDeclarationContext ctx) {
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -274,7 +273,7 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterMainDeclaration(BaracoParser.MainDeclarationContext ctx) {
-		System.out.println("main");
+		System.out.println("MAIN_DEC");
 		MainAnalyzer mainAnalyzer = new MainAnalyzer();
 		mainAnalyzer.analyze(ctx);
 	}

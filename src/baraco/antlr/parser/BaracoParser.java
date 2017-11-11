@@ -1244,7 +1244,7 @@ public class BaracoParser extends Parser {
 			setState(366);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==LBRACE) {
+			if (_la==COLON) {
 				{
 				setState(365);
 				classBody();
@@ -1482,7 +1482,7 @@ public class BaracoParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(394);
-			match(LBRACE);
+			match(COLON);
 			setState(398);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -1498,7 +1498,7 @@ public class BaracoParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(401);
-			match(RBRACE);
+			match(END);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1541,7 +1541,7 @@ public class BaracoParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(403);
-			match(LBRACE);
+			match(COLON);
 			setState(407);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -1557,7 +1557,7 @@ public class BaracoParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(410);
-			match(RBRACE);
+			match(END);
 			}
 		}
 		catch (RecognitionException re) {
@@ -6547,6 +6547,9 @@ public class BaracoParser extends Parser {
 		public TypeTypeContext typeType() {
 			return getRuleContext(TypeTypeContext.class,0);
 		}
+		public ArgumentsContext arguments() {
+			return getRuleContext(ArgumentsContext.class,0);
+		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
@@ -6555,9 +6558,6 @@ public class BaracoParser extends Parser {
 		}
 		public ExpressionListContext expressionList() {
 			return getRuleContext(ExpressionListContext.class,0);
-		}
-		public ArgumentsContext arguments() {
-			return getRuleContext(ArgumentsContext.class,0);
 		}
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -8105,12 +8105,12 @@ public class BaracoParser extends Parser {
 		"\2\2\2\u0181\u0182\3\2\2\2\u0182\u0183\5&\24\2\u0183!\3\2\2\2\u0184\u0189"+
 		"\5P)\2\u0185\u0186\7K\2\2\u0186\u0188\5P)\2\u0187\u0185\3\2\2\2\u0188"+
 		"\u018b\3\2\2\2\u0189\u0187\3\2\2\2\u0189\u018a\3\2\2\2\u018a#\3\2\2\2"+
-		"\u018b\u0189\3\2\2\2\u018c\u0190\7F\2\2\u018d\u018f\5(\25\2\u018e\u018d"+
+		"\u018b\u0189\3\2\2\2\u018c\u0190\7S\2\2\u018d\u018f\5(\25\2\u018e\u018d"+
 		"\3\2\2\2\u018f\u0192\3\2\2\2\u0190\u018e\3\2\2\2\u0190\u0191\3\2\2\2\u0191"+
-		"\u0193\3\2\2\2\u0192\u0190\3\2\2\2\u0193\u0194\7G\2\2\u0194%\3\2\2\2\u0195"+
-		"\u0199\7F\2\2\u0196\u0198\58\35\2\u0197\u0196\3\2\2\2\u0198\u019b\3\2"+
+		"\u0193\3\2\2\2\u0192\u0190\3\2\2\2\u0193\u0194\7=\2\2\u0194%\3\2\2\2\u0195"+
+		"\u0199\7S\2\2\u0196\u0198\58\35\2\u0197\u0196\3\2\2\2\u0198\u019b\3\2"+
 		"\2\2\u0199\u0197\3\2\2\2\u0199\u019a\3\2\2\2\u019a\u019c\3\2\2\2\u019b"+
-		"\u0199\3\2\2\2\u019c\u019d\7G\2\2\u019d\'\3\2\2\2\u019e\u01ab\7J\2\2\u019f"+
+		"\u0199\3\2\2\2\u019c\u019d\7=\2\2\u019d\'\3\2\2\2\u019e\u01ab\7J\2\2\u019f"+
 		"\u01a1\7*\2\2\u01a0\u019f\3\2\2\2\u01a0\u01a1\3\2\2\2\u01a1\u01a2\3\2"+
 		"\2\2\u01a2\u01ab\5\u0088E\2\u01a3\u01a5\5\n\6\2\u01a4\u01a3\3\2\2\2\u01a5"+
 		"\u01a8\3\2\2\2\u01a6\u01a4\3\2\2\2\u01a6\u01a7\3\2\2\2\u01a7\u01a9\3\2"+

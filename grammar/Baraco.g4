@@ -93,11 +93,11 @@ typeList
     ;
 
 classBody
-    :   '{' classBodyDeclaration* '}'
+    :   ':' classBodyDeclaration* 'end'
     ;
 
 interfaceBody
-    :   '{' interfaceBodyDeclaration* '}'
+    :   ':' interfaceBodyDeclaration* 'end'
     ;
 
 classBodyDeclaration
