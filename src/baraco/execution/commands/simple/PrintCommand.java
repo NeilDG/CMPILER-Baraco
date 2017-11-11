@@ -24,8 +24,6 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
 
-    private int called = 0;
-
     public PrintCommand(ExpressionContext expressionCtx) {
         this.expressionCtx = expressionCtx;
 
@@ -83,25 +81,21 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 			}
         }
 
-        else if(ctx instanceof ExpressionContext) {
-            ExpressionContext exprCtx = (ExpressionContext) ctx;
-            int i = exprCtx.expression().size();
-            //if(primaryCtx.expression() != null) {
-                //ExpressionContext exprCtx = primaryCtx.expression();
+        else if(ctx instanceof PrimaryContext) {
+            PrimaryContext primaryCtx = (PrimaryContext) ctx;
+
+            if(primaryCtx.expression() != null) {
+                ExpressionContext exprCtx = primaryCtx.expression();
                 this.complexExpr = true;
-                System.out.println("Complex expression detected: " +ctx.getText());
+                System.out.println("Complex expression detected: " +exprCtx.getText());
 
                 EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
                 evaluationCommand.execute();
 
-                //called++;
-                //if(called % 8 == 1)
-                    this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
-                //else
-                    //View.printInConsole(this.statementToPrint);
-            //}
+                this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
+            }
 
-            /*else if(primaryCtx.Identifier() != null && this.complexExpr == false) {
+            else if(primaryCtx.Identifier() != null && this.complexExpr == false) {
                 String identifier = primaryCtx.getText();
 
                 BaracoValue value = BaracoValueSearcher.searchBaracoValue(identifier);
@@ -114,7 +108,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 }
 
 
-            }*/
+            }
         }
     }
 
