@@ -14,6 +14,9 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PrintCommand implements ICommand, ParseTreeListener {
 
     private final static String TAG = "PrintCommand";
@@ -23,6 +26,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     private String statementToPrint = "";
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
+
+    private List<Object> printExpr = new ArrayList<>();
 
     public PrintCommand(ExpressionContext expressionCtx) {
         this.expressionCtx = expressionCtx;
@@ -37,7 +42,12 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         treeWalker.walk(this, this.expressionCtx);
 
         System.out.println(this.statementToPrint);
-        View.printInConsole(this.statementToPrint);
+        if(!printExpr.isEmpty()) {
+            View.printInConsole(this.printExpr.get(0).toString());
+            printExpr.clear();
+        }
+        else
+            View.printInConsole(this.statementToPrint);
         this.statementToPrint = ""; //reset statement to print afterwards
     }
 
@@ -92,6 +102,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
                 evaluationCommand.execute();
 
+                this.printExpr.add(evaluationCommand.getResult().toEngineeringString());
                 this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
             }
 
