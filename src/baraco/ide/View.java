@@ -71,6 +71,7 @@ public class View extends Application {
     public static TextFlow console;
     private FileHandler fileHandler;
     private Stage stage;
+    private String currentFileName;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -78,6 +79,7 @@ public class View extends Application {
         executor = Executors.newSingleThreadExecutor();
         controller = new Controller(this);
 
+        this.currentFileName = "";
         this.fileHandler = new FileHandler(primaryStage);
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
@@ -159,28 +161,28 @@ public class View extends Application {
             String content = this.fileHandler.open();
             if (content != null) {
                 this.editor.replaceText(content);
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+                this.updateCurrentFileName();
             }
         });
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event -> {
             if (this.fileHandler.save(editor.getText())) {
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+                this.updateCurrentFileName();
             }
         });
 
         Button saveAsButton = new Button("Save As");
         saveAsButton.setOnAction(event -> {
             if (this.fileHandler.saveAs(editor.getText())) {
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
+                this.updateCurrentFileName();
             }
         });
 
         Button runButton = new Button("Run");
         runButton.setDefaultButton(true);
         runButton.setOnAction(event -> {
-            controller.run(editor.getText());
+            controller.run(editor.getText(), this.currentFileName);
         });
 
 
@@ -274,5 +276,10 @@ public class View extends Application {
 
     public Controller getController() {
         return this.controller;
+    }
+
+    private void updateCurrentFileName() {
+        this.currentFileName = this.fileHandler.getCurrentFileName();
+        this.stage.setTitle("Baraco IDE - " + this.currentFileName);
     }
 }

@@ -46,7 +46,7 @@ public class Controller {
 
     }
 
-    public void run(String input) {
+    public void run(String input, String fileName) {
         // Perform interpretation
 
         ExecutionManager.reset();
@@ -60,7 +60,7 @@ public class Controller {
 
         System.out.println(input);
 
-        ParserHandler.getInstance().parseText("Test", input);
+        ParserHandler.getInstance().parseText(fileName, input);
 
         /*CharStream cs = new ANTLRInputStream(input);
 
