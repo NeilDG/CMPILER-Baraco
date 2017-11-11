@@ -6,6 +6,7 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.ForCommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
+import baraco.execution.commands.controlled.IfCommand;
 import baraco.execution.commands.simple.PrintCommand;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
@@ -36,6 +37,31 @@ public class StatementAnalyzer {
 
             BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
             blockAnalyzer.analyze(blockCtx);
+        }
+        else if(isIFStatement(ctx)) {
+            //Console.log("Par expression: " +ctx.parExpression().getText());
+
+            StatementContext statementCtx = ctx.statement(0);
+
+            //Console.log(LogType.DEBUG, "IF statement: " +statementCtx.getText());
+
+            IfCommand ifCommand = new IfCommand(ctx.parExpression());
+            StatementControlOverseer.getInstance().openConditionalCommand(ifCommand);
+
+            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            statementAnalyzer.analyze(statementCtx);
+
+            StatementControlOverseer.getInstance().reportExitPositiveRule();
+
+            //check if there is an ELSE statement
+            if (isELSEStatement(ctx)) {
+                statementCtx = ctx.statement(1);
+
+                //Console.log(LogType.DEBUG, "ELSE statement: " +statementCtx.getText());
+                statementAnalyzer.analyze(statementCtx);
+            }
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
         }
         else if(isFORStatement(ctx)) {
             System.out.println("FOR expression: " +ctx.forControl().getText());
@@ -91,5 +117,17 @@ public class StatementAnalyzer {
         List<TerminalNode> forTokenList = ctx.getTokens(BaracoLexer.FOR);
 
         return (forTokenList.size() != 0);
+    }
+
+    public static boolean isIFStatement(StatementContext ctx) {
+        List<TerminalNode> tokenList = ctx.getTokens(BaracoLexer.IF);
+
+        return (tokenList.size() != 0);
+    }
+
+    public static boolean isELSEStatement(StatementContext ctx) {
+        List<TerminalNode> tokenList = ctx.getTokens(BaracoLexer.ELSE);
+
+        return (tokenList.size() != 0);
     }
 }
