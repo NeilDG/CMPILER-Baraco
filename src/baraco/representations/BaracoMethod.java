@@ -101,6 +101,26 @@ public class BaracoMethod implements IControlledCommand{
         baracoValue.setValue(value);
     }
 
+    public void mapArrayAt(BaracoValue baracoValue, int index, String identifier) {
+        if(index >= this.parameterValues.size()) {
+            return;
+        }
+
+        BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+
+        BaracoArray newArray = new BaracoArray(baracoArray.getPrimitiveType(), identifier);
+        BaracoValue newValue = new BaracoValue(newArray, PrimitiveType.ARRAY);
+
+        newArray.initializeSize(baracoArray.getSize());
+
+        for(int i = 0; i < newArray.getSize(); i++) {
+            newArray.updateValueAt(baracoArray.getValueAt(i), i);
+        }
+
+        this.parameterValues.put(this.getParameterKeyAt(index), newValue);
+
+    }
+
     public int getParameterValueSize() {
         return this.parameterValues.size();
     }

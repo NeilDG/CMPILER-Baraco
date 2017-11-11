@@ -3,7 +3,8 @@ grammar Baraco;
 // starting point for parsing a java file
 compilationUnit
     //:   packageDeclaration? importDeclaration* typeDeclaration* EOF
-    :   constDeclaration* methodDeclaration* statement*
+    //:   constDeclaration* methodDeclaration* statement*
+    :   typeDeclaration* constDeclaration* methodDeclaration* statement* EOF
     ;
 
 packageDeclaration
@@ -129,13 +130,11 @@ mainDeclaration
     ;
 
 methodDeclaration
-    :   ((typeType|'void') Identifier formalParameters ('[' ']')*
+    :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
-        ))
-        |
-        mainDeclaration
+        )
     ;
 
 genericMethodDeclaration
@@ -385,8 +384,7 @@ statement
     |   ';'
     |   statementExpression ';'
     |   Identifier ':' statement
-    |   scanStatement ';'
-    |   printStatement ';'
+    |   PRINT '(' expression ')' ';'
     ;
 
 scanStatement
@@ -394,6 +392,7 @@ scanStatement
     |   Identifier '=' 'scanDecimal' '(' ')'
     |   Identifier '=' 'scanString' '(' ')'
     ;
+
 printStatement
     :   'print' '(' expression ')'
     |   'println' '(' expression ')'

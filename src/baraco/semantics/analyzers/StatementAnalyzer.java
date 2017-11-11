@@ -1,11 +1,17 @@
 package baraco.semantics.analyzers;
 
+import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.ForCommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.simple.PrintCommand;
 import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.List;
 
 public class StatementAnalyzer {
 
@@ -15,13 +21,34 @@ public class StatementAnalyzer {
 
     public void analyze(StatementContext ctx) {
 
-        if(ctx.printStatement() != null) {
+        if(ctx.PRINT() != null) {
             this.handlePrintStatement(ctx);
         }
+        else if(isFORStatement(ctx)) {
+            System.out.println("FOR expression: " +ctx.forControl().getText());
 
+            LocalScopeCreator.getInstance().openLocalScope();
+
+            ForControlAnalyzer forControlAnalyzer = new ForControlAnalyzer();
+            forControlAnalyzer.analyze(ctx.forControl());
+
+            ForCommand forCommand = new ForCommand(forControlAnalyzer.getLocalVarDecContext(), forControlAnalyzer.getExprContext(), forControlAnalyzer.getUpdateCommand());
+            StatementControlOverseer.getInstance().openControlledCommand(forCommand);
+
+            StatementContext statementCtx = ctx.statement(0);
+            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            statementAnalyzer.analyze(statementCtx);
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
+
+            LocalScopeCreator.getInstance().closeLocalScope();
+            System.out.println("End of FOR loop");
+        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
+        System.out.println("HANDLE PRINT: " + ctx.expression().size());
+
         PrintCommand printCommand = new PrintCommand(ctx.expression(0));
 
         StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
@@ -45,5 +72,11 @@ public class StatementAnalyzer {
             ExecutionManager.getInstance().addCommand(printCommand);
         }
 
+    }
+
+    public static boolean isFORStatement(StatementContext ctx) {
+        List<TerminalNode> forTokenList = ctx.getTokens(BaracoLexer.FOR);
+
+        return (forTokenList.size() != 0);
     }
 }

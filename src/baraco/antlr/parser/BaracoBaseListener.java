@@ -2,6 +2,7 @@
 package baraco.antlr.parser;
 import baraco.semantics.analyzers.ClassAnalyzer;
 import baraco.semantics.analyzers.MainAnalyzer;
+import baraco.semantics.analyzers.StatementAnalyzer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -102,7 +103,8 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterClassDeclaration(BaracoParser.ClassDeclarationContext ctx) {
-		System.out.println("CLASS_DEC");
+		ClassAnalyzer classAnalyzer = new ClassAnalyzer();
+		classAnalyzer.analyze(ctx);
 	}
 	/**
 	 * {@inheritDoc}
@@ -259,8 +261,7 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMemberDeclaration(BaracoParser.MemberDeclarationContext ctx) {
-	}
+	@Override public void enterMemberDeclaration(BaracoParser.MemberDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -273,7 +274,6 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterMainDeclaration(BaracoParser.MainDeclarationContext ctx) {
-		System.out.println("MAIN_DEC");
 		MainAnalyzer mainAnalyzer = new MainAnalyzer();
 		mainAnalyzer.analyze(ctx);
 	}
@@ -876,7 +876,10 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStatement(BaracoParser.StatementContext ctx) { }
+	@Override public void enterStatement(BaracoParser.StatementContext ctx) {
+		StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+		statementAnalyzer.analyze(ctx);
+	}
 	/**
 	 * {@inheritDoc}
 	 *

@@ -3,6 +3,7 @@ package baraco.execution.commands.simple;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.antlr.parser.BaracoParser.*;
+import baraco.ide.View;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
@@ -15,7 +16,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class PrintCommand implements ICommand, ParseTreeListener {
 
-    private final static String TAG = "Mobi_PrintCommand";
+    private final static String TAG = "PrintCommand";
 
     private ExpressionContext expressionCtx;
 
@@ -36,6 +37,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         treeWalker.walk(this, this.expressionCtx);
 
         System.out.println(this.statementToPrint);
+        View.printInConsole(this.statementToPrint);
         this.statementToPrint = ""; //reset statement to print afterwards
     }
 

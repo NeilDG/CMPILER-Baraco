@@ -5,11 +5,15 @@ import baraco.antlr.error.BaracoErrorListener;
 import baraco.builder.BuildChecker;
 import baraco.builder.ParserHandler;
 import baraco.execution.ExecutionManager;
+import baraco.execution.MethodTracker;
 import baraco.ide.View;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoBaseListener;
 import baraco.antlr.parser.BaracoListener;
 import baraco.antlr.parser.BaracoParser;
+import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -44,6 +48,13 @@ public class Controller {
 
     public void run(String input) {
         // Perform interpretation
+
+        ExecutionManager.reset();
+        LocalScopeCreator.reset();
+        SymbolTableManager.reset();
+        BuildChecker.reset();
+        StatementControlOverseer.reset();
+        MethodTracker.reset();
 
         view.resetConsole();
 
