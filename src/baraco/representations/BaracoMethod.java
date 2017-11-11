@@ -27,11 +27,6 @@ public class BaracoMethod implements IControlledCommand{
         VOID_TYPE
     }
 
-    private Object defaultValue; //this value will no longer change.
-    private Object value;
-    private PrimitiveType primitiveType = PrimitiveType.NOT_YET_IDENTIFIED;
-    private boolean finalFlag = false;
-
     private String methodName;
     private List<ICommand> commandSequences; //the list of commands execution by the function
 
@@ -64,7 +59,7 @@ public class BaracoMethod implements IControlledCommand{
             case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); break;
             case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); break;
             case DECIMAL_TYPE: this.returnValue = new BaracoValue(' ', PrimitiveType.DECIMAL); break;
-            case STRING_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.STRING); break;
+            case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); break;
             case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); break;
             default:break;
         }
