@@ -94,6 +94,20 @@ public class StatementAnalyzer {
             StatementControlOverseer.getInstance().compileControlledCommand();
             //Console.log(LogType.DEBUG, "End of WHILE expression: " +ctx.parExpression().getText());
         }
+        else if(isDOWHILEStatement(ctx)) {
+            //Console.log(LogType.DEBUG, "Do while expression: " +ctx.parExpression().getText());
+
+            StatementContext statementCtx = ctx.statement(0);
+
+            DoWhileCommand doWhileCommand = new DoWhileCommand(ctx.parExpression());
+            StatementControlOverseer.getInstance().openControlledCommand(doWhileCommand);
+
+            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            statementAnalyzer.analyze(statementCtx);
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
+            //Console.log(LogType.DEBUG, "End of DO-WHILE expression: " +ctx.parExpression().getText());
+        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
@@ -148,4 +162,12 @@ public class StatementAnalyzer {
 
         return (whileTokenList.size() != 0 && doTokenList.size() == 0);
     }
+
+    public static boolean isDOWHILEStatement(StatementContext ctx) {
+        List<TerminalNode> whileTokenList = ctx.getTokens(BaracoLexer.WHILE);
+        List<TerminalNode> doTokenList = ctx.getTokens(BaracoLexer.DO);
+
+        return (whileTokenList.size() != 0 && doTokenList.size() != 0);
+    }
+
 }
