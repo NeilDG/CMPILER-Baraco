@@ -24,6 +24,19 @@ public class StatementAnalyzer {
         if(ctx.PRINT() != null) {
             this.handlePrintStatement(ctx);
         }
+        //an expression
+        else if(ctx.statementExpression() != null) {
+            StatementExpressionAnalyzer expressionAnalyzer = new StatementExpressionAnalyzer();
+            expressionAnalyzer.analyze(ctx.statementExpression());
+        }
+
+        //a block statement
+        else if(ctx.block() != null) {
+            BlockContext blockCtx = ctx.block();
+
+            BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
+            blockAnalyzer.analyze(blockCtx);
+        }
         else if(isFORStatement(ctx)) {
             System.out.println("FOR expression: " +ctx.forControl().getText());
 
