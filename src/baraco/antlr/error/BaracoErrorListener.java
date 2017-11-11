@@ -1,6 +1,7 @@
 package baraco.antlr.error;
 
 import baraco.controller.Controller;
+import baraco.ide.View;
 import org.antlr.v4.runtime.*;
 
 import java.util.ArrayList;
@@ -19,6 +20,12 @@ public class BaracoErrorListener extends BaseErrorListener {
         errors = new ArrayList<BaracoError>();
 
         this.controller = controller;
+    }
+
+    public BaracoErrorListener () {
+        errors = new ArrayList<BaracoError>();
+
+        //this.controller = controller;
     }
 
     @Override
@@ -144,7 +151,7 @@ public class BaracoErrorListener extends BaseErrorListener {
             error.setErrorSuffix(".");
         }
 
-        controller.printErrorInConsole(error);
+        View.appendErrorInConsole(error);
         errors.add(error);
     }
 

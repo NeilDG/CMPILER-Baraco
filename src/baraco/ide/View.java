@@ -65,7 +65,7 @@ public class View extends Application {
     );
 
     private Controller controller;
-    private CodeArea editor;
+    public static CodeArea editor;
     private GridPane gridPane;
     private ExecutorService executor;
     public static TextFlow console;
@@ -191,7 +191,7 @@ public class View extends Application {
         return toolBar;
     }
 
-    public void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
+    public static void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
         int startPos = editor.position(startRow, startCol).toOffset();
         int endPos = editor.position(endRow, endCol).toOffset();
 
@@ -204,7 +204,7 @@ public class View extends Application {
         console.getChildren().add(error);
     }
 
-    public void appendErrorInConsole(BaracoError e) {
+    public static void appendErrorInConsole(BaracoError e) {
 
         Text errorPrefix = new Text(e.getErrorPrefix());
         Hyperlink line = new Hyperlink(e.getLineLayout());

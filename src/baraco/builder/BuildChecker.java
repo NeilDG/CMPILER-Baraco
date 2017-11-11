@@ -1,5 +1,6 @@
 package baraco.builder;
 
+import baraco.ide.View;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
@@ -41,6 +42,7 @@ public class BuildChecker implements ANTLRErrorListener {
         String errorMessage = ErrorRepository.getErrorMessage(errorCode) + " " + additionalMessage;
         //Console.log(LogType.ERROR, errorMessage);
         System.out.println("ERROR: " + errorMessage);
+        View.printInConsole("ERROR: " + errorMessage);
 
         sharedInstance.successful = false;
     }
@@ -48,6 +50,7 @@ public class BuildChecker implements ANTLRErrorListener {
     public static void reportCustomError(int errorCode, String additionalMessage, Object... parameters) {
         String errorMessage = String.format(ErrorRepository.getErrorMessage(errorCode) + " " + additionalMessage, parameters);
         System.out.println("ERROR: " + errorMessage);
+        View.printInConsole("ERROR: " + errorMessage);
 
         sharedInstance.successful = false;
     }
@@ -55,6 +58,7 @@ public class BuildChecker implements ANTLRErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
         System.out.println("ERROR: " + "Syntax error at line " + i + ":" + i1 + ". " + s);
+        View.printInConsole("ERROR: " + "Syntax error at line " + i + ":" + i1 + ". " + s);
 
         this.successful = false;
     }

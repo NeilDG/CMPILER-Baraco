@@ -1,5 +1,6 @@
 package baraco.builder;
 
+import baraco.antlr.error.BaracoErrorListener;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoBaseListener;
 import baraco.antlr.parser.BaracoParser;
@@ -36,7 +37,7 @@ public class ParserHandler {
         CommonTokenStream tokens = new CommonTokenStream(this.sharedLexer);
         this.sharedParser = new BaracoParser(tokens);
         this.sharedParser.removeErrorListeners();
-        this.sharedParser.addErrorListener(BuildChecker.getInstance());
+        this.sharedParser.addErrorListener(new BaracoErrorListener());
 
         ParserRuleContext parserRuleContext = this.sharedParser.compilationUnit();
         System.out.println("DEBUG: " + parserRuleContext.toStringTree(this.sharedParser));
