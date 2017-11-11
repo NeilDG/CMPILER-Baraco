@@ -2,7 +2,6 @@
 package baraco.antlr.parser;
 import baraco.semantics.analyzers.ClassAnalyzer;
 import baraco.semantics.analyzers.MainAnalyzer;
-import baraco.semantics.analyzers.StatementAnalyzer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -876,10 +875,7 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStatement(BaracoParser.StatementContext ctx) {
-		StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
-		statementAnalyzer.analyze(ctx);
-	}
+	@Override public void enterStatement(BaracoParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

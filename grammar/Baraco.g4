@@ -4,7 +4,7 @@ grammar Baraco;
 compilationUnit
     //:   packageDeclaration? importDeclaration* typeDeclaration* EOF
     //:   constDeclaration* methodDeclaration* statement*
-    :   typeDeclaration* constDeclaration* methodDeclaration* statement* EOF
+    :   typeDeclaration* constDeclaration* memberDeclaration* statement* EOF
     ;
 
 packageDeclaration
@@ -117,6 +117,7 @@ memberDeclaration
     |   annotationTypeDeclaration
     |   classDeclaration
     |   enumDeclaration
+    |   mainDeclaration
     ;
 
 /* We use rule this even for void methods which cannot have [] after parameters.
