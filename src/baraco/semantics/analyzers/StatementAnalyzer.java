@@ -24,6 +24,7 @@ public class StatementAnalyzer {
         }
         //an expression
         else if(ctx.statementExpression() != null) {
+            System.out.println("STATEMENT ANALYZER: " + ctx.statementExpression().expression().start.getText());
             StatementExpressionAnalyzer expressionAnalyzer = new StatementExpressionAnalyzer();
             expressionAnalyzer.analyze(ctx.statementExpression());
         }

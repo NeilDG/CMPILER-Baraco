@@ -90,7 +90,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 this.handleFunctionCallWithParams(exprCtx);
             }
 
-            else if(this.isFunctionCallWithNoParams(exprCtx)) {
+            else if(!this.isFunctionCallWithParams(exprCtx)) {
                 this.handleFunctionCallWithNoParams(exprCtx);
             }
         }
@@ -139,7 +139,8 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
     }
 
     private void handleFunctionCallWithNoParams(ExpressionContext funcExprCtx) {
-        String functionName = funcExprCtx.Identifier().getText();
+        System.out.println("HANDLEEEE: " + funcExprCtx.start.getText());
+        String functionName = funcExprCtx.start.getText();
 
         MethodCallCommand methodCallCommand = new MethodCallCommand(functionName, funcExprCtx);
         this.handleStatementExecution(methodCallCommand);
