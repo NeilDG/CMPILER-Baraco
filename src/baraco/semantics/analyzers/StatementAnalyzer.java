@@ -3,10 +3,7 @@ package baraco.semantics.analyzers;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.execution.ExecutionManager;
-import baraco.execution.commands.controlled.ForCommand;
-import baraco.execution.commands.controlled.IConditionalCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
-import baraco.execution.commands.controlled.IfCommand;
+import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.PrintCommand;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
@@ -83,6 +80,20 @@ public class StatementAnalyzer {
             LocalScopeCreator.getInstance().closeLocalScope();
             System.out.println("End of FOR loop");
         }
+        else if(isWHILEStatement(ctx)) {
+            //Console.log(LogType.DEBUG, "While par expression: " +ctx.parExpression().getText());
+
+            StatementContext statementCtx = ctx.statement(0);
+
+            WhileCommand whileCommand = new WhileCommand(ctx.parExpression());
+            StatementControlOverseer.getInstance().openControlledCommand(whileCommand);
+
+            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            statementAnalyzer.analyze(statementCtx);
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
+            //Console.log(LogType.DEBUG, "End of WHILE expression: " +ctx.parExpression().getText());
+        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
@@ -129,5 +140,12 @@ public class StatementAnalyzer {
         List<TerminalNode> tokenList = ctx.getTokens(BaracoLexer.ELSE);
 
         return (tokenList.size() != 0);
+    }
+
+    public static boolean isWHILEStatement(StatementContext ctx) {
+        List<TerminalNode> whileTokenList = ctx.getTokens(BaracoLexer.WHILE);
+        List<TerminalNode> doTokenList = ctx.getTokens(BaracoLexer.DO);
+
+        return (whileTokenList.size() != 0 && doTokenList.size() == 0);
     }
 }
