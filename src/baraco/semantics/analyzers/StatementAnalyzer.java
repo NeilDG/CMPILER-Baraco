@@ -22,6 +22,7 @@ public class StatementAnalyzer {
         if(ctx.PRINT() != null) {
             this.handlePrintStatement(ctx);
         }
+        // Add Scan implementation here
         //an expression
         else if(ctx.statementExpression() != null) {
             System.out.println("STATEMENT ANALYZER: " + ctx.statementExpression().expression().start.getText());
