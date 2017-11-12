@@ -9,6 +9,7 @@ import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -201,7 +202,9 @@ public class View extends Application {
     public static void printInConsole(String text) {
         Text error = new Text(text);
 
-        console.getChildren().add(error);
+        Platform.runLater(() -> {
+            console.getChildren().add(error);
+        });
     }
 
     public static void appendErrorInConsole(BaracoError e) {
