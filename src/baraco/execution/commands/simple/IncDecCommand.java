@@ -1,6 +1,7 @@
 package baraco.execution.commands.simple;
 
 import baraco.antlr.lexer.BaracoLexer;
+import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.ICommand;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.representations.BaracoValue;
@@ -15,6 +16,9 @@ public class IncDecCommand implements ICommand {
     public IncDecCommand(ExpressionContext exprCtx, int tokenSign) {
         this.exprCtx = exprCtx;
         this.tokenSign = tokenSign;
+
+        UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.exprCtx);
+        undeclaredChecker.verify();
     }
 
     /* (non-Javadoc)
