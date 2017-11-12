@@ -96,6 +96,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
             if(primaryCtx.expression() != null) {
                 ExpressionContext exprCtx = primaryCtx.expression();
+
+                //System.out.println(exprCtx.);
                 this.complexExpr = true;
                 System.out.println("Complex expression detected: " +exprCtx.getText());
 

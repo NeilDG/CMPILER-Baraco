@@ -91,7 +91,9 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 this.handleFunctionCallWithParams(exprCtx);
             }
 
-            else if(!this.isFunctionCallWithParams(exprCtx)) {
+            else if(isFunctionCallWithNoParams(exprCtx)) {
+               int i = exprCtx.depth();
+               TerminalNode n = exprCtx.Identifier();
                 called++;
                 if(called % 2 == 1)
                     this.handleFunctionCallWithNoParams(exprCtx);
@@ -188,7 +190,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
         if(exprCtx.depth() == FUNCTION_CALL_NO_PARAMS_DEPTH) {
             //ThisKeywordChecker thisChecker = new ThisKeywordChecker(exprCtx);
             //thisChecker.verify();
-            if(exprCtx.Identifier() != null)
+            //if(exprCtx.Identifier() != null)
                 return true;
         }
 
