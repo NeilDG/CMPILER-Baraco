@@ -5,6 +5,7 @@ import baraco.antlr.parser.BaracoParser.*;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.PrintCommand;
+import baraco.execution.commands.simple.ReturnCommand;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -110,6 +111,10 @@ public class StatementAnalyzer {
             StatementControlOverseer.getInstance().compileControlledCommand();
             //Console.log(LogType.DEBUG, "End of DO-WHILE expression: " +ctx.parExpression().getText());
         }
+        else if(isRETURNStatement(ctx) && ExecutionManager.getInstance().isInFunctionExecution()) {
+            System.out.println("Detected return expression: " +ctx.expression(0).getText());
+            this.handleReturnStatement(ctx.expression(0));
+        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
@@ -136,6 +141,36 @@ public class StatementAnalyzer {
         }
         else {
             ExecutionManager.getInstance().addCommand(printCommand);
+        }
+
+    }
+
+    private void handleReturnStatement(ExpressionContext exprCtx) {
+        ReturnCommand returnCommand = new ReturnCommand(exprCtx, ExecutionManager.getInstance().getCurrentFunction());
+		/*
+		 * TODO: Return commands supposedly stops a controlled or conditional command and returns back the control to the caller.
+		 * Find a way to halt such commands if they are inside a controlled command.
+		 */
+        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+
+        if(statementControl.isInConditionalCommand()) {
+            IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInPositiveRule()) {
+                conditionalCommand.addPositiveCommand(returnCommand);
+            }
+            else {
+                String functionName = ExecutionManager.getInstance().getCurrentFunction().getMethodName();
+                conditionalCommand.addNegativeCommand(returnCommand);
+            }
+        }
+
+        else if(statementControl.isInControlledCommand()) {
+            IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
+            controlledCommand.addCommand(returnCommand);
+        }
+        else {
+            ExecutionManager.getInstance().addCommand(returnCommand);
         }
 
     }
@@ -170,6 +205,11 @@ public class StatementAnalyzer {
         List<TerminalNode> doTokenList = ctx.getTokens(BaracoLexer.DO);
 
         return (whileTokenList.size() != 0 && doTokenList.size() != 0);
+    }
+    public static boolean isRETURNStatement(StatementContext ctx) {
+        List<TerminalNode> returnTokenList = ctx.getTokens(BaracoLexer.RETURN);
+
+        return (returnTokenList.size() != 0);
     }
 
 }
