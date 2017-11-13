@@ -95,9 +95,11 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                int i = exprCtx.depth();
                TerminalNode n = exprCtx.Identifier();
                 called++;
-                if(called % 2 == 1)
+                if(called % 2 == 1) {
+                    System.out.println("depth: " + exprCtx.depth());
                     this.handleFunctionCallWithNoParams(exprCtx);
-            }
+                }
+            }*/
         }
     }
 
