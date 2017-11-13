@@ -99,7 +99,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                     System.out.println("depth: " + exprCtx.depth());
                     this.handleFunctionCallWithNoParams(exprCtx);
                 }
-            }*/
+            }
         }
     }
 
