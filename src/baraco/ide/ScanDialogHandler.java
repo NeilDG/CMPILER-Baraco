@@ -38,7 +38,7 @@ public class ScanDialogHandler implements NotificationListener {
                     try {
                         NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
                     } catch (ConcurrentModificationException ex) {
-
+                        //kadiri
                     }
                 }
 
