@@ -6,6 +6,7 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.PrintCommand;
 import baraco.execution.commands.simple.ReturnCommand;
+import baraco.execution.commands.simple.ScanCommand;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -142,6 +143,11 @@ public class StatementAnalyzer {
         else {
             ExecutionManager.getInstance().addCommand(printCommand);
         }
+
+    }
+
+    private void handleScanStatement(StatementContext ctx) {
+        System.out.println("HANDLE SCAN: " + ctx.expression().size());
 
     }
 
