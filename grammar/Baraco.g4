@@ -389,9 +389,9 @@ statement
     ;
 
 scanStatement
-    :   Identifier '=' 'scanInt' '(' ')'
-    |   Identifier '=' 'scanDecimal' '(' ')'
-    |   Identifier '=' 'scanString' '(' ')'
+    :   'scanInt' '(' expression ',' Identifier ')'
+    |   'scanDecimal' '(' expression ',' Identifier ')'
+    |   'scanString' '(' expression ',' Identifier ')'
     ;
 
 printStatement
@@ -474,7 +474,8 @@ constantExpression
 
 expression
     :   primary
-    //|   expression '.' Identifier
+    |   arguments
+    |   expression '.' Identifier
     //|   expression '.' 'this'
     //|   expression '.' 'new' nonWildcardTypeArguments? innerCreator
     //|   expression '.' 'super' superSuffix
