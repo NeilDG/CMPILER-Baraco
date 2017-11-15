@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
 
 import javax.swing.text.html.Option;
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
 
 import static baraco.utils.notifications.KeyNames.VALUE_ENTERED_KEY;
@@ -34,7 +35,11 @@ public class ScanDialogHandler implements NotificationListener {
                     Parameters parameters = new Parameters();
                     parameters.putExtra(VALUE_ENTERED_KEY, result.get());
 
-                    NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
+                    try {
+                        NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
+                    } catch (ConcurrentModificationException ex) {
+
+                    }
                 }
 
         });

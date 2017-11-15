@@ -14,6 +14,8 @@ public class ScanCommand implements ICommand, NotificationListener {
     private String messageToDisplay;
     private String identifier;
 
+    private int called = 0;
+
     public ScanCommand(String messageToDisplay, String identifier) {
         this.messageToDisplay = StringUtils.removeQuotes(messageToDisplay);
         this.identifier = identifier;
@@ -21,13 +23,17 @@ public class ScanCommand implements ICommand, NotificationListener {
     }
     @Override
     public void execute() {
-        NotificationCenter.getInstance().addObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //add an observer to listen to when the dialog has been dismissed
+        called++;
 
-        Parameters params = new Parameters();
-        params.putExtra(KeyNames.MESSAGE_DISPLAY_KEY, this.messageToDisplay);
+        if(called % 2 == 1) {
+            NotificationCenter.getInstance().addObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //add an observer to listen to when the dialog has been dismissed
 
-        ExecutionManager.getInstance().blockExecution();
-        NotificationCenter.getInstance().postNotification(Notifications.ON_FOUND_SCAN_STATEMENT, params);
+            Parameters params = new Parameters();
+            params.putExtra(KeyNames.MESSAGE_DISPLAY_KEY, this.messageToDisplay);
+
+            ExecutionManager.getInstance().blockExecution();
+            NotificationCenter.getInstance().postNotification(Notifications.ON_FOUND_SCAN_STATEMENT, params);
+        }
     }
 
     private void acquireInputFromUser(Parameters params) {
