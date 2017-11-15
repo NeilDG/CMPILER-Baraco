@@ -33,11 +33,13 @@ public class ScanCommand implements ICommand, NotificationListener {
     private void acquireInputFromUser(Parameters params) {
         String valueEntered = params.getStringExtra(KeyNames.VALUE_ENTERED_KEY, "");
 
+        System.out.println("VALUE ENTERED: " + valueEntered);
+
         BaracoValue baracoValue = BaracoValueSearcher.searchBaracoValue(identifier);
         baracoValue.setValue(valueEntered);
 
         NotificationCenter.getInstance().removeObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //remove observer after using
-        ExecutionManager.getInstance().resumeExecution(); //resume execution of thread.
+        ExecutionManager.getInstance().resumeExecution(); //resume execution of thread
     }
 
     @Override

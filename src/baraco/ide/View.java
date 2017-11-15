@@ -74,6 +74,8 @@ public class View extends Application {
     private Stage stage;
     private String currentFileName;
 
+    private ScanDialogHandler scanDialogHandler;
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         this.stage = primaryStage;
@@ -85,6 +87,8 @@ public class View extends Application {
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
         primaryStage.show();
+
+        this.scanDialogHandler = new ScanDialogHandler();
 
         SymbolTableManager.initialize();
         BuildChecker.initialize();

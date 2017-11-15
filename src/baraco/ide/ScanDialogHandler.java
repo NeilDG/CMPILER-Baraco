@@ -1,8 +1,10 @@
 package baraco.ide;
 
 import baraco.utils.notifications.*;
+import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 import static baraco.utils.notifications.KeyNames.VALUE_ENTERED_KEY;
@@ -22,16 +24,22 @@ public class ScanDialogHandler implements NotificationListener {
     private void showScanDialog(Parameters params) {
         dialog.setContentText(params.getStringExtra(KeyNames.MESSAGE_DISPLAY_KEY, "Input: "));
 
+
         // Traditional way to get the response value.
-        Optional<String> result = dialog.showAndWait();
+        Platform.runLater(()-> {
 
-        if (result.isPresent()){
-            //System.out.println("Your name: " + result.get());
-            Parameters parameters = new Parameters();
-            params.putExtra(VALUE_ENTERED_KEY, result.get());
+                Optional<String> result = dialog.showAndWait();
 
-            NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
-        }
+                if (result.isPresent()){
+                    Parameters parameters = new Parameters();
+                    parameters.putExtra(VALUE_ENTERED_KEY, result.get());
+
+                    NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
+                }
+
+        });
+
+
     }
 
 

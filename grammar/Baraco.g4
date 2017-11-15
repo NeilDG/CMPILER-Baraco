@@ -386,12 +386,13 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     |   PRINT '(' expression ')' ';'
+    |   scanStatement
     ;
 
 scanStatement
-    :   'scanInt' '(' expression ',' Identifier ')'
-    |   'scanDecimal' '(' expression ',' Identifier ')'
-    |   'scanString' '(' expression ',' Identifier ')'
+    :   SCANINT '(' expression ',' Identifier ')'
+    |   SCANDEC '(' expression ',' Identifier ')'
+    |   SCANSTR '(' expression ',' Identifier ')'
     ;
 
 printStatement

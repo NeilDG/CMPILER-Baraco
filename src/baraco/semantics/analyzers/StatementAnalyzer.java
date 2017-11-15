@@ -24,6 +24,10 @@ public class StatementAnalyzer {
         if(ctx.PRINT() != null) {
             this.handlePrintStatement(ctx);
         }
+
+        else if (ctx.scanStatement() != null) {
+            this.handleScanStatement(ctx.scanStatement());
+        }
         // Add Scan implementation here
         //an expression
         else if(ctx.statementExpression() != null) {
@@ -146,8 +150,32 @@ public class StatementAnalyzer {
 
     }
 
-    private void handleScanStatement(StatementContext ctx) {
-        System.out.println("HANDLE SCAN: " + ctx.expression().size());
+    private void handleScanStatement(ScanStatementContext ctx) {
+        System.out.println("HANDLE SCAN: " + ctx.expression().getText() + ctx.Identifier().getText());
+
+        ScanCommand scanCommand = new ScanCommand(ctx.expression().getText(), ctx.Identifier().getText());
+
+        ExecutionManager.getInstance().addCommand(scanCommand);
+        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+
+        if(statementControl.isInConditionalCommand()) {
+            IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInPositiveRule()) {
+                conditionalCommand.addPositiveCommand(scanCommand);
+            }
+            else {
+                conditionalCommand.addNegativeCommand(scanCommand);
+            }
+        }
+
+        else if(statementControl.isInControlledCommand()) {
+            IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
+            controlledCommand.addCommand(scanCommand);
+        }
+        else {
+            ExecutionManager.getInstance().addCommand(scanCommand);
+        }
 
     }
 
