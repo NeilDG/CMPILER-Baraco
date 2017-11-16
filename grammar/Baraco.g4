@@ -390,9 +390,7 @@ statement
     ;
 
 scanStatement
-    :   SCANINT '(' expression ',' Identifier ')'
-    |   SCANDEC '(' expression ',' Identifier ')'
-    |   SCANSTR '(' expression ',' Identifier ')'
+    :   SCAN '(' expression ',' Identifier ')' ';'
     ;
 
 printStatement
@@ -642,9 +640,7 @@ TRY           : 'try';
 VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
-SCANINT       : 'scanInt';
-SCANDEC       : 'scanDecimal';
-SCANSTR       : 'scanString';
+SCAN          : 'scan';
 PRINT         : 'print';
 PRINTLN       : 'println';
 END           : 'end';
