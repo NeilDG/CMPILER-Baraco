@@ -7,6 +7,8 @@ import baraco.ide.View;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
+import baraco.representations.RecognizedKeywords;
+import baraco.semantics.utils.Expression;
 import baraco.semantics.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -26,11 +28,15 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     private String statementToPrint = "";
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
+    private boolean expCtxLOCK = false;
+    private boolean containString = false;
 
     private List<Object> printExpr = new ArrayList<>();
 
     public PrintCommand(ExpressionContext expressionCtx) {
         this.expressionCtx = expressionCtx;
+
+        containString = expressionCtx.getText().contains("\"");
 
         //UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.expressionCtx);
         //undeclaredChecker.verify();
@@ -41,14 +47,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.expressionCtx);
 
-        System.out.println(this.statementToPrint);
-        if(!printExpr.isEmpty()) {
-            View.printInConsole(this.printExpr.get(0).toString());
-            printExpr.clear();
-        }
-        else
-            View.printInConsole(this.statementToPrint);
-        this.statementToPrint = ""; //reset statement to print afterwards
+        View.printInConsole(this.statementToPrint);
     }
 
     @Override
@@ -64,51 +63,69 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof LiteralContext) {
+
+        if(ctx instanceof LiteralContext && !expCtxLOCK) {
+
+            System.out.println("LITERAL CONT " + ctx.getText());
+
             LiteralContext literalCtx = (LiteralContext) ctx;
 
-            if(literalCtx.StringLiteral() != null) {
+            if (literalCtx.StringLiteral() != null) {
                 String quotedString = literalCtx.StringLiteral().getText();
 
                 this.statementToPrint += StringUtils.removeQuotes(quotedString);
+            } else if (literalCtx.IntegerLiteral() != null) {
+                int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
+                this.statementToPrint += value;
+            } else if (literalCtx.FloatingPointLiteral() != null) {
+                float value = Float.parseFloat(literalCtx.FloatingPointLiteral().getText());
+                this.statementToPrint += value;
+            } else if (literalCtx.BooleanLiteral() != null) {
+                this.statementToPrint += literalCtx.BooleanLiteral().getText();
+            } else if (literalCtx.CharacterLiteral() != null) {
+                this.statementToPrint += literalCtx.CharacterLiteral().getText();
             }
-			else if(literalCtx.IntegerLiteral() != null) {
-				int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
-				this.statementToPrint += value;
-			}
 
-			else if(literalCtx.FloatingPointLiteral() != null) {
-				float value = Float.parseFloat(literalCtx.FloatingPointLiteral().getText());
-				this.statementToPrint += value;
-			}
+        } else if (ctx instanceof ExpressionContext && !expCtxLOCK && !containString) {
 
-			else if(literalCtx.BooleanLiteral() != null) {
-				this.statementToPrint += literalCtx.BooleanLiteral().getText();
-			}
+            try {
+                ExpressionContext expCtx = (ExpressionContext) ctx;
 
-			else if(literalCtx.CharacterLiteral() != null) {
-				this.statementToPrint += literalCtx.CharacterLiteral().getText();
-			}
-        }
+                EvaluationCommand evComm = new EvaluationCommand(expCtx);
+                evComm.execute();
 
-        else if(ctx instanceof PrimaryContext) {
+                expCtxLOCK = true;
+
+                printExpr.add(evComm.getResult());
+                statementToPrint += evComm.getResult();
+            } catch (ClassCastException ex) {
+
+            } catch (Expression.ExpressionException ex) {
+
+            }
+
+        } else if(ctx instanceof PrimaryContext && !expCtxLOCK) {
+
+            System.out.println("PRIMARY CONTEXT");
+
             PrimaryContext primaryCtx = (PrimaryContext) ctx;
 
             if(primaryCtx.expression() != null) {
                 ExpressionContext exprCtx = primaryCtx.expression();
 
-                //System.out.println(exprCtx.);
                 this.complexExpr = true;
                 System.out.println("Complex expression detected: " +exprCtx.getText());
 
                 EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
                 evaluationCommand.execute();
 
-                this.printExpr.add(evaluationCommand.getResult().toEngineeringString());
+                this.printExpr.add(evaluationCommand.getResult());
                 this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
+
+                ctx.children = null;
             }
 
-            else if(primaryCtx.Identifier() != null && this.complexExpr == false) {
+            else if(primaryCtx.Identifier() != null && !this.complexExpr) {
                 String identifier = primaryCtx.getText();
 
                 BaracoValue value = BaracoValueSearcher.searchBaracoValue(identifier);
@@ -116,8 +133,9 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                     this.arrayAccess = true;
                     this.evaluateArrayPrint(value, primaryCtx);
                 }
-                else if(this.arrayAccess == false) {
+                else if(!this.arrayAccess) {
                     this.statementToPrint += value.getValue();
+                    printExpr.add(value.getValue());
                 }
 
 
