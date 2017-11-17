@@ -110,7 +110,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
             PrimaryContext primaryCtx = (PrimaryContext) ctx;
 
-            if(primaryCtx.expression() != null) {
+            if(primaryCtx.expression() != null && !primaryCtx.expression().getText().contains("\"")) {
+
                 ExpressionContext exprCtx = primaryCtx.expression();
 
                 this.complexExpr = true;
