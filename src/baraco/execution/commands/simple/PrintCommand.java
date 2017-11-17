@@ -74,6 +74,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 String quotedString = literalCtx.StringLiteral().getText();
 
                 this.statementToPrint += StringUtils.removeQuotes(quotedString);
+
+                literalCtx.children = null;
             } else if (literalCtx.IntegerLiteral() != null) {
                 int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
                 this.statementToPrint += value;
