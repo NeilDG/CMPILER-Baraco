@@ -28,7 +28,6 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     private String statementToPrint = "";
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
-    private boolean expCtxLOCK = false;
     private boolean containString = false;
 
     private List<Object> printExpr = new ArrayList<>();
@@ -64,7 +63,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
 
-        if(ctx instanceof LiteralContext && !expCtxLOCK) {
+        if(ctx instanceof LiteralContext) {
 
             System.out.println("LITERAL CONT " + ctx.getText());
 
@@ -88,25 +87,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 this.statementToPrint += literalCtx.CharacterLiteral().getText();
             }
 
-        } else if (ctx instanceof ExpressionContext && !expCtxLOCK && !containString) {
-
-            try {
-                ExpressionContext expCtx = (ExpressionContext) ctx;
-
-                EvaluationCommand evComm = new EvaluationCommand(expCtx);
-                evComm.execute();
-
-                expCtxLOCK = true;
-
-                printExpr.add(evComm.getResult());
-                statementToPrint += evComm.getResult();
-            } catch (ClassCastException ex) {
-
-            } catch (Expression.ExpressionException ex) {
-
-            }
-
-        } else if(ctx instanceof PrimaryContext && !expCtxLOCK) {
+        } else if(ctx instanceof PrimaryContext) {
 
             System.out.println("PRIMARY CONTEXT");
 
@@ -122,8 +103,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
                 evaluationCommand.execute();
 
-                this.printExpr.add(evaluationCommand.getResult());
-                this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
+                //this.printExpr.add(evaluationCommand.getResult());
+                this.statementToPrint += evaluationCommand.getStringResult();
 
                 ctx.children = null;
             }
@@ -143,6 +124,24 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
 
             }
+        } else if (ctx instanceof ExpressionContext && !containString) {
+
+            try {
+                ExpressionContext expCtx = (ExpressionContext) ctx;
+
+                EvaluationCommand evComm = new EvaluationCommand(expCtx);
+                evComm.execute();
+
+                ctx.children = null;
+
+                //printExpr.add(evComm.getResult());
+                statementToPrint += evComm.getStringResult();
+            } catch (ClassCastException ex) {
+
+            } catch (Expression.ExpressionException ex) {
+
+            }
+
         }
     }
 

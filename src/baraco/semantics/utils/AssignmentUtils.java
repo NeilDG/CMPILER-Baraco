@@ -32,4 +32,10 @@ public class AssignmentUtils {
             //Console.log(LogType.DEBUG, "MobiValue: DID NOT FIND APPROPRIATE TYPE!!");
         }
     }
+
+    public static void assignAppropriateValue(BaracoValue baracoValue, String stringValue) {
+        if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+            baracoValue.setValue(stringValue);
+        }
+    }
 }

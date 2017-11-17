@@ -41,7 +41,11 @@ public class MappingCommand implements ICommand{
         evaluationCommand.execute();
 
         BaracoValue baracoValue = VariableSearcher.searchVariable(this.identifierString);
-        AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+
+        if (evaluationCommand.isNumericResult())
+            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+        else
+            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
     }
 
     /*

@@ -9,6 +9,7 @@ import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.Expression;
+import baraco.semantics.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -26,6 +27,10 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private String modifiedExp;
     private BigDecimal resultValue;
 
+    private boolean isNumeric;
+
+    private String stringResult;
+
     public EvaluationCommand(ExpressionContext exprCtx) {
         this.parentExprCtx = exprCtx;
     }
@@ -34,20 +39,35 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     public void execute() {
         this.modifiedExp = this.parentExprCtx.getText();
 
+        ParseTreeWalker treeWalker = new ParseTreeWalker();
+        treeWalker.walk(this, this.parentExprCtx);
+
+        //System.out.println("ADSF " + modifiedExp);
+
+        isNumeric = !modifiedExp.contains("\"");
+
         //catch rules if the value has direct boolean flags
         if(this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
+
             this.resultValue = new BigDecimal(1);
+            this.stringResult = this.resultValue.toEngineeringString();
+
         }
         else if(this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_FALSE)) {
+
             this.resultValue = new BigDecimal(0);
+            this.stringResult = this.resultValue.toEngineeringString();
+
+        }
+        else if (!isNumeric) {
+            this.stringResult = StringUtils.removeQuotes(modifiedExp);;
         }
         else {
-            ParseTreeWalker treeWalker = new ParseTreeWalker();
-            treeWalker.walk(this, this.parentExprCtx);
-
             Expression evalEx = new Expression(this.modifiedExp);
             //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
             this.resultValue = evalEx.eval();
+            this.stringResult = this.resultValue.toEngineeringString();
+
         }
 
     }
@@ -129,11 +149,16 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     }
 
     private void evaluateVariable(ExpressionContext exprCtx) {
-        BaracoValue mobiValue = VariableSearcher
+        BaracoValue baracoValue = VariableSearcher
                 .searchVariable(exprCtx.getText());
 
         this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                mobiValue.getValue().toString());
+                baracoValue.getValue().toString());
+
+        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
+            modifiedExp = "\"" + modifiedExp + "\"";
+
+        System.out.println("EVALUATED: " + modifiedExp);
     }
 
     /*
@@ -143,4 +168,11 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         return this.resultValue;
     }
 
+    public String getStringResult() {
+        return stringResult;
+    }
+
+    public boolean isNumericResult() {
+        return isNumeric;
+    }
 }
