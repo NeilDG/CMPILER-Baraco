@@ -63,8 +63,14 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             this.stringResult = StringUtils.removeQuotes(modifiedExp);;
         }
         else {
+
+            if (modifiedExp.contains("!")) {
+                modifiedExp = modifiedExp.replaceAll("!", "not");
+                modifiedExp = modifiedExp.replaceAll("not=", "!=");
+            }
+
             Expression evalEx = new Expression(this.modifiedExp);
-            //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
+
             this.resultValue = evalEx.eval();
             this.stringResult = this.resultValue.toEngineeringString();
 

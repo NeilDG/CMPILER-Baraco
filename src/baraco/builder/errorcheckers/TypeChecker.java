@@ -3,6 +3,9 @@
  */
 package baraco.builder.errorcheckers;
 
+import baraco.antlr.parser.BaracoParser;
+import baraco.semantics.searching.VariableSearcher;
+import baraco.semantics.utils.Expression;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -13,9 +16,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import baraco.builder.BuildChecker;
 import baraco.builder.ErrorRepository;
 import baraco.antlr.parser.BaracoParser.ExpressionContext;
+import baraco.antlr.parser.BaracoParser.PrimaryContext;
 import baraco.antlr.parser.BaracoParser.LiteralContext;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValue.PrimitiveType;
+
+import java.util.EmptyStackException;
 
 /**
  * Handles all the type checking
@@ -27,6 +33,10 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
     private BaracoValue baracoValue;
     private ExpressionContext exprCtx;
     private int lineNumber;
+    private String exprString;
+
+    private boolean evaluated;
+    private boolean varEvaluated;
 
     public TypeChecker(BaracoValue assignmentMobiValue, ExpressionContext exprCtx) {
         this.baracoValue = assignmentMobiValue;
@@ -34,6 +44,11 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
 
         Token firstToken = exprCtx.getStart();
         this.lineNumber = firstToken.getLine();
+
+        evaluated = false;
+        varEvaluated = false;
+
+        exprString = exprCtx.getText();
     }
 
     @Override
@@ -59,7 +74,43 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof LiteralContext) {
+
+        if((ctx instanceof ExpressionContext) && !evaluated) {
+            System.out.println("Expression Context " + ctx.getText());
+
+            if (baracoValue.getPrimitiveType() == PrimitiveType.BOOL) {
+
+                if (exprString.contains("!")) {
+                    exprString = exprString.replaceAll("!", "not");
+                    exprString = exprString.replaceAll("not=", "!=");
+                }
+
+                Expression exp = new Expression(exprString);
+
+                try {
+                    System.out.println(exp.eval().toString());
+                    evaluated = true;
+                } catch (NumberFormatException ex) {
+                    evaluated = false;
+                } catch (EmptyStackException ex) { // erase after aleviation
+                    evaluated = false;
+                }
+            }
+
+            String ctxString = ctx.getText();
+
+            // START PRINTING ERRORS
+            if (ctxString.contains(">") || ctxString.contains("<") || ctxString.contains("|") || ctxString.contains("&")) {
+                if (baracoValue.getPrimitiveType() != PrimitiveType.BOOL) {
+                    String additionalMessage = "Expected boolean.";
+                    BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH, additionalMessage, this.lineNumber);
+                }
+            }
+            // END PRINTING ERRORS
+        }
+
+        /*if(ctx instanceof LiteralContext) {
+            System.out.println("Literal Context");
             if(this.baracoValue == null) {
                 return;
             }
@@ -95,7 +146,7 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                     BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
                 }
             }
-        }
+        }*/
     }
 
     @Override
@@ -103,5 +154,13 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
         // TODO Auto-generated method stub
 
     }
+
+    /*private void evaluateVariable (PrimaryContext pCtx) {
+        BaracoValue baracoValue = VariableSearcher
+                .searchVariable(pCtx.Identifier().getText());
+
+        if (baracoValue.getValue() != null)
+
+    } */
 
 }
