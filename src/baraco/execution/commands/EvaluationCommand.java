@@ -37,6 +37,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void execute() {
+        System.out.println("EvaluationCommand: executing");
         this.modifiedExp = this.parentExprCtx.getText();
 
         ParseTreeWalker treeWalker = new ParseTreeWalker();
@@ -85,8 +86,13 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
+        System.out.println("EvaluationCommand: entering every rule");
         if (ctx instanceof ExpressionContext) {
             ExpressionContext exprCtx = (ExpressionContext) ctx;
+            System.out.println("exprCtx.getText(): " + exprCtx.getText());
+            System.out.println("exprCtx.Identifier(): " + exprCtx.Identifier());
+            System.out.println("exprCtx.expressionList(): " + exprCtx.expressionList());
+            System.out.println("exprCtx.arguments(): " + exprCtx.arguments());
             if (EvaluationCommand.isFunctionCall(exprCtx)) {
                 this.evaluateFunctionCall(exprCtx);
             }
@@ -103,7 +109,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     }
 
     public static boolean isFunctionCall(ExpressionContext exprCtx) {
-        if (exprCtx.arguments() != null) {
+        if (exprCtx.expression(0) != null) {
+            System.out.println("exprCtx.expression(0).getText(): " + exprCtx.expression(0).getText());
             return true;
         } else {
             return false;
@@ -119,15 +126,32 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     }
 
     private void evaluateFunctionCall(ExpressionContext exprCtx) {
-        String functionName = exprCtx.expression(0).Identifier().getText();
+        String functionName = exprCtx.expression(0).getText();
 
         ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
                 ParserHandler.getInstance().getCurrentClassName());
         BaracoMethod baracoMethod = classScope.searchMethod(functionName);
 
-        if (exprCtx.arguments().expressionList() != null) {
+        /*if (exprCtx.arguments().expressionList() != null) {
             List<ExpressionContext> exprCtxList = exprCtx.arguments()
                     .expressionList().expression();
+
+            for (int i = 0; i < exprCtxList.size(); i++) {
+                ExpressionContext parameterExprCtx = exprCtxList.get(i);
+
+                EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
+                evaluationCommand.execute();
+
+                baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+            }
+        }*/
+
+        if (baracoMethod == null) {
+            return;
+        }
+
+        if (exprCtx.expressionList() != null) {
+            List<ExpressionContext> exprCtxList = exprCtx.expressionList().expression();
 
             for (int i = 0; i < exprCtxList.size(); i++) {
                 ExpressionContext parameterExprCtx = exprCtxList.get(i);
@@ -151,6 +175,10 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private void evaluateVariable(ExpressionContext exprCtx) {
         BaracoValue baracoValue = VariableSearcher
                 .searchVariable(exprCtx.getText());
+
+        if (baracoValue == null) {
+            return;
+        }
 
         this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
                 baracoValue.getValue().toString());
