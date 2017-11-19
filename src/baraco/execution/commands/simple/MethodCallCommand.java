@@ -90,7 +90,12 @@ public class MethodCallCommand implements ICommand {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
                 evaluationCommand.execute();
 
-                this.baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                if (evaluationCommand.isNumericResult()) {
+                    this.baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                }
+                else {
+                    this.baracoMethod.mapParameterByValueAt(evaluationCommand.getStringResult(), i);
+                }
             }
         }
     }
