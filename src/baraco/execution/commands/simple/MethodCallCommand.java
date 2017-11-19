@@ -65,12 +65,18 @@ public class MethodCallCommand implements ICommand {
      * Maps parameters when needed
      */
     private void mapParameters() {
-        if(this.exprCtx.arguments() == null || this.exprCtx.arguments().expressionList() == null
+        System.out.println("MethodCallCommand: mapping parameters");
+        //System.out.println("exprctx: " + this.exprCtx.expressionList().getText());
+        /*if(this.exprCtx.arguments() == null || this.exprCtx.arguments().expressionList() == null
                 || this.exprCtx.arguments().expressionList().expression() == null) {
+            return;
+        }*/
+
+        if (this.exprCtx.expressionList() == null) {
             return;
         }
 
-        List<ExpressionContext> exprCtxList = this.exprCtx.arguments().expressionList().expression();
+        List<ExpressionContext> exprCtxList = this.exprCtx.expressionList().expression();
 
         //map values in parameters
         for(int i = 0; i < exprCtxList.size(); i++) {
