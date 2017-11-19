@@ -7,7 +7,6 @@ import baraco.ide.View;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
-import baraco.representations.RecognizedKeywords;
 import baraco.semantics.utils.Expression;
 import baraco.semantics.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -16,11 +15,8 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import javax.swing.plaf.nimbus.State;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class PrintCommand implements ICommand, ParseTreeListener {
 
