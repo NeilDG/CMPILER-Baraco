@@ -2,6 +2,9 @@ package baraco.execution.commands.utils;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.execution.commands.EvaluationCommand;
+import baraco.semantics.utils.Expression;
+
+import java.math.BigDecimal;
 
 public class ConditionEvaluator {
 
@@ -50,9 +53,31 @@ public class ConditionEvaluator {
 
         int result = evaluationCommand.getResult().intValue();
 
-        //Console.log("Evaluating: " +conditionExprCtx.getText() + " Result: " +result);
+        System.out.println("Evaluating: " +conditionExprCtx.getText() + " Result: " +result);
 
         return (result == 1);
+    }
+
+    public static boolean evaluateCondition(String condition) {
+
+        //catch rules if the if value has direct boolean flags
+        if(condition.contains("(true)")) {
+            return true;
+        }
+        else if(condition.contains("(false)")) {
+            return false;
+        }
+
+        //EvaluationCommand evaluationCommand = new EvaluationCommand(conditionExprCtx);
+        //evaluationCommand.execute();
+
+        Expression expression = new Expression(condition);
+
+        BigDecimal result = expression.eval();
+
+        //System.out.println("Evaluating: " +conditionExprCtx.getText() + " Result: " +result);
+
+        return (1 == Integer.parseInt(result.toEngineeringString()));
     }
 
     public static boolean evaluateCondition(BaracoParser.ExpressionContext conditionExprCtx) {

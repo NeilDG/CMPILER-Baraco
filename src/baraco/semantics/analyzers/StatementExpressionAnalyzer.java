@@ -172,7 +172,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
         return (decrementList.size() > 0);
     }
 
-    private boolean isFunctionCallWithParams(ExpressionContext exprCtx) {
+    public boolean isFunctionCallWithParams(ExpressionContext exprCtx) {
         ExpressionContext firstExprCtx = exprCtx.expression(0);
 
         if(firstExprCtx != null) {

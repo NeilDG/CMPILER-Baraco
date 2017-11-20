@@ -386,6 +386,7 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     |   PRINT '(' expression ')' ';'
+    |   PRINTLN '(' expression ')' ';'
     |   scanStatement
     ;
 
@@ -473,7 +474,7 @@ constantExpression
 
 expression
     :   primary
-    |   arguments
+    |   expression '(' arguments ')' ';'
     |   expression '.' Identifier
     //|   expression '.' 'this'
     //|   expression '.' 'new' nonWildcardTypeArguments? innerCreator

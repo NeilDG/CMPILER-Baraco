@@ -1,5 +1,7 @@
 package baraco.ide;
 
+import baraco.execution.ExecutionManager;
+import baraco.execution.ExecutionMonitor;
 import baraco.utils.notifications.*;
 import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
@@ -22,9 +24,8 @@ public class ScanDialogHandler implements NotificationListener {
         NotificationCenter.getInstance().addObserver(Notifications.ON_FOUND_SCAN_STATEMENT, this);
     }
 
-    private void showScanDialog(Parameters params) {
+    private void showScanDialog(Parameters params) throws InterruptedException {
         dialog.setContentText(params.getStringExtra(KeyNames.MESSAGE_DISPLAY_KEY, "Input: "));
-
 
         // Traditional way to get the response value.
         Platform.runLater(()-> {
@@ -35,11 +36,8 @@ public class ScanDialogHandler implements NotificationListener {
                     Parameters parameters = new Parameters();
                     parameters.putExtra(VALUE_ENTERED_KEY, result.get());
 
-                    try {
-                        NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
-                    } catch (ConcurrentModificationException ex) {
-                        //kadiri
-                    }
+                    NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
+
                 }
 
         });
@@ -52,7 +50,11 @@ public class ScanDialogHandler implements NotificationListener {
     public void onNotify(String notificationString, Parameters params) {
 
         if(notificationString == Notifications.ON_FOUND_SCAN_STATEMENT) {
-            this.showScanDialog(params);
+            try {
+                this.showScanDialog(params);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

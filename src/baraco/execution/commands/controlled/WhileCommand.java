@@ -4,7 +4,9 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.simple.ScanCommand;
 import baraco.execution.commands.utils.ConditionEvaluator;
+import baraco.representations.BaracoValueSearcher;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
 
@@ -17,6 +19,8 @@ public class WhileCommand implements IControlledCommand {
 
     protected BaracoParser.ParExpressionContext conditionalExpr;
     protected String modifiedConditionExpr;
+
+    private boolean lastLineFlag = false;
 
     public WhileCommand(BaracoParser.ParExpressionContext conditionalExpr) {
         this.commandSequences = new ArrayList<ICommand>();
@@ -36,12 +40,13 @@ public class WhileCommand implements IControlledCommand {
 
         try {
             //evaluate the given condition
-            while(ConditionEvaluator.evaluateCondition(this.conditionalExpr)) {
+            while(ConditionEvaluator.evaluateCondition(this.modifiedConditionExpr)) {
                 for(ICommand command : this.commandSequences) {
                     executionMonitor.tryExecution();
                     command.execute();
                 }
 
+                executionMonitor.tryExecution();
                 this.identifyVariables(); //identify variables again to detect changes to such variables used.
             }
 
