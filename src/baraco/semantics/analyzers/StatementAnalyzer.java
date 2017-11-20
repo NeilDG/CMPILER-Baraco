@@ -155,7 +155,6 @@ public class StatementAnalyzer {
 
         ScanCommand scanCommand = new ScanCommand(ctx.expression().getText(), ctx.Identifier().getText());
 
-        ExecutionManager.getInstance().addCommand(scanCommand);
         StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
 
         if(statementControl.isInConditionalCommand()) {

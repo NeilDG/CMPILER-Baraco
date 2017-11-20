@@ -1,9 +1,14 @@
 package baraco.execution.commands.simple;
 
+import baraco.builder.ParserHandler;
 import baraco.execution.ExecutionManager;
+import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.evaluation.MappingCommand;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.StringUtils;
 import baraco.utils.notifications.*;
 
@@ -14,7 +19,6 @@ public class ScanCommand implements ICommand, NotificationListener {
     private String messageToDisplay;
     private String identifier;
 
-    private int called = 0;
 
     public ScanCommand(String messageToDisplay, String identifier) {
         this.messageToDisplay = StringUtils.removeQuotes(messageToDisplay);
@@ -23,29 +27,26 @@ public class ScanCommand implements ICommand, NotificationListener {
     }
     @Override
     public void execute() {
-        called++;
+        System.out.println("Found scan statement");
+        NotificationCenter.getInstance().addObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //add an observer to listen to when the dialog has been dismissed
 
-        if(called % 2 == 1) {
-            NotificationCenter.getInstance().addObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //add an observer to listen to when the dialog has been dismissed
+        Parameters params = new Parameters();
+        params.putExtra(KeyNames.MESSAGE_DISPLAY_KEY, this.messageToDisplay);
 
-            Parameters params = new Parameters();
-            params.putExtra(KeyNames.MESSAGE_DISPLAY_KEY, this.messageToDisplay);
+        ExecutionManager.getInstance().blockExecution();
 
-            ExecutionManager.getInstance().blockExecution();
-            NotificationCenter.getInstance().postNotification(Notifications.ON_FOUND_SCAN_STATEMENT, params);
-        }
+        NotificationCenter.getInstance().postNotification(Notifications.ON_FOUND_SCAN_STATEMENT, params);
     }
 
     private void acquireInputFromUser(Parameters params) {
         String valueEntered = params.getStringExtra(KeyNames.VALUE_ENTERED_KEY, "");
-
-        System.out.println("VALUE ENTERED: " + valueEntered);
 
         BaracoValue baracoValue = BaracoValueSearcher.searchBaracoValue(identifier);
         baracoValue.setValue(valueEntered);
 
         NotificationCenter.getInstance().removeObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //remove observer after using
         ExecutionManager.getInstance().resumeExecution(); //resume execution of thread
+
     }
 
     @Override
