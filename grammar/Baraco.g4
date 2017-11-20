@@ -386,6 +386,7 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     |   PRINT '(' expression ')' ';'
+    |   PRINTLN '(' expression ')' ';'
     |   scanStatement
     ;
 

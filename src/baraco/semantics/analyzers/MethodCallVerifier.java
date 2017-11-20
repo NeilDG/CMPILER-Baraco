@@ -31,10 +31,10 @@ public class MethodCallVerifier implements ParseTreeListener {
         if(ctx instanceof BaracoParser.ExpressionContext) {
             BaracoParser.ExpressionContext exprCtx = (BaracoParser.ExpressionContext) ctx;
             if (EvaluationCommand.isFunctionCall(exprCtx)) {
-                if(exprCtx.expression(0).Identifier() == null)
+                if(exprCtx.expression(0) == null)
                     return;
 
-                String functionName = exprCtx.expression(0).Identifier().getText();
+                String functionName = exprCtx.expression(0).getText();
 
                 ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
                         ParserHandler.getInstance().getCurrentClassName());
