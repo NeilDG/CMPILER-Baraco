@@ -76,6 +76,9 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                         ParserHandler.getInstance().getCurrentClassName());
                 BaracoMethod baracoMethod = classScope.searchMethod(expCtx.getText());
 
+                if(baracoValue == null)
+                    return;
+
                 if(baracoMethod == null)
                     return;
 
