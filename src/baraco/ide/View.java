@@ -221,7 +221,11 @@ public class View extends Application {
         errorSuffix.setFill(Color.RED);
 
         line.setOnAction(event -> {
-            highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
+            if (e.getCharNumber() != -1)
+                highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
+            else
+                highlightLineInEditor(e.getLineNumber() - 1, 1, e.getLineNumber() - 1, 1);
+
         });
 
         console.getChildren().add(errorPrefix);
