@@ -35,7 +35,7 @@ public class ScanDialogHandler implements NotificationListener {
                 if (result.isPresent()){
                     Parameters parameters = new Parameters();
                     parameters.putExtra(VALUE_ENTERED_KEY, result.get());
-                    
+
                     NotificationCenter.getInstance().postNotification(Notifications.ON_SCAN_DIALOG_DISMISSED, parameters); //report back results to scan command
 
                 } else {

@@ -53,7 +53,7 @@ public class ScanCommand implements ICommand, NotificationListener {
     private void acquireInputFromUser(Parameters params) {
         String valueEntered = params.getStringExtra(KeyNames.VALUE_ENTERED_KEY, "");
 
-        boolean success = false;
+        boolean success;
 
         if(this.array == null) {
             BaracoValue baracoValue = BaracoValueSearcher.searchBaracoValue(identifier);
@@ -68,8 +68,10 @@ public class ScanCommand implements ICommand, NotificationListener {
 
             }
         }
-        else
+        else {
             handleArrayAssignment(valueEntered);
+            success = true;
+        }
 
         if(success) {
             NotificationCenter.getInstance().removeObserver(Notifications.ON_SCAN_DIALOG_DISMISSED, this); //remove observer after using
