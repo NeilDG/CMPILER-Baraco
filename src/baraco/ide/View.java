@@ -42,9 +42,10 @@ import baraco.antlr.error.BaracoError;
 public class View extends Application {
 
     private static final String[] KEYWORDS = new String[] {
-            "bool", "break", "case", "const", "do", "else", "decimal", "for",
-            "if", "int", "return", "switch", "void", "while", "scanInt", "scanDec",
-            "scanStr", "print", "println", "end", "and", "or", "class", "public", "private", "true", "false", "string", "char"
+            "bool", "break", "case", "final", "do", "else", "decimal", "for",
+            "if", "int", "return", "switch", "void", "while", "print", "println",
+            "end", "and", "or", "class", "public", "private", "true", "false", "string",
+            "char", "final", "scan"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
