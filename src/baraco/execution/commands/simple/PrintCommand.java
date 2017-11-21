@@ -1,5 +1,6 @@
 package baraco.execution.commands.simple;
 
+import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.antlr.parser.BaracoParser.*;
@@ -17,18 +18,19 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PrintCommand implements ICommand, ParseTreeListener {
 
     private final static String TAG = "PrintCommand";
+    private final Pattern functionPattern = Pattern.compile("([a-zA-Z0-9]+)\\(([ ,.a-zA-Z0-9]+)\\)");
 
     private ExpressionContext expressionCtx;
 
     private String statementToPrint = "";
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
-    private boolean containString = false;
-    private boolean containArith = false;
     private boolean isLN = false;
 
     private List<Object> printExpr = new ArrayList<>();
@@ -41,15 +43,10 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
         this.expressionCtx = sCtx.expression(0);
 
-        containString = expressionCtx.getText().contains("\"");
+        UndeclaredChecker undeclaredChecker = new UndeclaredChecker(expressionCtx);
+        undeclaredChecker.verify();
 
-        containArith = expressionCtx.getText().contains("+") ||
-                        expressionCtx.getText().contains("-") ||
-                        expressionCtx.getText().contains("*") ||
-                        expressionCtx.getText().contains("/");
-
-        //UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.expressionCtx);
-        //undeclaredChecker.verify();
+        statementToPrint = "";
     }
 
     @Override
@@ -63,7 +60,6 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         View.printInConsole(this.statementToPrint);
 
         statementToPrint = "";
-        evaluatedExp = false;
     }
 
     @Override
@@ -80,7 +76,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
 
-        if(ctx instanceof LiteralContext && (containString || containArith)) {
+        if(ctx instanceof LiteralContext) {
 
             LiteralContext literalCtx = (LiteralContext) ctx;
 
@@ -93,9 +89,12 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
                 ParserRuleContext prCtx = literalCtx;
 
-                while(!(prCtx instanceof StatementContext) &&
-                        !( prCtx.getText().startsWith("(") && prCtx.getText().endsWith(")") )) // if it belongs to complex
+                while(!(prCtx instanceof StatementContext)){
                     prCtx = prCtx.getParent();
+                        if ( (prCtx.getText().startsWith("(") && prCtx.getText().endsWith(")") ) ||
+                                 functionPattern.matcher(prCtx.getText()).matches())
+                            break; // if it belongs to complex or function
+                }
 
                 if (prCtx instanceof StatementContext) { // if not in complex
                     int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
@@ -110,29 +109,39 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 this.statementToPrint += literalCtx.CharacterLiteral().getText();
             }
 
-        } else if (ctx instanceof ExpressionContext &&
-                !containString &&
-                !evaluatedExp) {
+        } else if (ctx instanceof ExpressionContext) {
 
             System.out.println("EXPRESSION CONT " + ctx.getText());
 
+            try {
+                int some = Integer.parseInt(ctx.getText());
+                return;
+            }catch (NumberFormatException ex) {
+
+            }
+
+            ExpressionContext expCtx = (ExpressionContext) ctx;
+
             ParserRuleContext prCtx = ctx;
 
-            while(!(prCtx instanceof StatementContext) &&
-                    !( prCtx.getText().startsWith("[") && prCtx.getText().endsWith("]") )) // if it belongs to complex
+            while(!(prCtx instanceof StatementContext)) { // if it belongs to complex
                 prCtx = prCtx.getParent();
+                if (prCtx.getText().endsWith("]") ||
+                        functionPattern.matcher(prCtx.getText()).matches() )
+                        break;
+            }
 
-            if (!(prCtx instanceof StatementContext)) {
+            if (prCtx instanceof StatementContext &&
+                    !ctx.getText().contains("\"") &&
+                    functionPattern.matcher(ctx.getText()).matches()) {
 
                 try {
-                    ExpressionContext expCtx = (ExpressionContext) ctx;
 
                     EvaluationCommand evComm = new EvaluationCommand(expCtx);
                     evComm.execute();
 
                     statementToPrint += evComm.getStringResult();
 
-                    evaluatedExp = true;
                 } catch (ClassCastException ex) {
 
                 } catch (Expression.ExpressionException ex) {
@@ -141,9 +150,11 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
             }
 
-        } else if(ctx instanceof PrimaryContext && !evaluatedExp) {
+        } else if(ctx instanceof PrimaryContext) {
 
             PrimaryContext primaryCtx = (PrimaryContext) ctx;
+
+            System.out.println("PRIMARY CONTEXT " + ctx.getText());
 
             if(primaryCtx.expression() != null && !primaryCtx.getText().contains("\"")) {
 
@@ -177,13 +188,17 @@ public class PrintCommand implements ICommand, ParseTreeListener {
                 String identifier = primaryCtx.getText();
 
                 BaracoValue value = BaracoValueSearcher.searchBaracoValue(identifier);
-                if(value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
-                    this.arrayAccess = true;
-                    this.evaluateArrayPrint(value, primaryCtx);
-                }
-                else if(!this.arrayAccess) {
-                    this.statementToPrint += value.getValue();
-                    printExpr.add(value.getValue());
+
+                System.out.println(identifier + " is identifier");
+
+                if(value != null) {
+                    if (value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
+                        this.arrayAccess = true;
+                        this.evaluateArrayPrint(value, primaryCtx);
+                    } else if (!this.arrayAccess) {
+                        this.statementToPrint += value.getValue();
+                        printExpr.add(value.getValue());
+                    }
                 }
 
 

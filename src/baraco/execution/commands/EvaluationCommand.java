@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class EvaluationCommand implements ICommand, ParseTreeListener {
 
@@ -86,13 +87,13 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        System.out.println("EvaluationCommand: entering every rule");
+        //System.out.println("EvaluationCommand: entering every rule");
         if (ctx instanceof ExpressionContext) {
             ExpressionContext exprCtx = (ExpressionContext) ctx;
-            System.out.println("exprCtx.getText(): " + exprCtx.getText());
+            /*System.out.println("exprCtx.getText(): " + exprCtx.getText());
             System.out.println("exprCtx.Identifier(): " + exprCtx.Identifier());
             System.out.println("exprCtx.expressionList(): " + exprCtx.expressionList());
-            System.out.println("exprCtx.arguments(): " + exprCtx.arguments());
+            System.out.println("exprCtx.arguments(): " + exprCtx.arguments());*/
             if (EvaluationCommand.isFunctionCall(exprCtx)) {
                 this.evaluateFunctionCall(exprCtx);
             }
@@ -109,7 +110,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     }
 
     public static boolean isFunctionCall(ExpressionContext exprCtx) {
-        if (exprCtx.expression(0) != null) {
+        Pattern functionPattern = Pattern.compile("([a-zA-Z0-9]+)\\(([ ,.a-zA-Z0-9]*)\\)");
+
+        if (exprCtx.expressionList() != null || functionPattern.matcher(exprCtx.getText()).matches()) {
             System.out.println("exprCtx.expression(0).getText(): " + exprCtx.expression(0).getText());
             return true;
         } else {

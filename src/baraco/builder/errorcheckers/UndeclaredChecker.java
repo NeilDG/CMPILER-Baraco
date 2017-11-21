@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class UndeclaredChecker implements IErrorChecker, ParseTreeListener{
 
     private BaracoParser.ExpressionContext exprCtx;
+    private String prevFunctionName = "";
     private int lineNumber;
 
     public UndeclaredChecker(BaracoParser.ExpressionContext exprCtx) {
@@ -56,10 +57,15 @@ public class UndeclaredChecker implements IErrorChecker, ParseTreeListener{
         if(ctx instanceof BaracoParser.ExpressionContext) {
             BaracoParser.ExpressionContext exprCtx = (BaracoParser.ExpressionContext) ctx;
             if(EvaluationCommand.isFunctionCall(exprCtx)) {
+                System.out.println("FUNCTION ENTER " + ctx.getText());
+                String s[] = exprCtx.getText().split("\\(");
+                prevFunctionName = s[0];
                 this.verifyFunctionCall(exprCtx);
             }
             else if(EvaluationCommand.isVariableOrConst(exprCtx)) {
-                this.verifyVariableOrConst(exprCtx);
+                System.out.println("VARIABLE ENTER " + ctx.getText());
+                if(!prevFunctionName.equals(exprCtx.getText()))
+                    this.verifyVariableOrConst(exprCtx);
             }
         }
     }
@@ -75,10 +81,11 @@ public class UndeclaredChecker implements IErrorChecker, ParseTreeListener{
         //ThisKeywordChecker thisChecker = new ThisKeywordChecker(funcExprCtx.expression(0));
         //thisChecker.verify();
 
-        if(funcExprCtx.expression(0).Identifier() == null)
+        if(funcExprCtx.expression(0) == null) {
             return;
+        }
 
-        String functionName = funcExprCtx.expression(0).Identifier().getText();
+        String functionName = funcExprCtx.expression(0).getText();
 
         ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
                 ParserHandler.getInstance().getCurrentClassName());
