@@ -20,6 +20,8 @@ public class MethodAnalyzer implements ParseTreeListener {
     private IdentifiedTokens identifiedTokens;
     private BaracoMethod declaredBaracoFunction;
 
+    private boolean paramsFlag = false;
+
     public MethodAnalyzer(IdentifiedTokens identifiedTokens, ClassScope declaredClassScope) {
         this.identifiedTokens = identifiedTokens;
         this.declaredClassScope = declaredClassScope;
@@ -69,7 +71,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 
     private void analyzeMethod(ParserRuleContext ctx) {
 
-        if(ctx instanceof BaracoParser.TypeTypeContext) {
+        if(ctx instanceof BaracoParser.TypeTypeContext && !paramsFlag) {
             BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
 
             //return type is a primitive type
@@ -84,6 +86,9 @@ public class MethodAnalyzer implements ParseTreeListener {
         }
 
         else if(ctx instanceof BaracoParser.FormalParametersContext) {
+
+            paramsFlag = true;
+
             BaracoParser.FormalParametersContext formalParamsCtx = (BaracoParser.FormalParametersContext) ctx;
             this.analyzeParameters(formalParamsCtx);
             this.storeMobiFunction();
