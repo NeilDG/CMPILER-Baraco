@@ -50,6 +50,7 @@ public class ForCommand implements IControlledCommand {
                     command.execute();
                 }
 
+                executionMonitor.tryExecution();
                 this.updateCommand.execute(); //execute the update command
                 this.identifyVariables(); //identify variables again to detect changes to such variables used.
             }
