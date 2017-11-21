@@ -238,6 +238,7 @@ public class View extends Application {
     public void resetConsole() {
         console = new TextFlow(new Text("Console: \n"));
         ScrollPane consoleScroll = new ScrollPane(console);
+        consoleScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         gridPane.add(consoleScroll, 0, 2, GridPane.REMAINING, 1);
     }
 
