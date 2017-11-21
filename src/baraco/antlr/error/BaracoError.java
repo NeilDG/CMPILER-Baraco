@@ -12,7 +12,7 @@ public class BaracoError {
     public static final String TOKEN_RECOGNITION_KEY = "token recognition error";
 
     private int lineNumber;
-    private int charNumber;
+    private int charNumber = -1;
     private String errorPrefix;
     private String lineLayout;
     private String errorSuffix;
