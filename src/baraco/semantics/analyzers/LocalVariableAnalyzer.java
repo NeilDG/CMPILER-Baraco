@@ -121,6 +121,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
             }
 
             this.identifiedTokens.addToken(IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
+            this.createBaracoValue();
 
             if(varCtx.variableInitializer() != null) {
 
@@ -142,8 +143,6 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
                 TypeChecker typeChecker = new TypeChecker(declaredBaracoValue, varCtx.variableInitializer().expression());
                 typeChecker.verify();
             }
-
-            this.createBaracoValue();
 
         }
 
