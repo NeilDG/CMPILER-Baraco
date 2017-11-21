@@ -1,5 +1,7 @@
 package baraco.execution.commands.simple;
 
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.builder.errorcheckers.TypeChecker;
 import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.EvaluationCommand;
@@ -8,6 +10,7 @@ import baraco.antlr.parser.BaracoParser.*;
 import baraco.representations.BaracoMethod;
 import baraco.representations.BaracoValue;
 import baraco.semantics.utils.AssignmentUtils;
+import org.antlr.v4.runtime.Token;
 
 public class ReturnCommand implements ICommand {
     private final static String TAG = "MobiProg_ReturnCommand";
@@ -23,6 +26,14 @@ public class ReturnCommand implements ICommand {
         undeclaredChecker.verify();
 
         BaracoValue baracoValue = this.assignedBaracoMethod.getReturnValue();
+
+        if (baracoValue == null) {
+            Token firstToken = this.expressionCtx.getStart();
+            int lineNumber = firstToken.getLine();
+
+            BuildChecker.reportCustomError(ErrorRepository.RETURN_IN_VOID, "", lineNumber);
+        }
+
         TypeChecker typeChecker = new TypeChecker(baracoValue, this.expressionCtx);
         typeChecker.verify();
     }
