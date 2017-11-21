@@ -391,7 +391,8 @@ statement
     ;
 
 scanStatement
-    :   SCAN '(' expression ',' Identifier ')' ';'
+    :   SCAN '(' expression ',' Identifier')' ';'
+    |   SCAN '(' expression ',' Identifier '[' expression ']' ')' ';'
     ;
 
 printStatement

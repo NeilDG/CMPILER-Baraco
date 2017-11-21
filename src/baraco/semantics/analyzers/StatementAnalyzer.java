@@ -151,9 +151,13 @@ public class StatementAnalyzer {
     }
 
     private void handleScanStatement(ScanStatementContext ctx) {
-        System.out.println("HANDLE SCAN: " + ctx.expression().getText() + ctx.Identifier().getText());
+        //System.out.println("HANDLE SCAN: " + ctx.expression().getText() + ctx.Identifier().getText());
+        ScanCommand scanCommand;
 
-        ScanCommand scanCommand = new ScanCommand(ctx.expression().getText(), ctx.Identifier().getText());
+        if(ctx.expression(1) != null)
+            scanCommand = new ScanCommand(ctx.expression(0).getText(), ctx.expression(1), ctx.Identifier().getText());
+        else
+            scanCommand = new ScanCommand(ctx.expression(0).getText(), ctx.Identifier().getText());
 
         StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
 
