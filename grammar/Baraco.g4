@@ -45,7 +45,7 @@ classOrInterfaceModifier
     ;
 
 variableModifier
-    :   'final'
+    :   FINAL
     |   annotation
     ;
 

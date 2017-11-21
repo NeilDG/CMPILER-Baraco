@@ -79,7 +79,7 @@ public class ConstChecker implements IErrorChecker, ParseTreeListener {
             baracoValue = VariableSearcher.searchVariableInClassIncludingLocal(classScope, varExprCtx.primary().Identifier().getText());
         }
 
-        if(baracoValue != null && baracoValue.isFinal()) {
+        if(baracoValue != null && baracoValue.isFinal() && baracoValue.getValue() != null) {
             BuildChecker.reportCustomError(ErrorRepository.CONST_REASSIGNMENT, "", varExprCtx.getText(), this.lineNumber);
         }
     }

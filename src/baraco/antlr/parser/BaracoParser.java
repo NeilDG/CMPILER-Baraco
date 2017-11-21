@@ -733,6 +733,7 @@ public class BaracoParser extends Parser {
 	}
 
 	public static class VariableModifierContext extends ParserRuleContext {
+		public TerminalNode FINAL() { return getToken(BaracoParser.FINAL, 0); }
 		public AnnotationContext annotation() {
 			return getRuleContext(AnnotationContext.class,0);
 		}

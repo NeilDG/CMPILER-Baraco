@@ -98,6 +98,8 @@ public class LocalScope implements IScope {
     public void addEmptyVariableFromKeywords(String primitiveTypeString, String identifierString) {
         this.initializeLocalVariableMap();
 
+        System.out.println("EMPTY VAR");
+
         BaracoValue baracoValue = BaracoValue.createEmptyVariableFromKeywords(primitiveTypeString);
         this.localVariables.put(identifierString, baracoValue);
     }
@@ -108,9 +110,32 @@ public class LocalScope implements IScope {
     public void addInitializedVariableFromKeywords(String primitiveTypeString, String identifierString, String valueString) {
         this.initializeLocalVariableMap();
 
+        System.out.println("INIT VAR");
+
         this.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
         BaracoValue baracoValue = this.localVariables.get(identifierString);
         baracoValue.setValue(valueString);
+    }
+
+    public void addFinalEmptyVariableFromKeywords(String primitiveTypeString, String identifierString) {
+        this.initializeLocalVariableMap();
+
+        System.out.println("FINAL EMPTY");
+
+        BaracoValue baracoValue = BaracoValue.createEmptyVariableFromKeywords(primitiveTypeString);
+        baracoValue.markFinal();
+        this.localVariables.put(identifierString, baracoValue);
+    }
+
+    public void addFinalInitVariableFromKeyWords(String primitiveTypeString, String identifierString, String valueString) {
+        this.initializeLocalVariableMap();
+
+        System.out.println("FINAL INIT");
+
+        this.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
+        BaracoValue baracoValue = this.localVariables.get(identifierString);
+        baracoValue.setValue(valueString);
+        baracoValue.markFinal();
     }
 
     public void addMobiValue(String identifier, BaracoValue baracoValue) {

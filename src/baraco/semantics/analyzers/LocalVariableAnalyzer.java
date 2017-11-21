@@ -1,5 +1,6 @@
 package baraco.semantics.analyzers;
 
+import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.builder.errorcheckers.TypeChecker;
@@ -20,6 +21,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 
     private final static String TAG = "MobiProg_LocalVariableAnalyzer";
 
+    private final static String FINAL_TYPE_KEY = "FINAL_TYPE_KEY";
     private final static String PRIMITIVE_TYPE_KEY = "PRIMITIVE_TYPE_KEY";
     private final static String IDENTIFIER_KEY = "IDENTIFIER_KEY";
     private final static String IDENTIFIER_VALUE_KEY = "IDENTIFIER_VALUE_KEY";
@@ -63,10 +65,20 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
     }
 
     private void analyzeVariables(ParserRuleContext ctx) {
+
+        if(ctx instanceof BaracoParser.VariableModifierContext){
+            BaracoParser.VariableModifierContext varModCtx = (BaracoParser.VariableModifierContext) ctx;
+
+            if (ctx.getTokens(BaracoLexer.FINAL).size() > 0) {
+                this.identifiedTokens.addToken(FINAL_TYPE_KEY, varModCtx.getText());
+            }
+
+        }
+
         if(ctx instanceof BaracoParser.TypeTypeContext) {
             BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
             //clear tokens for reuse
-            this.identifiedTokens.clearTokens();
+            //this.identifiedTokens.clearTokens();
 
             if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
                 BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
@@ -109,13 +121,13 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
             }
 
             this.identifiedTokens.addToken(IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
-            this.createBaracoValue();
 
             if(varCtx.variableInitializer() != null) {
 
                 //we do not evaluate strings.
                 if(this.identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY)) {
                     String primitiveTypeString = this.identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
+
                     if(primitiveTypeString.contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
                         this.identifiedTokens.addToken(IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
                     }
@@ -130,6 +142,8 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
                 TypeChecker typeChecker = new TypeChecker(declaredBaracoValue, varCtx.variableInitializer().expression());
                 typeChecker.verify();
             }
+
+            this.createBaracoValue();
 
         }
 
@@ -171,9 +185,16 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
             if(this.identifiedTokens.containsTokens(IDENTIFIER_VALUE_KEY)) {
                 identifierValueString = this.identifiedTokens.getToken(IDENTIFIER_VALUE_KEY);
                 localScope.addInitializedVariableFromKeywords(primitiveTypeString, identifierString, identifierValueString);
+
+                if (this.identifiedTokens.containsTokens(FINAL_TYPE_KEY))
+                    localScope.addFinalInitVariableFromKeyWords(primitiveTypeString, identifierString, identifierValueString);
+
             }
             else {
                 localScope.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
+
+                if (this.identifiedTokens.containsTokens(FINAL_TYPE_KEY))
+                    localScope.addFinalEmptyVariableFromKeywords(primitiveTypeString, identifierString);
             }
 
             //remove the following tokens
