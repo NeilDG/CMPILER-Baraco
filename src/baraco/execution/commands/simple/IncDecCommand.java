@@ -1,6 +1,7 @@
 package baraco.execution.commands.simple;
 
 import baraco.antlr.lexer.BaracoLexer;
+import baraco.builder.errorcheckers.ConstChecker;
 import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.ICommand;
 import baraco.antlr.parser.BaracoParser.*;
@@ -16,6 +17,9 @@ public class IncDecCommand implements ICommand {
     public IncDecCommand(ExpressionContext exprCtx, int tokenSign) {
         this.exprCtx = exprCtx;
         this.tokenSign = tokenSign;
+        
+        ConstChecker constChecker = new ConstChecker(this.exprCtx);
+        constChecker.verify();
 
         UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.exprCtx);
         undeclaredChecker.verify();
@@ -35,7 +39,8 @@ public class IncDecCommand implements ICommand {
 
         BaracoValue baracoValue = leftHandMapper.getBaracoValue();
 
-        this.performOperation(baracoValue);
+        if(!baracoValue.isFinal())
+            this.performOperation(baracoValue);
     }
 
     /*

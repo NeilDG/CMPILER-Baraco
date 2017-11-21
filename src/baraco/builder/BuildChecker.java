@@ -50,7 +50,7 @@ public class BuildChecker implements ANTLRErrorListener {
     public static void reportCustomError(int errorCode, String additionalMessage, Object... parameters) {
         String errorMessage = String.format(ErrorRepository.getErrorMessage(errorCode) + " " + additionalMessage, parameters);
         System.out.println("ERROR: " + errorMessage);
-        View.printInConsole("ERROR: " + errorMessage);
+        View.printInConsole("ERROR: " + errorMessage + "\n");
 
         sharedInstance.successful = false;
     }
