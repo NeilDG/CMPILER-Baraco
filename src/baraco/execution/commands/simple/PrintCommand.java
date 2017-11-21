@@ -29,13 +29,17 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     private boolean arrayAccess = false;
     private boolean containString = false;
     private boolean containArith = false;
+    private boolean isLN = false;
 
     private List<Object> printExpr = new ArrayList<>();
 
     private boolean evaluatedExp = false;
 
-    public PrintCommand(ExpressionContext expressionCtx) {
-        this.expressionCtx = expressionCtx;
+    public PrintCommand(StatementContext sCtx) {
+
+        isLN = sCtx.PRINTLN() != null;
+
+        this.expressionCtx = sCtx.expression(0);
 
         containString = expressionCtx.getText().contains("\"");
 
@@ -52,6 +56,9 @@ public class PrintCommand implements ICommand, ParseTreeListener {
     public void execute() {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.expressionCtx);
+
+        if (isLN)
+            statementToPrint += "\n";
 
         View.printInConsole(this.statementToPrint);
 

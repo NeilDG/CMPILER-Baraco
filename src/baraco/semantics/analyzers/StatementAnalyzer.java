@@ -21,7 +21,7 @@ public class StatementAnalyzer {
 
     public void analyze(StatementContext ctx) {
 
-        if(ctx.PRINT() != null) {
+        if(ctx.PRINT() != null || ctx.PRINTLN() != null) {
             this.handlePrintStatement(ctx);
         }
 
@@ -125,7 +125,7 @@ public class StatementAnalyzer {
     private void handlePrintStatement(StatementContext ctx) {
         System.out.println("HANDLE PRINT: " + ctx.expression().size());
 
-        PrintCommand printCommand = new PrintCommand(ctx.expression(0));
+        PrintCommand printCommand = new PrintCommand(ctx);
 
         StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
         //add to conditional controlled command
