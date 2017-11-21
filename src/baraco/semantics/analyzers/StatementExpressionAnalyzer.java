@@ -7,9 +7,11 @@ import baraco.execution.commands.ICommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.evaluation.AssignmentCommand;
+import baraco.execution.commands.evaluation.ShorthandCommand;
 import baraco.execution.commands.simple.IncDecCommand;
 import baraco.execution.commands.simple.MethodCallCommand;
 import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.utils.Expression;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -67,6 +69,51 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(assignmentCommand);
 
+            }
+            else if(isAddAssignExpression(exprCtx)) {
+                System.out.println("Add assign expr detected: " + exprCtx.getText());
+
+                List<ExpressionContext> exprListCtx = exprCtx.expression();
+                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.ADD_ASSIGN);
+
+                this.readRightHandExprCtx = exprListCtx.get(1);
+                this.handleStatementExecution(shorthandCommand);
+            }
+            else if(isSubAssignExpression(exprCtx)) {
+                System.out.println("Sub assign expr detected: " + exprCtx.getText());
+
+                List<ExpressionContext> exprListCtx = exprCtx.expression();
+                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.SUB_ASSIGN);
+
+                this.readRightHandExprCtx = exprListCtx.get(1);
+                this.handleStatementExecution(shorthandCommand);
+            }
+            else if(isMulAssignExpression(exprCtx)) {
+                System.out.println("Mul assign expr detected: " + exprCtx.getText());
+
+                List<ExpressionContext> exprListCtx = exprCtx.expression();
+                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.MUL_ASSIGN);
+
+                this.readRightHandExprCtx = exprListCtx.get(1);
+                this.handleStatementExecution(shorthandCommand);
+            }
+            else if(isDivAssignExpression(exprCtx)) {
+                System.out.println("Div assign expr detected: " + exprCtx.getText());
+
+                List<ExpressionContext> exprListCtx = exprCtx.expression();
+                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.DIV_ASSIGN);
+
+                this.readRightHandExprCtx = exprListCtx.get(1);
+                this.handleStatementExecution(shorthandCommand);
+            }
+            else if(isModAssignExpression(exprCtx)) {
+                System.out.println("Mod assign expr detected: " + exprCtx.getText());
+
+                List<ExpressionContext> exprListCtx = exprCtx.expression();
+                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.MOD_ASSIGN);
+
+                this.readRightHandExprCtx = exprListCtx.get(1);
+                this.handleStatementExecution(shorthandCommand);
             }
             else if(isIncrementExpression(exprCtx)) {
                 System.out.println("Increment expr detected: " +exprCtx.getText());
@@ -157,6 +204,37 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 
     public static boolean isAssignmentExpression(ExpressionContext exprCtx) {
         List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.ASSIGN);
+
+        return (tokenList.size() > 0);
+    }
+
+    public static boolean isAddAssignExpression(ExpressionContext exprCtx) {
+        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.ADD_ASSIGN);
+
+        return (tokenList.size() > 0);
+    }
+
+    public static boolean isSubAssignExpression(ExpressionContext exprCtx) {
+        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.SUB_ASSIGN);
+
+        return (tokenList.size() > 0);
+    }
+
+    public static boolean isMulAssignExpression(ExpressionContext exprCtx) {
+        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.MUL_ASSIGN);
+
+        return (tokenList.size() > 0);
+    }
+
+    public static boolean isDivAssignExpression(ExpressionContext exprCtx) {
+        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.DIV_ASSIGN);
+
+        return (tokenList.size() > 0);
+    }
+
+    public static boolean isModAssignExpression(ExpressionContext exprCtx) {
+        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.MOD_ASSIGN);
+
         return (tokenList.size() > 0);
     }
 

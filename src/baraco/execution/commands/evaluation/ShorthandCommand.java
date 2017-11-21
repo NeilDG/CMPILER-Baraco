@@ -1,7 +1,7 @@
 package baraco.execution.commands.evaluation;
 
 import baraco.antlr.lexer.BaracoLexer;
-import baraco.antlr.parser.BaracoParser.*;
+import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.ConstChecker;
 import baraco.builder.errorcheckers.TypeChecker;
 import baraco.builder.errorcheckers.UndeclaredChecker;
@@ -18,17 +18,17 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
-public class AssignmentCommand implements ICommand {
+public class ShorthandCommand implements ICommand {
 
-    private final static String TAG = "MobiProg_NewAssignmentCommand";
+    private BaracoParser.ExpressionContext leftHandExprCtx;
+    private BaracoParser.ExpressionContext rightHandExprCtx;
+    int tokenSign;
 
-    private ExpressionContext leftHandExprCtx;
-    private ExpressionContext rightHandExprCtx;
-
-    public AssignmentCommand(ExpressionContext leftHandExprCtx,
-                             ExpressionContext rightHandExprCtx) {
+    public ShorthandCommand(BaracoParser.ExpressionContext leftHandExprCtx,
+                             BaracoParser.ExpressionContext rightHandExprCtx, int tokenSign) {
         this.leftHandExprCtx = leftHandExprCtx;
         this.rightHandExprCtx = rightHandExprCtx;
+        this.tokenSign = tokenSign;
 
         UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.leftHandExprCtx);
         undeclaredChecker.verify();
@@ -74,13 +74,18 @@ public class AssignmentCommand implements ICommand {
             if (evaluationCommand.isNumericResult()) {
 
                 if (!baracoValue.isFinal()) {
-                    AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+                    // Add checking for shorthand expressions
+                     AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult(), tokenSign);
                 }
 
             } else {
-
                 if (!baracoValue.isFinal()) {
-                    AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                    if (this.tokenSign == BaracoLexer.ADD_ASSIGN) {
+                        AssignmentUtils.addAssignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                    }
+                    else {
+                        AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                    }
                 }
             }
         }
@@ -95,7 +100,7 @@ public class AssignmentCommand implements ICommand {
 
     private void handleArrayAssignment(String resultString) {
         TerminalNode identifierNode = this.leftHandExprCtx.expression(0).primary().Identifier();
-        ExpressionContext arrayIndexExprCtx = this.leftHandExprCtx.expression(1);
+        BaracoParser.ExpressionContext arrayIndexExprCtx = this.leftHandExprCtx.expression(1);
 
         BaracoValue baracoValue = VariableSearcher.searchVariable(identifierNode.getText());
         BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
