@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class PrintCommand implements ICommand, ParseTreeListener {
 
     private final static String TAG = "PrintCommand";
-    private final Pattern functionPattern = Pattern.compile("([a-zA-Z0-9]+)\\(([ ,.a-zA-Z0-9]+)\\)");
+    private final Pattern functionPattern = Pattern.compile("([a-zA-Z0-9]+)\\(([ ,.a-zA-Z0-9]*)\\)");
 
     private ExpressionContext expressionCtx;
 

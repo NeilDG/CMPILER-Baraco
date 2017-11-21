@@ -3,6 +3,12 @@
  */
 package baraco.builder.errorcheckers;
 
+import baraco.builder.ParserHandler;
+import baraco.execution.commands.EvaluationCommand;
+import baraco.representations.BaracoMethod;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.ClassScope;
+import baraco.semantics.utils.Expression;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -16,6 +22,7 @@ import baraco.antlr.parser.BaracoParser.ExpressionContext;
 import baraco.antlr.parser.BaracoParser.LiteralContext;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValue.PrimitiveType;
+import sun.reflect.generics.tree.ReturnType;
 
 /**
  * Handles all the type checking
@@ -59,7 +66,47 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof LiteralContext) {
+        if(ctx instanceof ExpressionContext) {
+
+            ExpressionContext expCtx = (ExpressionContext) ctx;
+
+            if (EvaluationCommand.isFunctionCall(exprCtx)){
+
+                ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
+                        ParserHandler.getInstance().getCurrentClassName());
+                BaracoMethod baracoMethod = classScope.searchMethod(expCtx.getText());
+
+                if(baracoMethod == null)
+                    return;
+
+                if(this.baracoValue.getPrimitiveType() == PrimitiveType.BOOL) {
+                    if(baracoMethod.getReturnType() != BaracoMethod.MethodType.BOOL_TYPE) {
+                        String additionalMessage = "Expected boolean.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.INT) {
+                    if(baracoMethod.getReturnType() != BaracoMethod.MethodType.INT_TYPE) {
+                        String additionalMessage = "Expected int.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.DECIMAL) {
+                    if(baracoMethod.getReturnType() != BaracoMethod.MethodType.DECIMAL_TYPE) {
+                        String additionalMessage = "Expected floating point or double.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.STRING) {
+                    if(baracoMethod.getReturnType() != BaracoMethod.MethodType.STRING_TYPE) {
+                        String additionalMessage = "Expected string.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+
+            }
+
+        } else if(ctx instanceof LiteralContext) {
             if(this.baracoValue == null) {
                 return;
             }
