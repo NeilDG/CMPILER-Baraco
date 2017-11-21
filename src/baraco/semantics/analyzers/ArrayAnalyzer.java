@@ -1,6 +1,7 @@
 package baraco.semantics.analyzers;
 
 import baraco.antlr.parser.BaracoParser;
+import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.evaluation.ArrayInitializeCommand;
 import baraco.representations.BaracoArray;
@@ -61,6 +62,8 @@ public class ArrayAnalyzer implements ParseTreeListener {
         }
         else if(ctx instanceof BaracoParser.VariableDeclaratorIdContext) {
             BaracoParser.VariableDeclaratorIdContext varDecIdCtx = (BaracoParser.VariableDeclaratorIdContext) ctx;
+            MultipleVariableDeclarationChecker multipleDeclaredChecker = new MultipleVariableDeclarationChecker(varDecIdCtx);
+            multipleDeclaredChecker.verify();
             this.identifiedTokens.addToken(ARRAY_IDENTIFIER_KEY, varDecIdCtx.getText());
 
             this.analyzeArray();

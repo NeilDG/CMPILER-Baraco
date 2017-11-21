@@ -111,8 +111,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
             BaracoParser.VariableDeclaratorContext varCtx = (BaracoParser.VariableDeclaratorContext) ctx;
 
             if(this.hasPassedArrayDeclaration) {
-                MultipleVariableDeclarationChecker multipleDeclaredChecker = new MultipleVariableDeclarationChecker(varCtx.variableDeclaratorId());
-                multipleDeclaredChecker.verify();
+
                 return;
             }
 
