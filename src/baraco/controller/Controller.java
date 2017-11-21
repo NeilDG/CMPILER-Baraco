@@ -62,29 +62,6 @@ public class Controller {
 
         ParserHandler.getInstance().parseText(fileName, input);
 
-        /*CharStream cs = new ANTLRInputStream(input);
-
-        BaracoLexer mokaLexer = new BaracoLexer(cs);
-
-        CommonTokenStream tokenStream = new CommonTokenStream(mokaLexer);
-
-        tokenStream.fill();
-
-        List<Token> tokens = tokenStream.getTokens();
-
-        BaracoParser parser = new BaracoParser(tokenStream);
-
-        BaracoErrorListener baracoErrorListener = new BaracoErrorListener(this);
-
-        parser.removeErrorListeners();
-        parser.addErrorListener(baracoErrorListener);
-
-        ParseTree tree = parser.compilationUnit();
-
-        ParseTreeWalker walker = new ParseTreeWalker();
-        BaracoListener listener = new BaracoBaseListener();
-        walker.walk(listener, tree);*/
-
         if(BuildChecker.getInstance().canExecute()) {
             ExecutionManager.getInstance().executeAllActions();
             System.out.println("BuildChecker executed");
