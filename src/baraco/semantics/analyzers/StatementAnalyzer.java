@@ -2,12 +2,16 @@ package baraco.semantics.analyzers;
 
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser.*;
+import baraco.builder.ParserHandler;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.PrintCommand;
 import baraco.execution.commands.simple.ReturnCommand;
 import baraco.execution.commands.simple.ScanCommand;
+import baraco.representations.BaracoMethod;
 import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -207,6 +211,8 @@ public class StatementAnalyzer {
             controlledCommand.addCommand(returnCommand);
         }
         else {
+            ExecutionManager.getInstance().getCurrentFunction().setValidReturns(true);
+
             ExecutionManager.getInstance().addCommand(returnCommand);
         }
 

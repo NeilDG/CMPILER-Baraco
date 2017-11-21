@@ -1,6 +1,8 @@
 package baraco.semantics.analyzers;
 
 import baraco.antlr.parser.BaracoParser;
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.builder.errorcheckers.MultipleMethodDeclarationChecker;
 import baraco.execution.ExecutionManager;
 import baraco.representations.BaracoMethod;
@@ -9,6 +11,7 @@ import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import baraco.semantics.utils.IdentifiedTokens;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -65,6 +68,20 @@ public class MethodAnalyzer implements ParseTreeListener {
     @Override
     public void exitEveryRule(ParserRuleContext ctx) {
         if(ctx instanceof BaracoParser.MethodDeclarationContext) {
+
+            BaracoParser.MethodDeclarationContext mdCtx = (BaracoParser.MethodDeclarationContext) ctx;
+
+            if (!this.declaredBaracoFunction.hasValidReturns()) {
+
+                int lineNumber = 0;
+
+                if (mdCtx.Identifier() != null)
+                    lineNumber = mdCtx.Identifier().getSymbol().getLine();
+
+                BuildChecker.reportCustomError(ErrorRepository.NO_RETURN_STATEMENT, "", this.declaredBaracoFunction.getMethodName(), lineNumber);
+            }
+
+
             ExecutionManager.getInstance().closeFunctionExecution();
         }
     }

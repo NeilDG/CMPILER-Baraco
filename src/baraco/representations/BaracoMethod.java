@@ -37,6 +37,8 @@ public class BaracoMethod implements IControlledCommand{
     private BaracoValue returnValue; //the return value of the function. null if it's a void type
     private MethodType returnType = MethodType.VOID_TYPE; //the return type of the function
 
+    private boolean hasValidReturns = true;
+
     public BaracoMethod() {
         this.commandSequences = new ArrayList<ICommand>();
         this.parameterValues = new LinkedHashMap<String, BaracoValue>();
@@ -56,13 +58,22 @@ public class BaracoMethod implements IControlledCommand{
 
         //create an empty mobi value as a return value
         switch(this.returnType) {
-            case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); break;
-            case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); break;
-            case DECIMAL_TYPE: this.returnValue = new BaracoValue(' ', PrimitiveType.DECIMAL); break;
-            case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); break;
-            case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); break;
-            default:break;
+            case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); setValidReturns(false); break;
+            case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); setValidReturns(false); break;
+            case DECIMAL_TYPE: this.returnValue = new BaracoValue(' ', PrimitiveType.DECIMAL); setValidReturns(false); break;
+            case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); setValidReturns(false); break;
+            case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); setValidReturns(false); break;
+            default:
+                break;
         }
+    }
+
+    public boolean hasValidReturns(){
+        return this.hasValidReturns;
+    }
+
+    public void setValidReturns(boolean b) {
+        hasValidReturns = b;
     }
 
     public MethodType getReturnType() {

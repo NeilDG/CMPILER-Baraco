@@ -15,6 +15,7 @@ public class ErrorRepository {
     public final static int MISSING_THIS_KEYWORD = 8000;
     public final static int RETURN_IN_VOID = 9000;
     public final static int INVALID_INDEX_ASSIGN = 9001;
+    public final static int NO_RETURN_STATEMENT = 9002;
 
     private static ErrorRepository sharedInstance = null;
 
@@ -38,6 +39,7 @@ public class ErrorRepository {
         this.errorMessageDictionary.put(MISSING_THIS_KEYWORD, "Missing 'this' keyword for method call %s line %d.");
         this.errorMessageDictionary.put(RETURN_IN_VOID, "You can't return a value in a void function in line %d.");
         this.errorMessageDictionary.put(INVALID_INDEX_ASSIGN, "Invalid index in array assignment at line %d.");
+        this.errorMessageDictionary.put(NO_RETURN_STATEMENT, "No return statement in function %s at line %d.");
     }
 
     public static void initialize() {
