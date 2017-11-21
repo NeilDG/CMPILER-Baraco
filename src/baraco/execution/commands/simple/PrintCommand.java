@@ -93,7 +93,8 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
                 ParserRuleContext prCtx = literalCtx;
 
-                while(!(prCtx instanceof StatementContext) && !( prCtx.getText().startsWith("(") && prCtx.getText().endsWith(")") )) // if it belongs to complex
+                while(!(prCtx instanceof StatementContext) &&
+                        !( prCtx.getText().startsWith("(") && prCtx.getText().endsWith(")") )) // if it belongs to complex
                     prCtx = prCtx.getParent();
 
                 if (prCtx instanceof StatementContext) { // if not in complex
@@ -115,18 +116,28 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
             System.out.println("EXPRESSION CONT " + ctx.getText());
 
-            try {
-                ExpressionContext expCtx = (ExpressionContext) ctx;
+            ParserRuleContext prCtx = ctx;
 
-                EvaluationCommand evComm = new EvaluationCommand(expCtx);
-                evComm.execute();
+            while(!(prCtx instanceof StatementContext) &&
+                    !( prCtx.getText().startsWith("[") && prCtx.getText().endsWith("]") )) // if it belongs to complex
+                prCtx = prCtx.getParent();
 
-                statementToPrint += evComm.getStringResult();
+            if (!(prCtx instanceof StatementContext)) {
 
-                evaluatedExp = true;
-            } catch (ClassCastException ex) {
+                try {
+                    ExpressionContext expCtx = (ExpressionContext) ctx;
 
-            } catch (Expression.ExpressionException ex) {
+                    EvaluationCommand evComm = new EvaluationCommand(expCtx);
+                    evComm.execute();
+
+                    statementToPrint += evComm.getStringResult();
+
+                    evaluatedExp = true;
+                } catch (ClassCastException ex) {
+
+                } catch (Expression.ExpressionException ex) {
+
+                }
 
             }
 
