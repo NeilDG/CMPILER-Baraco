@@ -18,6 +18,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -206,6 +207,8 @@ public class View extends Application {
 
     public static void printInConsole(String text) {
         Text error = new Text(text);
+        error.setFont(Font.font("Courier", 14));
+
 
         Platform.runLater(() -> {
             console.getChildren().add(error);
@@ -215,8 +218,12 @@ public class View extends Application {
     public static void appendErrorInConsole(BaracoError e) {
 
         Text errorPrefix = new Text(e.getErrorPrefix());
+        errorPrefix.setFont(Font.font("Courier", 14));
+
         Hyperlink line = new Hyperlink(e.getLineLayout());
+        line.setFont(Font.font("Courier", 14));
         Text errorSuffix = new Text(e.getErrorSuffix());
+        errorSuffix.setFont(Font.font("Courier", 14));
         errorPrefix.setFill(Color.RED);
         errorSuffix.setFill(Color.RED);
 
@@ -236,7 +243,9 @@ public class View extends Application {
     }
 
     public void resetConsole() {
-        console = new TextFlow(new Text("Console: \n"));
+        Text consoleText = new Text("Console: \n");
+        consoleText.setFont(Font.font("Courier", 12));
+        console = new TextFlow(consoleText);
         ScrollPane consoleScroll = new ScrollPane(console);
         consoleScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         gridPane.add(consoleScroll, 0, 2, GridPane.REMAINING, 1);
