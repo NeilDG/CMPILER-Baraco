@@ -221,7 +221,9 @@ public class View extends Application {
         errorPrefix.setFont(Font.font("Courier", 14));
 
         Hyperlink line = new Hyperlink(e.getLineLayout());
+        line.setFont(Font.font("Courier", 14));
         Text errorSuffix = new Text(e.getErrorSuffix());
+        errorSuffix.setFont(Font.font("Courier", 14));
         errorPrefix.setFill(Color.RED);
         errorSuffix.setFill(Color.RED);
 
