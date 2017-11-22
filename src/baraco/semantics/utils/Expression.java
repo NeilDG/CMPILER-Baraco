@@ -509,7 +509,7 @@ public class Expression {
                 return result;
             }
         });
-        addOperator(new Operator("&&", 4, false) {
+        addOperator(new Operator("and", 4, false) {
             @Override
             public BigDecimal eval(BigDecimal v1, BigDecimal v2) {
                 boolean b1 = !v1.equals(BigDecimal.ZERO);
@@ -518,7 +518,7 @@ public class Expression {
             }
         });
 
-        addOperator(new Operator("||", 2, false) {
+        addOperator(new Operator("or", 2, false) {
             @Override
             public BigDecimal eval(BigDecimal v1, BigDecimal v2) {
                 boolean b1 = !v1.equals(BigDecimal.ZERO);

@@ -22,7 +22,6 @@ import baraco.antlr.parser.BaracoParser.ExpressionContext;
 import baraco.antlr.parser.BaracoParser.LiteralContext;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValue.PrimitiveType;
-import sun.reflect.generics.tree.ReturnType;
 
 /**
  * Handles all the type checking
