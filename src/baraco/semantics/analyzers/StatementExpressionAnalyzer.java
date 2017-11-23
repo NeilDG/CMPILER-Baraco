@@ -184,7 +184,8 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 
     private void handleFunctionCallWithParams(ExpressionContext funcExprCtx) {
         ExpressionContext functionExprCtx = funcExprCtx.expression(0);
-        String functionName = functionExprCtx.Identifier().getText();
+        String functionName = functionExprCtx.getText();
+        //String functionName = functionExprCtx.Identifier().getText();
 
         MethodCallCommand functionCallCommand = new MethodCallCommand(functionName, funcExprCtx);
         this.handleStatementExecution(functionCallCommand);
@@ -258,7 +259,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 //ThisKeywordChecker thisChecker = new ThisKeywordChecker(firstExprCtx);
                 //thisChecker.verify();
 
-                return (firstExprCtx.Identifier() != null);
+                return (exprCtx.expressionList() != null);
             }
         }
 

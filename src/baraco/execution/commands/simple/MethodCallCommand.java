@@ -69,10 +69,10 @@ public class MethodCallCommand implements ICommand {
     private void mapParameters() {
         System.out.println("MethodCallCommand: mapping parameters");
         //System.out.println("exprctx: " + this.exprCtx.expressionList().getText());
-        if(this.exprCtx.arguments() == null || this.exprCtx.arguments().expressionList() == null
+        /*if(this.exprCtx.arguments() == null || this.exprCtx.arguments().expressionList() == null
                 || this.exprCtx.arguments().expressionList().expression() == null) {
             return;
-        }
+        }*/
 
         if (this.exprCtx.expressionList() == null) {
             return;

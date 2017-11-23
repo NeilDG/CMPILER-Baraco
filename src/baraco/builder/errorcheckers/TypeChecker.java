@@ -3,26 +3,23 @@
  */
 package baraco.builder.errorcheckers;
 
+import baraco.antlr.parser.BaracoParser.ExpressionContext;
+import baraco.antlr.parser.BaracoParser.LiteralContext;
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.builder.ParserHandler;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.representations.BaracoMethod;
+import baraco.representations.BaracoValue;
+import baraco.representations.BaracoValue.PrimitiveType;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
-import baraco.semantics.utils.Expression;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import baraco.builder.BuildChecker;
-import baraco.builder.ErrorRepository;
-import baraco.antlr.parser.BaracoParser.ExpressionContext;
-import baraco.antlr.parser.BaracoParser.LiteralContext;
-import baraco.representations.BaracoValue;
-import baraco.representations.BaracoValue.PrimitiveType;
-import sun.reflect.generics.tree.ReturnType;
 
 /**
  * Handles all the type checking
