@@ -5,6 +5,8 @@ import baraco.execution.ExecutionMonitor;
 import baraco.execution.MethodTracker;
 import baraco.execution.commands.ICommand;
 import baraco.execution.commands.controlled.IControlledCommand;
+import baraco.execution.commands.controlled.IfCommand;
+import baraco.execution.commands.simple.ReturnCommand;
 import baraco.representations.BaracoValue.PrimitiveType;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
@@ -220,13 +222,20 @@ public class BaracoMethod implements IControlledCommand{
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
+
+                if (command instanceof ReturnCommand) {
+                    break;
+                } else if (command instanceof IfCommand) {
+                    if (((IfCommand) command).isReturned())
+                        break;
+                }
             }
 
         } catch(InterruptedException e) {
             System.out.println(TAG + ": " + "Monitor block interrupted! " +e.getMessage());
         }
 
-        MethodTracker.getInstance().reportExitFunction();
+            //MethodTracker.getInstance().reportExitFunction();
     }
 
     @Override

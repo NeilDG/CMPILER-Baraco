@@ -4,6 +4,7 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.simple.ReturnCommand;
 import baraco.execution.commands.utils.ConditionEvaluator;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
@@ -18,6 +19,8 @@ public class IfCommand implements IConditionalCommand {
 
     private BaracoParser.ParExpressionContext conditionalExpr;
     private String modifiedConditionExpr;
+
+    private boolean returned;
 
     public IfCommand(BaracoParser.ParExpressionContext conditionalExpr) {
         this.positiveCommands = new ArrayList<ICommand>();
@@ -44,6 +47,11 @@ public class IfCommand implements IConditionalCommand {
                 for (ICommand command : this.positiveCommands) {
                     executionMonitor.tryExecution();
                     command.execute();
+
+                    if (command instanceof ReturnCommand) {
+                        returned = true;
+                        break;
+                    }
                 }
             }
             //execute the negative commands
@@ -51,6 +59,11 @@ public class IfCommand implements IConditionalCommand {
                 for (ICommand command : this.negativeCommands) {
                     executionMonitor.tryExecution();
                     command.execute();
+
+                    if (command instanceof ReturnCommand) {
+                        returned = true;
+                        break;
+                    }
                 }
             }
         } catch (InterruptedException e) {
@@ -80,6 +93,10 @@ public class IfCommand implements IConditionalCommand {
     @Override
     public void addNegativeCommand(ICommand command) {
         this.negativeCommands.add(command);
+    }
+
+    public boolean isReturned() {
+        return returned;
     }
 
     public void clearAllCommands() {
