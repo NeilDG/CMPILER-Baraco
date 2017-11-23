@@ -202,6 +202,7 @@ public class StatementAnalyzer {
             }
             else {
                 String functionName = ExecutionManager.getInstance().getCurrentFunction().getMethodName();
+                ExecutionManager.getInstance().getCurrentFunction().setValidReturns(true);
                 conditionalCommand.addNegativeCommand(returnCommand);
             }
         }

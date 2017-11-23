@@ -10,6 +10,8 @@ import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -152,6 +154,12 @@ public class View extends Application {
                     }
                 })
                 .subscribe(this::applyHighlighting);
+
+        editor.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (fileHandler.save(editor.getText())) {
+                updateCurrentFileName();
+            }
+        });
 
         gridPane.add(new VirtualizedScrollPane<>(editor), 0, 1);
 
