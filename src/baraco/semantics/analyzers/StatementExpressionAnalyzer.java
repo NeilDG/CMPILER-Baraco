@@ -133,8 +133,10 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 this.handleStatementExecution(incDecCommand);
 
             }
+            else if(isFunctionCall(exprCtx))
+                handleFunctionCall(exprCtx);
 
-            else if(this.isFunctionCallWithParams(exprCtx)) {
+            /*else if(this.isFunctionCallWithParams(exprCtx)) {
                 this.handleFunctionCallWithParams(exprCtx);
             }
 
@@ -146,7 +148,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                     System.out.println("depth: " + exprCtx.depth());
                     this.handleFunctionCallWithNoParams(exprCtx);
                 }
-            }
+            }*/
         }
     }
 
@@ -194,13 +196,21 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
     }
 
     private void handleFunctionCallWithNoParams(ExpressionContext funcExprCtx) {
-        System.out.println("HANDLEEEE: " + funcExprCtx.start.getText());
+        System.out.println("HANDLEEEE: " + funcExprCtx.expression(0).getText());
         String functionName = funcExprCtx.start.getText();
 
         MethodCallCommand methodCallCommand = new MethodCallCommand(functionName, funcExprCtx);
         this.handleStatementExecution(methodCallCommand);
 
         System.out.println("Function call with no params detected: " +functionName);
+    }
+
+    private void handleFunctionCall(ExpressionContext funcExprCtx) {
+        String functionName = funcExprCtx.expression(0).getText();
+
+        MethodCallCommand methodCallCommand = new MethodCallCommand(functionName, funcExprCtx);
+        this.handleStatementExecution(methodCallCommand);
+
     }
 
     public static boolean isAssignmentExpression(ExpressionContext exprCtx) {
@@ -251,6 +261,10 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
         return (decrementList.size() > 0);
     }
 
+    public boolean isFunctionCall(ExpressionContext exprCtx) {
+        return exprCtx.expression(0) != null && exprCtx != this.readRightHandExprCtx;
+    }
+
     public boolean isFunctionCallWithParams(ExpressionContext exprCtx) {
         ExpressionContext firstExprCtx = exprCtx.expression(0);
 
@@ -268,7 +282,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
     }
 
     private boolean isFunctionCallWithNoParams(ExpressionContext exprCtx) {
-        if(exprCtx.depth() == FUNCTION_CALL_NO_PARAMS_DEPTH) {
+        if(exprCtx.depth() == FUNCTION_CALL_NO_PARAMS_DEPTH || exprCtx.depth() == 17) {
             //ThisKeywordChecker thisChecker = new ThisKeywordChecker(exprCtx);
             //thisChecker.verify();
             //if(exprCtx.Identifier() != null)
