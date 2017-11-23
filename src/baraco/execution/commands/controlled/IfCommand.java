@@ -99,6 +99,10 @@ public class IfCommand implements IConditionalCommand {
         return returned;
     }
 
+    public void resetReturnFlag() {
+       returned = false;
+    }
+
     public void clearAllCommands() {
         this.positiveCommands.clear();
         this.negativeCommands.clear();

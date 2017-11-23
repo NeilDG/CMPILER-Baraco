@@ -226,8 +226,10 @@ public class BaracoMethod implements IControlledCommand{
                 if (command instanceof ReturnCommand) {
                     break;
                 } else if (command instanceof IfCommand) {
-                    if (((IfCommand) command).isReturned())
+                    if (((IfCommand) command).isReturned()) {
+                        ((IfCommand) command).resetReturnFlag();
                         break;
+                    }
                 }
             }
 
@@ -235,7 +237,7 @@ public class BaracoMethod implements IControlledCommand{
             System.out.println(TAG + ": " + "Monitor block interrupted! " +e.getMessage());
         }
 
-            //MethodTracker.getInstance().reportExitFunction();
+        MethodTracker.getInstance().reportExitFunction();
     }
 
     @Override
