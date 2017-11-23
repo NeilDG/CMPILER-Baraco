@@ -27,10 +27,11 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private ExpressionContext parentExprCtx;
     private String modifiedExp;
     private BigDecimal resultValue;
+    private String stringResult;
+
+    private String prevFuncEvaluated;
 
     private boolean isNumeric;
-
-    private String stringResult;
 
     public EvaluationCommand(ExpressionContext exprCtx) {
         this.parentExprCtx = exprCtx;
@@ -38,8 +39,18 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void execute() {
+
         System.out.println("EvaluationCommand: executing");
         this.modifiedExp = this.parentExprCtx.getText();
+
+        for (ExpressionContext eCtx : this.parentExprCtx.expression()) { // bias functions in evaluating
+            if (isFunctionCall(eCtx)) {
+                EvaluationCommand evaluationCommand = new EvaluationCommand(eCtx);
+                evaluationCommand.execute();
+
+                this.modifiedExp = this.modifiedExp.replace(eCtx.getText(), evaluationCommand.modifiedExp);
+            }
+        }
 
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.parentExprCtx);
@@ -49,22 +60,23 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         isNumeric = !modifiedExp.contains("\"");
 
         //catch rules if the value has direct boolean flags
-        if(this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
+
+
+        if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
 
             this.resultValue = new BigDecimal(1);
             this.stringResult = this.resultValue.toEngineeringString();
 
-        }
-        else if(this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_FALSE)) {
+        } else if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_FALSE)) {
 
             this.resultValue = new BigDecimal(0);
             this.stringResult = this.resultValue.toEngineeringString();
 
-        }
-        else if (!isNumeric) {
-            this.stringResult = StringUtils.removeQuotes(modifiedExp);;
-        }
-        else {
+        } else if (!isNumeric) {
+            this.stringResult = StringUtils.removeQuotes(modifiedExp);
+            ;
+        } else {
+
             Expression evalEx = new Expression(this.modifiedExp);
             //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
             this.resultValue = evalEx.eval();
@@ -90,18 +102,34 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         //System.out.println("EvaluationCommand: entering every rule");
         if (ctx instanceof ExpressionContext) {
             ExpressionContext exprCtx = (ExpressionContext) ctx;
+
             /*System.out.println("exprCtx.getText(): " + exprCtx.getText());
             System.out.println("exprCtx.Identifier(): " + exprCtx.Identifier());
             System.out.println("exprCtx.expressionList(): " + exprCtx.expressionList());
             System.out.println("exprCtx.arguments(): " + exprCtx.arguments());*/
             if (EvaluationCommand.isFunctionCall(exprCtx)) {
                 this.evaluateFunctionCall(exprCtx);
+            } else if (EvaluationCommand.isVariableOrConst(exprCtx)) {
+
+            /*ParserRuleContext prCtx = exprCtx;
+
+            while(!(prCtx instanceof StatementContext)){
+                prCtx = prCtx.getParent();
+
+                if (prCtx instanceof ExpressionContext) {
+                    ExpressionContext expCtx = (ExpressionContext) prCtx;
+
+                    if (isFunctionCall(expCtx))
+                        break;
+                }
             }
 
-            else if (EvaluationCommand.isVariableOrConst(exprCtx)) {
+            if (prCtx instanceof StatementContext)*/
                 this.evaluateVariable(exprCtx);
             }
         }
+
+
     }
 
     @Override
@@ -129,11 +157,14 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     }
 
     private void evaluateFunctionCall(ExpressionContext exprCtx) {
-        String functionName = exprCtx.expression(0).getText();
 
-        ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
-                ParserHandler.getInstance().getCurrentClassName());
-        BaracoMethod baracoMethod = classScope.searchMethod(functionName);
+        for (ExpressionContext eCtx : exprCtx.expression()) {
+
+            String functionName = eCtx.getText();
+
+            ClassScope classScope = SymbolTableManager.getInstance().getClassScope(
+                    ParserHandler.getInstance().getCurrentClassName());
+            BaracoMethod baracoMethod = classScope.searchMethod(functionName);
 
         /*if (exprCtx.arguments().expressionList() != null) {
             List<ExpressionContext> exprCtxList = exprCtx.arguments()
@@ -149,12 +180,17 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             }
         }*/
 
-        if (baracoMethod == null) {
-            return;
-        }
+            if (baracoMethod == null) {
+                return;
+            }
 
-        if (exprCtx.expressionList() != null) {
-            List<ExpressionContext> exprCtxList = exprCtx.expressionList().expression();
+            List<ExpressionContext> exprCtxList;
+
+            if (eCtx.expressionList() != null) {
+                exprCtxList = eCtx.expressionList().expression();
+            } else {
+                exprCtxList = exprCtx.expressionList().expression();
+            }
 
             for (int i = 0; i < exprCtxList.size(); i++) {
                 ExpressionContext parameterExprCtx = exprCtxList.get(i);
@@ -164,15 +200,16 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
                 baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
             }
+
+            baracoMethod.execute();
+
+            System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
+            String prevString = this.modifiedExp;
+            this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
+                    baracoMethod.getReturnValue().getValue().toString());
+            System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
+
         }
-
-        baracoMethod.execute();
-
-        System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
-        this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
-                baracoMethod.getReturnValue().getValue().toString());
-        System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
-
     }
 
     private void evaluateVariable(ExpressionContext exprCtx) {

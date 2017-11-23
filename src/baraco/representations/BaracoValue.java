@@ -1,5 +1,7 @@
 package baraco.representations;
 
+import java.util.Stack;
+
 public class BaracoValue {
 
     //these are the accepted primitive types
@@ -13,14 +15,16 @@ public class BaracoValue {
         ARRAY
     }
 
-    private Object defaultValue; //this value will no longer change.
-    private Object value;
+    private Stack<Object> defaultValue; //this value will no longer change.
+    private Stack<Object> value;
     private PrimitiveType primitiveType = PrimitiveType.NOT_YET_IDENTIFIED;
     private boolean finalFlag = false;
 
     public BaracoValue(Object value, PrimitiveType primitiveType) {
         if(value == null || checkValueType(value, primitiveType)) {
-            this.value = value;
+            this.value = new Stack<Object>();
+
+            this.value.push(value);
             this.primitiveType = primitiveType;
         }
         else {
@@ -34,6 +38,10 @@ public class BaracoValue {
 
     public void reset() {
         this.value = this.defaultValue;
+    }
+
+    public Object popBack() {
+        return this.value.pop();
     }
 
     /*
@@ -55,14 +63,14 @@ public class BaracoValue {
         else if(this.primitiveType == PrimitiveType.STRING) {
             value.replace("\"", "");
 
-            this.value = value.replace("\"", "");
+            this.value.push(value.replace("\"", ""));
         }
         else if(this.primitiveType == PrimitiveType.ARRAY) {
             System.out.println(this.primitiveType + " is an array. Cannot directly change value.");
         }
         else {
             //attempts to type cast the value
-            this.value = this.attemptTypeCast(value);
+            this.value.push(this.attemptTypeCast(value));
         }
     }
 
@@ -79,7 +87,7 @@ public class BaracoValue {
     }
 
     public Object getValue() {
-        return this.value;
+        return this.value.peek();
     }
 
     public PrimitiveType getPrimitiveType() {

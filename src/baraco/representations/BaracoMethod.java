@@ -238,6 +238,13 @@ public class BaracoMethod implements IControlledCommand{
         }
 
         MethodTracker.getInstance().reportExitFunction();
+        this.popBackParameters();
+    }
+
+    public void popBackParameters() {
+        for (BaracoValue bV : this.parameterValues.values()) {
+            bV.popBack();
+        }
     }
 
     @Override
