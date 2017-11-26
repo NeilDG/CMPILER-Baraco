@@ -66,7 +66,11 @@ public class AssignmentCommand implements ICommand {
         evaluationCommand.execute();
 
         if(this.isLeftHandArrayAccessor()) {
-            this.handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
+
+            if(evaluationCommand.isNumericResult())
+                this.handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
+            else
+                this.handleArrayAssignment(evaluationCommand.getStringResult());
         }
         else {
             BaracoValue baracoValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
