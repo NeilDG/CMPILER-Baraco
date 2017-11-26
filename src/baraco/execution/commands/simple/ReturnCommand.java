@@ -48,7 +48,10 @@ public class ReturnCommand implements ICommand {
 
         BaracoValue baracoValue = this.assignedBaracoMethod.getReturnValue();
 
-        AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+        if (evaluationCommand.isNumericResult())
+            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+        else
+            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
         //Console.log(LogType.DEBUG,"Return value is: " +evaluationCommand.getResult().toEngineeringString());
     }
 

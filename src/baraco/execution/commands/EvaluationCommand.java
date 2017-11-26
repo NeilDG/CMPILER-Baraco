@@ -53,8 +53,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.parentExprCtx);
 
-        isNumeric = !modifiedExp.contains("\"");
+        isNumeric = !this.modifiedExp.contains("\"");
 
+        System.out.println(this.modifiedExp + " IS NUMeRC " + isNumericResult());
 
         if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
 
@@ -68,7 +69,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         } else if (!isNumeric) {
 
-            if (this.parentExprCtx.expression().size() != 0 && !isArrayElement(parentExprCtx)) {
+            if (this.parentExprCtx.expression().size() != 0 &&
+                    !isArrayElement(parentExprCtx) &&
+                    !isFunctionCall(parentExprCtx)) {
 
                 for (ExpressionContext expCtx :
                         this.parentExprCtx.expression()) {
@@ -199,15 +202,22 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
                 evaluationCommand.execute();
 
-                baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                if (evaluationCommand.isNumericResult())
+                    baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                else
+                    baracoMethod.mapParameterByValueAt(evaluationCommand.getStringResult(), i);
             }
 
             baracoMethod.execute();
 
-            //System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
+            System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
             this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
                     baracoMethod.getReturnValue().getValue().toString());
-           //System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
+
+            if (baracoMethod.getReturnType() == BaracoMethod.MethodType.STRING_TYPE)
+                this.modifiedExp = "\"" + this.modifiedExp + "\"";
+
+            System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
 
         }
     }
