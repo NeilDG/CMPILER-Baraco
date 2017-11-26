@@ -3,6 +3,7 @@ package baraco.semantics.analyzers;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
@@ -262,7 +263,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
     }
 
     public boolean isFunctionCall(ExpressionContext exprCtx) {
-        return exprCtx.expression(0) != null && exprCtx != this.readRightHandExprCtx;
+        return exprCtx.expression(0) != null && exprCtx != this.readRightHandExprCtx && EvaluationCommand.isFunctionCall(exprCtx);
     }
 
     public boolean isFunctionCallWithParams(ExpressionContext exprCtx) {

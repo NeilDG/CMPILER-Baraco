@@ -2,9 +2,7 @@ package baraco.execution.commands;
 
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.builder.ParserHandler;
-import baraco.representations.BaracoMethod;
-import baraco.representations.BaracoValue;
-import baraco.representations.RecognizedKeywords;
+import baraco.representations.*;
 import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
@@ -27,7 +25,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private ExpressionContext parentExprCtx;
     private String modifiedExp;
     private BigDecimal resultValue;
-    private String stringResult;
+    private String stringResult = "";
 
     private String prevFuncEvaluated;
 
@@ -55,11 +53,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.parentExprCtx);
 
-        //System.out.println("ADSF " + modifiedExp);
-
         isNumeric = !modifiedExp.contains("\"");
-
-        //catch rules if the value has direct boolean flags
 
 
         if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
@@ -73,10 +67,25 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             this.stringResult = this.resultValue.toEngineeringString();
 
         } else if (!isNumeric) {
-            this.stringResult = StringUtils.removeQuotes(modifiedExp);
-            ;
-        } else {
 
+            if (this.parentExprCtx.expression().size() != 0 && !isArrayElement(parentExprCtx)) {
+
+                for (ExpressionContext expCtx :
+                        this.parentExprCtx.expression()) {
+                    EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
+                    innerEvCmd.execute();
+
+                    if (isNumericResult())
+                        this.stringResult += innerEvCmd.getResult();
+                    else
+                        this.stringResult += innerEvCmd.getStringResult();
+                }
+
+            } else {
+                this.stringResult = StringUtils.removeQuotes(modifiedExp);
+            }
+
+        } else {
             Expression evalEx = new Expression(this.modifiedExp);
             //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
             this.resultValue = evalEx.eval();
@@ -99,37 +108,17 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        //System.out.println("EvaluationCommand: entering every rule");
         if (ctx instanceof ExpressionContext) {
             ExpressionContext exprCtx = (ExpressionContext) ctx;
 
-            /*System.out.println("exprCtx.getText(): " + exprCtx.getText());
-            System.out.println("exprCtx.Identifier(): " + exprCtx.Identifier());
-            System.out.println("exprCtx.expressionList(): " + exprCtx.expressionList());
-            System.out.println("exprCtx.arguments(): " + exprCtx.arguments());*/
             if (EvaluationCommand.isFunctionCall(exprCtx)) {
                 this.evaluateFunctionCall(exprCtx);
+            } else if (EvaluationCommand.isArrayElement(exprCtx)) {
+                this.evaluateArray(exprCtx);
             } else if (EvaluationCommand.isVariableOrConst(exprCtx)) {
-
-            /*ParserRuleContext prCtx = exprCtx;
-
-            while(!(prCtx instanceof StatementContext)){
-                prCtx = prCtx.getParent();
-
-                if (prCtx instanceof ExpressionContext) {
-                    ExpressionContext expCtx = (ExpressionContext) prCtx;
-
-                    if (isFunctionCall(expCtx))
-                        break;
-                }
-            }
-
-            if (prCtx instanceof StatementContext)*/
                 this.evaluateVariable(exprCtx);
             }
         }
-
-
     }
 
     @Override
@@ -141,7 +130,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         Pattern functionPattern = Pattern.compile("([a-zA-Z0-9]+)\\(([ ,.a-zA-Z0-9]*)\\)");
 
         if (exprCtx.expressionList() != null || functionPattern.matcher(exprCtx.getText()).matches()) {
-            System.out.println("exprCtx.expression(0).getText(): " + exprCtx.expression(0).getText());
             return true;
         } else {
             return false;
@@ -151,6 +139,19 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     public static boolean isVariableOrConst(ExpressionContext exprCtx) {
         if (exprCtx.primary() != null && exprCtx.primary().Identifier() != null) {
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isArrayElement(ExpressionContext exprCtx) {
+        if (exprCtx.expression(0) != null && exprCtx.expression(1) != null) {
+            BaracoValue value = BaracoValueSearcher.searchBaracoValue(exprCtx.expression(0).getText());
+
+            if (value != null)
+                return value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY;
+            else
+                return false;
         } else {
             return false;
         }
@@ -203,11 +204,10 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
             baracoMethod.execute();
 
-            System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
-            String prevString = this.modifiedExp;
+            //System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
             this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
                     baracoMethod.getReturnValue().getValue().toString());
-            System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
+           //System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
 
         }
     }
@@ -216,7 +216,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         BaracoValue baracoValue = VariableSearcher
                 .searchVariable(exprCtx.getText());
 
-        if (baracoValue == null) {
+        if (baracoValue == null || baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
             return;
         }
 
@@ -226,7 +226,31 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
             modifiedExp = "\"" + modifiedExp + "\"";
 
-        System.out.println("EVALUATED: " + modifiedExp);
+        //System.out.println("EVALUATED: " + modifiedExp);
+    }
+
+    private void evaluateArray(ExpressionContext exprCtx) {
+        BaracoValue value = BaracoValueSearcher.searchBaracoValue(exprCtx.expression(0).getText());
+
+        if (value != null) {
+            if (value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
+
+                BaracoArray baracoArray = (BaracoArray) value.getValue();
+
+                EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
+                evCmd.execute();
+
+                BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
+
+                if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
+                    this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
+                else
+                    this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", arrayMobiValue.getValue().toString());
+
+                System.out.println("@ " + this.parentExprCtx.getText() +" EVALUATED ARRAY " + exprCtx.getText() + ":" + modifiedExp);
+            }
+        }
+
     }
 
     /*
