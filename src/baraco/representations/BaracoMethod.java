@@ -62,7 +62,7 @@ public class BaracoMethod implements IControlledCommand{
         switch(this.returnType) {
             case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); setValidReturns(false); break;
             case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); setValidReturns(false); break;
-            case DECIMAL_TYPE: this.returnValue = new BaracoValue(' ', PrimitiveType.DECIMAL); setValidReturns(false); break;
+            case DECIMAL_TYPE: this.returnValue = new BaracoValue(0.0, PrimitiveType.DECIMAL); setValidReturns(false); break;
             case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); setValidReturns(false); break;
             case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); setValidReturns(false); break;
             default:
