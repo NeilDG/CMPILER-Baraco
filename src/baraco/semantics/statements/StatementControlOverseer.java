@@ -121,11 +121,11 @@ public class StatementControlOverseer {
             ICommand parentCommand = this.procedureCallStack.peek();
             this.activeControlledCommand = parentCommand;
 
-            if(parentCommand instanceof IControlledCommand) {
+            /*if(parentCommand instanceof IControlledCommand) {
                 IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                 controlledCommand.addCommand(childCommand);
-
-            }
+                System.out.println("egul erp");
+            }*/
         }
         else {
             System.out.println(TAG + ": " + "Procedure call stack is now empty.");
