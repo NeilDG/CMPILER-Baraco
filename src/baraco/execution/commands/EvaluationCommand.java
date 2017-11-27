@@ -55,8 +55,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         isNumeric = !this.modifiedExp.contains("\"");
 
-        System.out.println(this.modifiedExp + " IS NUMeRC " + isNumericResult());
-
         if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
 
             this.resultValue = new BigDecimal(1);
@@ -75,6 +73,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
                 for (ExpressionContext expCtx :
                         this.parentExprCtx.expression()) {
+
+                    System.out.println("start this " + this.parentExprCtx.getText());
+
                     EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
                     innerEvCmd.execute();
 
@@ -90,6 +91,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         } else {
             Expression evalEx = new Expression(this.modifiedExp);
+
+            System.out.println(this.modifiedExp);
+
             //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
             this.resultValue = evalEx.eval();
             this.stringResult = this.resultValue.toEngineeringString();
@@ -250,12 +254,20 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
+                System.out.println("The result : " + evCmd.getResult().intValue());
+
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
 
-                if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
-                    this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
-                else
-                    this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", arrayMobiValue.getValue().toString());
+                System.out.println("The value : " + arrayMobiValue.getValue().toString());
+                System.out.println(this.modifiedExp.replace(exprCtx.getText(), "\"" + arrayMobiValue.getValue().toString() + "\""));
+
+                if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+                    //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
+                    this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(), "\"" + arrayMobiValue.getValue().toString() + "\"");
+                } else {
+                    //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", arrayMobiValue.getValue().toString());
+                    this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(), arrayMobiValue.getValue().toString());
+                }
 
                 System.out.println("@ " + this.parentExprCtx.getText() +" EVALUATED ARRAY " + exprCtx.getText() + ":" + modifiedExp);
             }
