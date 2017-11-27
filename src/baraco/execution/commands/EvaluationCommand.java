@@ -74,15 +74,19 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 for (ExpressionContext expCtx :
                         this.parentExprCtx.expression()) {
 
-                    System.out.println("start this " + this.parentExprCtx.getText());
+                    if (!isArray(expCtx)) {
 
-                    EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
-                    innerEvCmd.execute();
+                        System.out.println("start this " + this.parentExprCtx.getText());
 
-                    if (isNumericResult())
-                        this.stringResult += innerEvCmd.getResult();
-                    else
-                        this.stringResult += innerEvCmd.getStringResult();
+                        EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
+                        innerEvCmd.execute();
+
+                        if (isNumericResult())
+                            this.stringResult += innerEvCmd.getResult();
+                        else
+                            this.stringResult += innerEvCmd.getStringResult();
+
+                    }
                 }
 
             } else {
@@ -92,9 +96,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         } else {
             Expression evalEx = new Expression(this.modifiedExp);
 
-            System.out.println(this.modifiedExp);
-
-            //Log.i(TAG,"Modified exp to eval: " +this.modifiedExp);
             this.resultValue = evalEx.eval();
             this.stringResult = this.resultValue.toEngineeringString();
 
@@ -164,6 +165,16 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         }
     }
 
+    public static boolean isArray(ExpressionContext exprCtx) {
+        BaracoValue value = BaracoValueSearcher.searchBaracoValue(exprCtx.getText());
+
+        if (value != null) {
+            return value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY && !isArrayElement(exprCtx);
+        }
+
+        return false;
+    }
+
     private void evaluateFunctionCall(ExpressionContext exprCtx) {
 
         for (ExpressionContext eCtx : exprCtx.expression()) {
@@ -203,13 +214,20 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             for (int i = 0; i < exprCtxList.size(); i++) {
                 ExpressionContext parameterExprCtx = exprCtxList.get(i);
 
-                EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
-                evaluationCommand.execute();
+                if (isArray(parameterExprCtx)) {
+                    BaracoValue barArray = BaracoValueSearcher.searchBaracoValue(parameterExprCtx.getText());
+                    baracoMethod.mapArrayAt(barArray, i, parameterExprCtx.getText());
+                } else {
+                    EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
+                    evaluationCommand.execute();
 
-                if (evaluationCommand.isNumericResult())
-                    baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
-                else
-                    baracoMethod.mapParameterByValueAt(evaluationCommand.getStringResult(), i);
+                    if (evaluationCommand.getResult() != null && !evaluationCommand.getStringResult().equals("")) {
+                        if (evaluationCommand.isNumericResult())
+                            baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                        else
+                            baracoMethod.mapParameterByValueAt(evaluationCommand.getStringResult(), i);
+                    }
+                }
             }
 
             baracoMethod.execute();
@@ -254,6 +272,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
+                System.out.println("The result : " + exprCtx.getText());
                 System.out.println("The result : " + evCmd.getResult().intValue());
 
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
