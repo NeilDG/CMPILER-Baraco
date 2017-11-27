@@ -1,13 +1,18 @@
 package baraco.execution.commands.controlled;
 
 import baraco.antlr.parser.BaracoParser;
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
 import baraco.execution.commands.utils.ConditionEvaluator;
+import baraco.representations.BaracoValue;
 import baraco.semantics.analyzers.LocalVariableAnalyzer;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
+import baraco.semantics.searching.VariableSearcher;
+import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +42,7 @@ public class ForCommand implements IControlledCommand {
      */
     @Override
     public void execute() {
-        this.evaluateLocalVariable();
+        //this.evaluateLocalVariable();
         this.identifyVariables();
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
