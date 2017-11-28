@@ -332,7 +332,7 @@ public class View extends Application {
 
     private void setCodeTemplate() {
         String className = this.currentFileName.replace(".bara", "");
-        String content = "public class " + className +
+        String content = "class " + className +
                 ": \n" +
                 "\tvoid main(): \n\n" +
                 "\tend\n" +
