@@ -13,6 +13,7 @@ import baraco.representations.BaracoValue;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
 import baraco.semantics.searching.VariableSearcher;
+import baraco.semantics.utils.LocalVarTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,18 +56,7 @@ public class IfCommand implements IConditionalCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
-                    if (command instanceof MappingCommand) {
-                        localVars.add(((MappingCommand) command).getIdentifierString());
-                    }
-
-                    if (command instanceof AssignmentCommand) {
-                        if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
-                            localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
-                    }
-
-                    if (command instanceof IncDecCommand) {
-                        localVars.add(((IncDecCommand) command).getIdentifierString());
-                    }
+                    LocalVarTracker.populateLocalVars(localVars, command);
 
                     if (command instanceof ReturnCommand) {
                         returned = true;
@@ -80,6 +70,8 @@ public class IfCommand implements IConditionalCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
+                    LocalVarTracker.populateLocalVars(localVars, command);
+
                     if (command instanceof ReturnCommand) {
                         returned = true;
                         break;
@@ -91,7 +83,7 @@ public class IfCommand implements IConditionalCommand {
             System.out.println("Monitor block interrupted! " + e.getMessage());
         }
 
-        resetLocalVars();
+        LocalVarTracker.resetLocalVars(localVars);
 
     }
 
@@ -141,9 +133,5 @@ public class IfCommand implements IConditionalCommand {
 
     public ArrayList<String> getLocalVars() {
         return localVars;
-    }
-
-    public void resetLocalVars() {
-        localVars = new ArrayList<>();
     }
 }

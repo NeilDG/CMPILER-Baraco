@@ -15,6 +15,7 @@ import baraco.semantics.analyzers.LocalVariableAnalyzer;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
 import baraco.semantics.searching.VariableSearcher;
+import baraco.semantics.utils.LocalVarTracker;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class ForCommand implements IControlledCommand {
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
-        localVars = new ArrayList<>();
+        LocalVarTracker.resetLocalVars(localVars);
 
         try {
             //evaluate the given condition
@@ -61,24 +62,7 @@ public class ForCommand implements IControlledCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
-                    if (command instanceof MappingCommand) {
-                        localVars.add(((MappingCommand) command).getIdentifierString());
-                    }
-
-                    if (command instanceof AssignmentCommand) {
-                        if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
-                            localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
-
-                    }
-
-                    if (command instanceof IncDecCommand) {
-                        localVars.add(((IncDecCommand) command).getIdentifierString());
-
-                    }
-
-                    if (command instanceof IfCommand) {
-                        localVars.addAll(((IfCommand) command).getLocalVars());
-                    }
+                    LocalVarTracker.populateLocalVars(localVars, command);
 
                 }
 

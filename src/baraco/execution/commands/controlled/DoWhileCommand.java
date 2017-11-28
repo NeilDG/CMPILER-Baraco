@@ -4,6 +4,7 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.semantics.utils.LocalVarTracker;
 
 public class DoWhileCommand extends WhileCommand {
 
@@ -28,10 +29,14 @@ public class DoWhileCommand extends WhileCommand {
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
+        LocalVarTracker.resetLocalVars(super.getLocalVars());
+
         try {
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
+
+                LocalVarTracker.populateLocalVars(super.getLocalVars(), command);
             }
 
         } catch(InterruptedException e) {

@@ -16,6 +16,7 @@ import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.antlr.parser.BaracoParser.ExpressionContext;
+import baraco.semantics.utils.LocalVarTracker;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -226,33 +227,14 @@ public class BaracoMethod implements IControlledCommand{
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
         MethodTracker.getInstance().reportEnterFunction(this);
 
-        this.localVars = new ArrayList<>();
+        LocalVarTracker.resetLocalVars(localVars);
 
         try {
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
 
-                if (command instanceof MappingCommand) {
-                    localVars.add(((MappingCommand) command).getIdentifierString());
-                }
-
-                if (command instanceof AssignmentCommand) {
-                    if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
-                        localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
-                }
-
-                if (command instanceof IncDecCommand) {
-                    localVars.add(((IncDecCommand) command).getIdentifierString());
-                }
-
-                if (command instanceof ForCommand) {
-                    localVars.addAll(((ForCommand) command).getLocalVars());
-                }
-
-                if (command instanceof IfCommand) {
-                    localVars.addAll(((IfCommand) command).getLocalVars());
-                }
+                LocalVarTracker.populateLocalVars(localVars, command);
 
                 if (command instanceof ReturnCommand) {
                     break;

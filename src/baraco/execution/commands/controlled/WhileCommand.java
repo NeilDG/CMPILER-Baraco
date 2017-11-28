@@ -9,6 +9,7 @@ import baraco.execution.commands.utils.ConditionEvaluator;
 import baraco.representations.BaracoValueSearcher;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
+import baraco.semantics.utils.LocalVarTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ public class WhileCommand implements IControlledCommand {
     protected String modifiedConditionExpr;
 
     private boolean lastLineFlag = false;
+
+    private ArrayList<String> localVars = new ArrayList<>();
 
     public WhileCommand(BaracoParser.ParExpressionContext conditionalExpr) {
         this.commandSequences = new ArrayList<ICommand>();
@@ -38,12 +41,17 @@ public class WhileCommand implements IControlledCommand {
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
+        LocalVarTracker.resetLocalVars(localVars);
+
         try {
             //evaluate the given condition
             while(ConditionEvaluator.evaluateCondition(this.modifiedConditionExpr)) {
                 for(ICommand command : this.commandSequences) {
                     executionMonitor.tryExecution();
                     command.execute();
+
+                    LocalVarTracker.populateLocalVars(localVars, command);
+
                 }
 
                 executionMonitor.tryExecution();
@@ -77,5 +85,9 @@ public class WhileCommand implements IControlledCommand {
 
     public int getCommandCount() {
         return this.commandSequences.size();
+    }
+
+    public ArrayList<String> getLocalVars() {
+        return localVars;
     }
 }
