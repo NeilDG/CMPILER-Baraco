@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -110,6 +111,21 @@ public class View extends Application {
         gridPane = new GridPane();
         Scene scene = new Scene(gridPane, 1024, 768);
         scene.getStylesheets().add(View.class.getResource("java-keywords.css").toExternalForm());
+
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.S && e.isMetaDown() && e.isShiftDown()) {
+                System.out.println("Save As shortcut");
+                if (this.fileHandler.saveAs(editor.getText())) {
+                    this.updateCurrentFileName();
+                }
+            }
+            else if(e.getCode() == KeyCode.S && e.isMetaDown()) {
+                System.out.println("Save shortcut");
+                if (this.fileHandler.save(editor.getText())) {
+                    this.updateCurrentFileName();
+                }
+            }
+        });
 
 
         // Set column constraints
