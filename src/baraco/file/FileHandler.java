@@ -54,6 +54,16 @@ public class FileHandler {
         return false;
     }
 
+    public boolean newFile() {
+        File selectedFile = showFileChooser(false);
+        if (selectedFile != null) {
+            this.currentFile = selectedFile;
+            return true;
+        }
+
+        return false;
+    }
+
     public File showFileChooser(boolean isOpen) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose " + (isOpen ? "Open" : "Save") + " Location");
