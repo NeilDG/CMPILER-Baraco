@@ -221,7 +221,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                     EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
                     evaluationCommand.execute();
 
-                    if (evaluationCommand.getResult() != null && !evaluationCommand.getStringResult().equals("")) {
+                    if (evaluationCommand.getResult() != null || !evaluationCommand.getStringResult().equals("")) {
                         if (evaluationCommand.isNumericResult())
                             baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
                         else
