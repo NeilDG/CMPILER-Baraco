@@ -15,7 +15,7 @@ public class AssignmentUtils {
 	 */
     public static void assignAppropriateValue(BaracoValue baracoValue, BigDecimal evaluationValue) {
         if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.INT) {
-            baracoValue.setValue(evaluationValue.intValue() + "");
+            baracoValue.setValue(Integer.toString(evaluationValue.intValue()));
         }
         else if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.DECIMAL) {
             baracoValue.setValue(Double.toString(evaluationValue.doubleValue()));
