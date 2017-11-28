@@ -54,4 +54,12 @@ public class MappingCommand implements ICommand{
     public String getModifiedExp() {
         return this.modifiedExp;
     }
+
+    public String getIdentifierString() {
+        return identifierString;
+    }
+
+    public BaracoParser.ExpressionContext getParentExprCtx() {
+        return parentExprCtx;
+    }
 }

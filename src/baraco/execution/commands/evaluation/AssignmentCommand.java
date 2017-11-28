@@ -90,7 +90,7 @@ public class AssignmentCommand implements ICommand {
         }
     }
 
-    private boolean isLeftHandArrayAccessor() {
+    public boolean isLeftHandArrayAccessor() {
         List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.LBRACK);
         List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.RBRACK);
 
@@ -113,5 +113,13 @@ public class AssignmentCommand implements ICommand {
         baracoArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
 
         //Console.log("Index to access: " +evaluationCommand.getResult().intValue()+ " Updated with: " +resultString);
+    }
+
+    public ExpressionContext getLeftHandExprCtx() {
+        return leftHandExprCtx;
+    }
+
+    public ExpressionContext getRightHandExprCtx() {
+        return rightHandExprCtx;
     }
 }

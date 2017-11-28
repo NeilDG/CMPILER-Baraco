@@ -4,10 +4,15 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.evaluation.AssignmentCommand;
+import baraco.execution.commands.evaluation.MappingCommand;
+import baraco.execution.commands.simple.IncDecCommand;
 import baraco.execution.commands.simple.ReturnCommand;
 import baraco.execution.commands.utils.ConditionEvaluator;
+import baraco.representations.BaracoValue;
 import baraco.semantics.mapping.IValueMapper;
 import baraco.semantics.mapping.IdentifierMapper;
+import baraco.semantics.searching.VariableSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +26,8 @@ public class IfCommand implements IConditionalCommand {
     private String modifiedConditionExpr;
 
     private boolean returned;
+
+    private ArrayList<String> localVars = new ArrayList<>();
 
     public IfCommand(BaracoParser.ParExpressionContext conditionalExpr) {
         this.positiveCommands = new ArrayList<ICommand>();
@@ -48,6 +55,19 @@ public class IfCommand implements IConditionalCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
+                    if (command instanceof MappingCommand) {
+                        localVars.add(((MappingCommand) command).getIdentifierString());
+                    }
+
+                    if (command instanceof AssignmentCommand) {
+                        if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
+                            localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
+                    }
+
+                    if (command instanceof IncDecCommand) {
+                        localVars.add(((IncDecCommand) command).getIdentifierString());
+                    }
+
                     if (command instanceof ReturnCommand) {
                         returned = true;
                         break;
@@ -70,6 +90,8 @@ public class IfCommand implements IConditionalCommand {
             //Log.e(TAG, "Monitor block interrupted! " +e.getMessage());
             System.out.println("Monitor block interrupted! " + e.getMessage());
         }
+
+        resetLocalVars();
 
     }
 
@@ -115,5 +137,13 @@ public class IfCommand implements IConditionalCommand {
     public int getNegativeCommandsCount() {
         return this.negativeCommands.size();
 
+    }
+
+    public ArrayList<String> getLocalVars() {
+        return localVars;
+    }
+
+    public void resetLocalVars() {
+        localVars = new ArrayList<>();
     }
 }

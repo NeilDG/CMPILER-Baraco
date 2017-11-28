@@ -5,9 +5,12 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.builder.errorcheckers.TypeChecker;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.IConditionalCommand;
+import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.evaluation.MappingCommand;
 import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
+import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import baraco.semantics.utils.IdentifiedTokens;
@@ -161,7 +164,28 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
         }
         else {
             MappingCommand mappingCommand = new MappingCommand(varCtx.variableDeclaratorId().getText(), varCtx.variableInitializer().expression());
-            ExecutionManager.getInstance().addCommand(mappingCommand);
+
+            StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+            //add to conditional controlled command
+            if(statementControl.isInConditionalCommand()) {
+                IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
+
+                if(statementControl.isInPositiveRule()) {
+                    conditionalCommand.addPositiveCommand(mappingCommand);
+                }
+                else {
+                    conditionalCommand.addNegativeCommand(mappingCommand);
+                }
+            }
+
+            else if(statementControl.isInControlledCommand()) {
+                IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
+                controlledCommand.addCommand(mappingCommand);
+            }
+            else {
+                ExecutionManager.getInstance().addCommand(mappingCommand);
+            }
+
         }
     }
 

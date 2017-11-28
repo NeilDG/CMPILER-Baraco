@@ -73,4 +73,7 @@ public class IncDecCommand implements ICommand {
         }
     }
 
+    public String getIdentifierString() {
+        return exprCtx.primary().Identifier().getText();
+    }
 }

@@ -5,6 +5,7 @@ import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class AssignmentUtils {
 
@@ -14,7 +15,7 @@ public class AssignmentUtils {
 	 */
     public static void assignAppropriateValue(BaracoValue baracoValue, BigDecimal evaluationValue) {
         if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.INT) {
-            baracoValue.setValue(Integer.toString(evaluationValue.intValue()));
+            baracoValue.setValue(evaluationValue.intValue() + "");
         }
         else if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.DECIMAL) {
             baracoValue.setValue(Double.toString(evaluationValue.doubleValue()));

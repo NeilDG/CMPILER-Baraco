@@ -47,6 +47,10 @@ public class BaracoValue {
         return null;
     }
 
+    public int stackSize() {
+        return value.size();
+    }
+
     /*
      * Marks this value as final if there is a final keyword
      */

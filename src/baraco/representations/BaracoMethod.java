@@ -4,10 +4,15 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.MethodTracker;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.controlled.ForCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.controlled.IfCommand;
+import baraco.execution.commands.evaluation.AssignmentCommand;
+import baraco.execution.commands.evaluation.MappingCommand;
+import baraco.execution.commands.simple.IncDecCommand;
 import baraco.execution.commands.simple.ReturnCommand;
 import baraco.representations.BaracoValue.PrimitiveType;
+import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.antlr.parser.BaracoParser.ExpressionContext;
@@ -38,6 +43,8 @@ public class BaracoMethod implements IControlledCommand{
     private LinkedHashMap<String, BaracoValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
     private BaracoValue returnValue; //the return value of the function. null if it's a void type
     private MethodType returnType = MethodType.VOID_TYPE; //the return type of the function
+
+    private ArrayList<String> localVars = new ArrayList<>();
 
     private boolean hasValidReturns = true;
 
@@ -125,7 +132,7 @@ public class BaracoMethod implements IControlledCommand{
             newArray.updateValueAt(baracoArray.getValueAt(i), i);
         }
 
-        this.parameterValues.put(this.getParameterKeyAt(index), newValue);
+        this.parameterValues.put(this.getParameterKeyAt(index), baracoValue);
 
     }
 
@@ -218,10 +225,34 @@ public class BaracoMethod implements IControlledCommand{
     public void execute() {
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
         MethodTracker.getInstance().reportEnterFunction(this);
+
+        this.localVars = new ArrayList<>();
+
         try {
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
+
+                if (command instanceof MappingCommand) {
+                    localVars.add(((MappingCommand) command).getIdentifierString());
+                }
+
+                if (command instanceof AssignmentCommand) {
+                    if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
+                        localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
+                }
+
+                if (command instanceof IncDecCommand) {
+                    localVars.add(((IncDecCommand) command).getIdentifierString());
+                }
+
+                if (command instanceof ForCommand) {
+                    localVars.addAll(((ForCommand) command).getLocalVars());
+                }
+
+                if (command instanceof IfCommand) {
+                    localVars.addAll(((IfCommand) command).getLocalVars());
+                }
 
                 if (command instanceof ReturnCommand) {
                     break;
@@ -232,18 +263,31 @@ public class BaracoMethod implements IControlledCommand{
                     }
                 }
             }
-
         } catch(InterruptedException e) {
             System.out.println(TAG + ": " + "Monitor block interrupted! " +e.getMessage());
         }
 
         MethodTracker.getInstance().reportExitFunction();
         this.popBackParameters();
+        this.popBackLocalVars();
     }
 
-    public void popBackParameters() {
+    private void popBackParameters() {
         for (BaracoValue bV : this.parameterValues.values()) {
-            bV.popBack();
+            if(bV.getPrimitiveType() != PrimitiveType.ARRAY)
+                bV.popBack();
+        }
+    }
+
+    private void popBackLocalVars() {
+        for(String s : this.localVars) {
+            BaracoValue value = VariableSearcher.searchVariableInFunction(this, s);
+
+            if(value.stackSize() > 1) { // prevent from reaching null
+                if (value.getPrimitiveType() != PrimitiveType.ARRAY)
+                    value.popBack();
+            }
+
         }
     }
 

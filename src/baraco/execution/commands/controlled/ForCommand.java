@@ -6,6 +6,9 @@ import baraco.builder.ErrorRepository;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.evaluation.AssignmentCommand;
+import baraco.execution.commands.evaluation.MappingCommand;
+import baraco.execution.commands.simple.IncDecCommand;
 import baraco.execution.commands.utils.ConditionEvaluator;
 import baraco.representations.BaracoValue;
 import baraco.semantics.analyzers.LocalVariableAnalyzer;
@@ -29,6 +32,8 @@ public class ForCommand implements IControlledCommand {
 
     private String modifiedConditionExpr;
 
+    private ArrayList<String> localVars = new ArrayList<>();
+
     public ForCommand(BaracoParser.LocalVariableDeclarationContext localVarDecCtx, BaracoParser.ExpressionContext conditionalExpr, ICommand updateCommand) {
         this.localVarDecCtx = localVarDecCtx;
         this.conditionalExpr = conditionalExpr;
@@ -47,12 +52,34 @@ public class ForCommand implements IControlledCommand {
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
+        localVars = new ArrayList<>();
+
         try {
             //evaluate the given condition
             while(ConditionEvaluator.evaluateCondition(this.conditionalExpr)) {
                 for(ICommand command : this.commandSequences) {
                     executionMonitor.tryExecution();
                     command.execute();
+
+                    if (command instanceof MappingCommand) {
+                        localVars.add(((MappingCommand) command).getIdentifierString());
+                    }
+
+                    if (command instanceof AssignmentCommand) {
+                        if(!((AssignmentCommand) command).isLeftHandArrayAccessor())
+                            localVars.add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
+
+                    }
+
+                    if (command instanceof IncDecCommand) {
+                        localVars.add(((IncDecCommand) command).getIdentifierString());
+
+                    }
+
+                    if (command instanceof IfCommand) {
+                        localVars.addAll(((IfCommand) command).getLocalVars());
+                    }
+
                 }
 
                 executionMonitor.tryExecution();
@@ -102,4 +129,7 @@ public class ForCommand implements IControlledCommand {
         return this.commandSequences.size();
     }
 
+    public ArrayList<String> getLocalVars() {
+        return localVars;
+    }
 }
