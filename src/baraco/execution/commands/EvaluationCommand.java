@@ -55,17 +55,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         isNumeric = !this.modifiedExp.contains("\"");
 
-        if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
-
-            this.resultValue = new BigDecimal(1);
-            this.stringResult = this.resultValue.toEngineeringString();
-
-        } else if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_FALSE)) {
-
-            this.resultValue = new BigDecimal(0);
-            this.stringResult = this.resultValue.toEngineeringString();
-
-        } else if (!isNumeric) {
+        if (!isNumeric) {
 
             if (this.parentExprCtx.expression().size() != 0 &&
                     !isArrayElement(parentExprCtx) &&
@@ -92,6 +82,20 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             }
 
         } else {
+
+            if (this.modifiedExp.contains("!")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("!", "not");
+                this.modifiedExp = this.modifiedExp.replaceAll("not=", "!=");
+            }
+
+            if (this.modifiedExp.contains("and")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("and", "&&");
+            }
+
+            if (this.modifiedExp.contains("or")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("or", "||");
+            }
+
             Expression evalEx = new Expression(this.modifiedExp);
 
             this.resultValue = evalEx.eval();
