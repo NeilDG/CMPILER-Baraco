@@ -7,11 +7,13 @@ import baraco.execution.MethodTracker;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
 import baraco.ide.dialogs.ErrorDialogHandler;
+import baraco.ide.dialogs.GenerateMethodDialog;
 import baraco.ide.dialogs.RefactorDialogHandler;
 import baraco.ide.dialogs.ScanDialogHandler;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import baraco.semantics.utils.LocalVarTracker;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -101,6 +103,7 @@ public class View extends Application {
         LocalScopeCreator.initialize();
         StatementControlOverseer.initialize();
         MethodTracker.initialize();
+        LocalVarTracker.initialize();
     }
 
     public static void main(String[] args) {
@@ -451,7 +454,8 @@ public class View extends Application {
     }
 
     private void generateMethod() {
-
+        GenerateMethodDialog generateMethodDialog = new GenerateMethodDialog();
+        generateMethodDialog.showGenerateMethodDialog();
     }
 
     private void generateStatement() {

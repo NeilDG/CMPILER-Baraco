@@ -80,7 +80,7 @@ public class PrintCommand implements ICommand, ParseTreeListener {
             evComm.execute();
 
             if (evComm.isNumericResult())
-                statementToPrint += evComm.getResult();
+                statementToPrint += evComm.getResult().toEngineeringString();
             else
                 statementToPrint += evComm.getStringResult();
 

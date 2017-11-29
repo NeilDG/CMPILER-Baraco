@@ -401,7 +401,7 @@ printStatement
     ;
 
 catchClause
-    :   'catch' '(' variableModifier* catchType Identifier ')' block
+    :   'catch' '(' ')' block
     ;
 
 catchType

@@ -38,7 +38,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     @Override
     public void execute() {
 
-        System.out.println("EvaluationCommand: executing");
+        //System.out.println("EvaluationCommand: executing");
         this.modifiedExp = this.parentExprCtx.getText();
 
         for (ExpressionContext eCtx : this.parentExprCtx.expression()) { // bias functions in evaluating
@@ -55,17 +55,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         isNumeric = !this.modifiedExp.contains("\"");
 
-        if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_TRUE)) {
-
-            this.resultValue = new BigDecimal(1);
-            this.stringResult = this.resultValue.toEngineeringString();
-
-        } else if (this.modifiedExp.contains(RecognizedKeywords.BOOLEAN_FALSE)) {
-
-            this.resultValue = new BigDecimal(0);
-            this.stringResult = this.resultValue.toEngineeringString();
-
-        } else if (!isNumeric) {
+        if (!isNumeric) {
 
             if (this.parentExprCtx.expression().size() != 0 &&
                     !isArrayElement(parentExprCtx) &&
@@ -92,6 +82,20 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             }
 
         } else {
+
+            if (this.modifiedExp.contains("!")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("!", "not");
+                this.modifiedExp = this.modifiedExp.replaceAll("not=", "!=");
+            }
+
+            if (this.modifiedExp.contains("and")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("and", "&&");
+            }
+
+            if (this.modifiedExp.contains("or")) {
+                this.modifiedExp = this.modifiedExp.replaceAll("or", "||");
+            }
+
             Expression evalEx = new Expression(this.modifiedExp);
 
             this.resultValue = evalEx.eval();
@@ -230,14 +234,14 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
             baracoMethod.execute();
 
-            System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
+            //System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
             this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
                     baracoMethod.getReturnValue().getValue().toString());
 
             if (baracoMethod.getReturnType() == BaracoMethod.MethodType.STRING_TYPE)
                 this.modifiedExp = "\"" + this.modifiedExp + "\"";
 
-            System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
+            //System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
 
         }
     }
@@ -295,6 +299,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     public String getStringResult() {
         return stringResult;
     }
+
+    public String getModifiedExp() { return modifiedExp;}
 
     public boolean isNumericResult() {
         return isNumeric;
