@@ -12,7 +12,7 @@ public class ErrorDialogHandler {
 
     public void showErrorDialog(String message) {
         alert.setTitle("Error!");
-        alert.setHeaderText("Something went wrong");
+        alert.setHeaderText("Something went wrong...");
         alert.setContentText(message);
 
         alert.showAndWait();
