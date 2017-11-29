@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class BaracoMethodTemplate {
 
     String methodName;
+    BaracoValue.PrimitiveType returnType;
     ArrayList<BaracoMethodTemplateParameter> parameters;
 
     public BaracoMethodTemplate() {
@@ -17,17 +18,22 @@ public class BaracoMethodTemplate {
         return this.methodName;
     }
 
-    private BaracoMethodTemplate setMethodName(String methodName) {
+    public BaracoMethodTemplate setMethodName(String methodName) {
         this.methodName = methodName;
         return this;
     }
 
-    private BaracoMethodTemplate addParameter(String parameterName, BaracoValue.PrimitiveType dataType) {
+    public BaracoMethodTemplate setReturnType(BaracoValue.PrimitiveType returnType) {
+        this.returnType = returnType;
+        return this;
+    }
+
+    public BaracoMethodTemplate addParameter(String parameterName, BaracoValue.PrimitiveType dataType) {
         this.parameters.add(new BaracoMethodTemplateParameter(parameterName, dataType));
         return this;
     }
 
-    private BaracoMethodTemplate addParameter(BaracoMethodTemplateParameter parameter) {
+    public BaracoMethodTemplate addParameter(BaracoMethodTemplateParameter parameter) {
         this.parameters.add(parameter);
         return this;
     }

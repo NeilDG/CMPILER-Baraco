@@ -7,6 +7,7 @@ import baraco.execution.MethodTracker;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
 import baraco.ide.dialogs.ErrorDialogHandler;
+import baraco.ide.dialogs.GenerateMethodDialog;
 import baraco.ide.dialogs.RefactorDialogHandler;
 import baraco.ide.dialogs.ScanDialogHandler;
 import baraco.semantics.statements.StatementControlOverseer;
@@ -453,7 +454,8 @@ public class View extends Application {
     }
 
     private void generateMethod() {
-
+        GenerateMethodDialog generateMethodDialog = new GenerateMethodDialog();
+        generateMethodDialog.showGenerateMethodDialog();
     }
 
     private void generateStatement() {
