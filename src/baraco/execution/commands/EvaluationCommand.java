@@ -53,7 +53,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.parentExprCtx);
 
-        isNumeric = !this.modifiedExp.contains("\"");
+        isNumeric = !this.modifiedExp.contains("\"") && !this.modifiedExp.contains("\'");
 
         if (!isNumeric) {
 
@@ -69,8 +69,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                         EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
                         innerEvCmd.execute();
 
-                        if (isNumericResult())
-                            this.stringResult += innerEvCmd.getResult();
+                        if (innerEvCmd.isNumericResult())
+                            this.stringResult += innerEvCmd.getResult().toEngineeringString();
                         else
                             this.stringResult += innerEvCmd.getStringResult();
 
@@ -259,6 +259,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
         if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
             modifiedExp = "\"" + modifiedExp + "\"";
+
+        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR)
+            modifiedExp = "'" + modifiedExp + "'";
 
         //System.out.println("EVALUATED: " + modifiedExp);
     }

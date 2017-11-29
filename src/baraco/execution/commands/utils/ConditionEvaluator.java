@@ -71,6 +71,19 @@ public class ConditionEvaluator {
         //EvaluationCommand evaluationCommand = new EvaluationCommand(conditionExprCtx);
         //evaluationCommand.execute();
 
+        if (condition.contains("!")) {
+            condition = condition.replaceAll("!", "not");
+            condition = condition.replaceAll("not=", "!=");
+        }
+
+        if (condition.contains("and")) {
+            condition = condition.replaceAll("and", "&&");
+        }
+
+        if (condition.contains("or")) {
+            condition = condition.replaceAll("or", "||");
+        }
+
         Expression expression = new Expression(condition);
 
         BigDecimal result = expression.eval();

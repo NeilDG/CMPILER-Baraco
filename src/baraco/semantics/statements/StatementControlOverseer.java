@@ -124,7 +124,6 @@ public class StatementControlOverseer {
             /*if(parentCommand instanceof IControlledCommand) {
                 IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                 controlledCommand.addCommand(childCommand);
-                System.out.println("egul erp");
             }*/
         }
         else {

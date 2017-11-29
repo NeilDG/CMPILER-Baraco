@@ -86,7 +86,15 @@ public class BaracoValue {
         switch(this.primitiveType) {
             case CHAR: return Character.valueOf(value.charAt(0));
             case BOOL: return Boolean.valueOf(value);
-            case INT: return Integer.valueOf(value);
+            case INT:
+                String s = value;
+
+                if(s.contains(".")) {
+                    String[] split = s.split("[.]");
+                    return Integer.valueOf(split[0]);
+                } else {
+                    return Integer.valueOf(value);
+                }
             case DECIMAL: return Double.valueOf(value);
             case STRING: return value;
             default: return null;

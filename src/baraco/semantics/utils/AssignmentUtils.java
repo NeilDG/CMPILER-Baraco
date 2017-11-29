@@ -37,7 +37,8 @@ public class AssignmentUtils {
     }
 
     public static void assignAppropriateValue(BaracoValue baracoValue, String stringValue) {
-        if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+        if(baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING ||
+                baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
             baracoValue.setValue(stringValue);
         }
     }

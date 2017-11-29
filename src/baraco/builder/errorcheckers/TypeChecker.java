@@ -105,7 +105,7 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                 }
 
             }
-            else {
+            /*else {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(expCtx);
                 evaluationCommand.execute();
 
@@ -133,7 +133,7 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                         BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
                     }
                 }
-            }
+            }*/
 
         } /*else if(ctx instanceof LiteralContext) {
             if(this.baracoValue == null) {
