@@ -2,8 +2,7 @@ package baraco.semantics.statements;
 
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.ICommand;
-import baraco.execution.commands.controlled.IConditionalCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
+import baraco.execution.commands.controlled.*;
 
 import java.util.Stack;
 
@@ -121,10 +120,10 @@ public class StatementControlOverseer {
             ICommand parentCommand = this.procedureCallStack.peek();
             this.activeControlledCommand = parentCommand;
 
-            /*if(parentCommand instanceof IControlledCommand) {
+            if(parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
                 IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                 controlledCommand.addCommand(childCommand);
-            }*/
+            }
         }
         else {
             System.out.println(TAG + ": " + "Procedure call stack is now empty.");
