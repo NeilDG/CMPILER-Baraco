@@ -10,14 +10,9 @@ import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -154,7 +149,9 @@ public class View extends Application {
         gridPane.getRowConstraints().addAll(row1, row2, row3);
 
 
-        gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+        //gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+
+        gridPane.add(setupMenuBar(), 0, 0, GridPane.REMAINING, 1);
 
         // Credits to RichTextFX for the API
         editor = new CodeArea();
@@ -221,6 +218,75 @@ public class View extends Application {
         ToolBar toolBar = new ToolBar(openButton, newButton, saveButton, saveAsButton, runButton);
 
         return toolBar;
+    }
+
+    private MenuBar setupMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        // File menu
+        Menu menuFile = new Menu("File");
+        // Setup file menu items
+        MenuItem newItem = new MenuItem("New");
+        newItem.setOnAction(event -> {
+            newFile();
+        });
+        MenuItem openItem = new MenuItem("Open");
+        openItem.setOnAction(event -> {
+            openFile();
+        });
+        MenuItem saveItem = new MenuItem("Save");
+        saveItem.setOnAction(event -> {
+            saveFile();
+        });
+        MenuItem saveAsItem = new MenuItem("Save As");
+        saveAsItem.setOnAction(event -> {
+            saveAsFile();
+        });
+        menuFile.getItems().addAll(newItem, openItem, saveItem, saveAsItem);
+
+        // Edit menu
+        Menu menuEdit = new Menu("Edit");
+        // Setup edit menu items
+        MenuItem undoItem = new MenuItem("Undo");
+        undoItem.setOnAction(event -> {
+            editor.undo();
+        });
+        MenuItem redoItem = new MenuItem("Redo");
+        redoItem.setOnAction(event -> {
+            editor.redo();
+        });
+        MenuItem cutItem = new MenuItem("Cut");
+        cutItem.setOnAction(event -> {
+            editor.cut();
+        });
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(event -> {
+            editor.copy();
+        });
+        MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setOnAction(event -> {
+            editor.paste();
+        });
+        menuEdit.getItems().addAll(undoItem, redoItem, cutItem, copyItem, pasteItem);
+
+        // Code menu
+        Menu menuCode = new Menu("Code");
+        // Setup code menu items
+        MenuItem generateCodeItem = new MenuItem("Generate...");
+        menuCode.getItems().addAll(generateCodeItem);
+
+        // Run button
+        Menu menuRun = new Menu();
+        Label runLabel = new Label("Run");
+        runLabel.setOnMouseClicked(event -> {
+            controller.run(editor.getText(), this.currentFileName);
+        });
+        menuRun.setGraphic(runLabel);
+
+        // Add menus to menubar
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuCode, menuRun);
+
+        return menuBar;
     }
 
     public static void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
@@ -330,7 +396,7 @@ public class View extends Application {
         this.stage.setTitle("Baraco IDE - " + this.currentFileName);
     }
 
-    private void setCodeTemplate() {
+    private void setNewFileTemplate() {
         String className = this.currentFileName.replace(".bara", "");
         String content = "class " + className +
                 ": \n" +
@@ -363,7 +429,7 @@ public class View extends Application {
     private void newFile() {
         if (this.fileHandler.newFile()) {
             this.updateCurrentFileName();
-            this.setCodeTemplate();
+            this.setNewFileTemplate();
             this.saveFile();
         }
     }
