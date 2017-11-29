@@ -16,6 +16,7 @@ import baraco.semantics.utils.AssignmentUtils;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class AssignmentCommand implements ICommand {
@@ -38,6 +39,7 @@ public class AssignmentCommand implements ICommand {
 
         undeclaredChecker = new UndeclaredChecker(this.rightHandExprCtx);
         undeclaredChecker.verify();
+
 
         ParseTreeWalker functionWalker = new ParseTreeWalker();
         functionWalker.walk(new MethodCallVerifier(), this.rightHandExprCtx);
