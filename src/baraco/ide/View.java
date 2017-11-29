@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -113,6 +114,25 @@ public class View extends Application {
         Scene scene = new Scene(gridPane, 1024, 768);
         scene.getStylesheets().add(View.class.getResource("java-keywords.css").toExternalForm());
 
+        scene.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.S && e.isMetaDown() && e.isShiftDown()) {
+                System.out.println("Save As shortcut");
+                saveAsFile();
+            }
+            else if(e.getCode() == KeyCode.S && e.isMetaDown()) {
+                System.out.println("Save shortcut");
+                saveFile();
+            }
+            else if(e.getCode() == KeyCode.O && e.isMetaDown()) {
+                System.out.println("Open shortcut");
+                openFile();
+            }
+            else if(e.getCode() == KeyCode.N && e.isMetaDown()) {
+                System.out.println("New shortcut");
+                newFile();
+            }
+        });
+
 
         // Set column constraints
         /*ColumnConstraints col1 = new ColumnConstraints();
@@ -175,25 +195,22 @@ public class View extends Application {
         // Setup toolbar
         Button openButton = new Button("Open");
         openButton.setOnAction(event -> {
-            String content = this.fileHandler.open();
-            if (content != null) {
-                this.editor.replaceText(content);
-                this.updateCurrentFileName();
-            }
+            openFile();
+        });
+
+        Button newButton = new Button("New");
+        newButton.setOnAction(event -> {
+            newFile();
         });
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event -> {
-            if (this.fileHandler.save(editor.getText())) {
-                this.updateCurrentFileName();
-            }
+            saveFile();
         });
 
         Button saveAsButton = new Button("Save As");
         saveAsButton.setOnAction(event -> {
-            if (this.fileHandler.saveAs(editor.getText())) {
-                this.updateCurrentFileName();
-            }
+            saveAsFile();
         });
 
         Button runButton = new Button("Run");
@@ -203,7 +220,7 @@ public class View extends Application {
         });
 
 
-        ToolBar toolBar = new ToolBar(openButton, saveButton, saveAsButton, runButton);
+        ToolBar toolBar = new ToolBar(openButton, newButton, saveButton, saveAsButton, runButton);
 
         return toolBar;
     }
@@ -313,5 +330,43 @@ public class View extends Application {
     private void updateCurrentFileName() {
         this.currentFileName = this.fileHandler.getCurrentFileName();
         this.stage.setTitle("Baraco IDE - " + this.currentFileName);
+    }
+
+    private void setCodeTemplate() {
+        String className = this.currentFileName.replace(".bara", "");
+        String content = "class " + className +
+                ": \n" +
+                "\tvoid main(): \n\n" +
+                "\tend\n" +
+                "end";
+        this.editor.replaceText(content);
+    }
+
+    private void saveFile() {
+        if (this.fileHandler.save(editor.getText())) {
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void saveAsFile() {
+        if (this.fileHandler.saveAs(editor.getText())) {
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void openFile() {
+        String content = this.fileHandler.open();
+        if (content != null) {
+            this.editor.replaceText(content);
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void newFile() {
+        if (this.fileHandler.newFile()) {
+            this.updateCurrentFileName();
+            this.setCodeTemplate();
+            this.saveFile();
+        }
     }
 }
