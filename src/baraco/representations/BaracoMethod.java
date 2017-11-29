@@ -21,6 +21,7 @@ import baraco.semantics.utils.LocalVarTracker;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class BaracoMethod implements IControlledCommand{
 
@@ -44,8 +45,6 @@ public class BaracoMethod implements IControlledCommand{
     private LinkedHashMap<String, BaracoValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
     private BaracoValue returnValue; //the return value of the function. null if it's a void type
     private MethodType returnType = MethodType.VOID_TYPE; //the return type of the function
-
-    private ArrayList<String> localVars = new ArrayList<>();
 
     private boolean hasValidReturns = true;
 
@@ -227,14 +226,14 @@ public class BaracoMethod implements IControlledCommand{
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
         MethodTracker.getInstance().reportEnterFunction(this);
 
-        LocalVarTracker.resetLocalVars(localVars);
+        LocalVarTracker.getInstance().startNewSession();
 
         try {
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
 
-                LocalVarTracker.populateLocalVars(localVars, command);
+                LocalVarTracker.getInstance().populateLocalVars(command);
 
                 if (command instanceof ReturnCommand) {
                     break;
@@ -252,6 +251,10 @@ public class BaracoMethod implements IControlledCommand{
         MethodTracker.getInstance().reportExitFunction();
         this.popBackParameters();
         this.popBackLocalVars();
+
+        LocalVarTracker.getInstance().endCurrentSession();
+
+        //LocalVarTracker.resetLocalVars(localVars);
     }
 
     private void popBackParameters() {
@@ -262,8 +265,12 @@ public class BaracoMethod implements IControlledCommand{
     }
 
     private void popBackLocalVars() {
-        for(String s : this.localVars) {
-            BaracoValue value = VariableSearcher.searchVariableInFunction(this, s);
+        for(String s : LocalVarTracker.getInstance().getCurrentSession()) {
+
+            BaracoValue value = VariableSearcher.searchVariable(s);
+
+            if (value == null)
+                value = VariableSearcher.searchVariableInFunction(this, s);
 
             if(value.stackSize() > 1) { // prevent from reaching null
                 if (value.getPrimitiveType() != PrimitiveType.ARRAY)

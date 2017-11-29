@@ -41,7 +41,7 @@ public class BaracoValue {
     }
 
     public Object popBack() {
-        if (this.value.size() > 1)
+        if (this.value.size() > 2)
             return this.value.pop();
 
         return null;

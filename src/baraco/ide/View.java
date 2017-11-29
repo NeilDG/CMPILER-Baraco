@@ -8,6 +8,7 @@ import baraco.file.FileHandler;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import baraco.semantics.utils.LocalVarTracker;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -100,6 +101,7 @@ public class View extends Application {
         LocalScopeCreator.initialize();
         StatementControlOverseer.initialize();
         MethodTracker.initialize();
+        LocalVarTracker.initialize();
     }
 
     public static void main(String[] args) {

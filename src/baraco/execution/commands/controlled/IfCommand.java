@@ -56,7 +56,11 @@ public class IfCommand implements IConditionalCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
-                    LocalVarTracker.populateLocalVars(localVars, command);
+                    LocalVarTracker.getInstance().populateLocalVars(command);
+
+                    if (ExecutionManager.getInstance().getCurrentFunction() != null) {
+                        System.out.println(ExecutionManager.getInstance().getCurrentFunction().getMethodName());
+                    }
 
                     if (command instanceof ReturnCommand) {
                         returned = true;
@@ -70,7 +74,7 @@ public class IfCommand implements IConditionalCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
-                    LocalVarTracker.populateLocalVars(localVars, command);
+                    LocalVarTracker.getInstance().populateLocalVars(command);
 
                     if (command instanceof ReturnCommand) {
                         returned = true;
@@ -82,8 +86,6 @@ public class IfCommand implements IConditionalCommand {
             //Log.e(TAG, "Monitor block interrupted! " +e.getMessage());
             System.out.println("Monitor block interrupted! " + e.getMessage());
         }
-
-        LocalVarTracker.resetLocalVars(localVars);
 
     }
 

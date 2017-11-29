@@ -14,6 +14,7 @@ import baraco.ide.View;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import baraco.semantics.utils.LocalVarTracker;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -57,6 +58,7 @@ public class Controller {
         BuildChecker.reset();
         StatementControlOverseer.reset();
         MethodTracker.reset();
+        LocalVarTracker.reset();
 
         view.resetConsole();
 

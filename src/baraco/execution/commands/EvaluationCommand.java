@@ -38,7 +38,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     @Override
     public void execute() {
 
-        System.out.println("EvaluationCommand: executing");
+        //System.out.println("EvaluationCommand: executing");
         this.modifiedExp = this.parentExprCtx.getText();
 
         for (ExpressionContext eCtx : this.parentExprCtx.expression()) { // bias functions in evaluating
@@ -75,8 +75,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                         this.parentExprCtx.expression()) {
 
                     if (!isArray(expCtx)) {
-
-                        System.out.println("start this " + this.parentExprCtx.getText());
 
                         EvaluationCommand innerEvCmd = new EvaluationCommand(expCtx);
                         innerEvCmd.execute();
@@ -232,14 +230,14 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
             baracoMethod.execute();
 
-            System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
+            //System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
             this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
                     baracoMethod.getReturnValue().getValue().toString());
 
             if (baracoMethod.getReturnType() == BaracoMethod.MethodType.STRING_TYPE)
                 this.modifiedExp = "\"" + this.modifiedExp + "\"";
 
-            System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
+            //System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
 
         }
     }
@@ -272,13 +270,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
-                System.out.println("The result : " + exprCtx.getText());
-                System.out.println("The result : " + evCmd.getResult().intValue());
-
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
-
-                System.out.println("The value : " + arrayMobiValue.getValue().toString());
-                System.out.println(this.modifiedExp.replace(exprCtx.getText(), "\"" + arrayMobiValue.getValue().toString() + "\""));
 
                 if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
                     //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
@@ -287,8 +279,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                     //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", arrayMobiValue.getValue().toString());
                     this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(), arrayMobiValue.getValue().toString());
                 }
-
-                System.out.println("@ " + this.parentExprCtx.getText() +" EVALUATED ARRAY " + exprCtx.getText() + ":" + modifiedExp);
             }
         }
 

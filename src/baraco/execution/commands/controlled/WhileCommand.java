@@ -50,7 +50,7 @@ public class WhileCommand implements IControlledCommand {
                     executionMonitor.tryExecution();
                     command.execute();
 
-                    LocalVarTracker.populateLocalVars(localVars, command);
+                    LocalVarTracker.getInstance().populateLocalVars(command);
 
                 }
 
