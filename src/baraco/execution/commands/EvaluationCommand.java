@@ -7,6 +7,8 @@ import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.Expression;
+import baraco.semantics.utils.Expression.LazyFunction;
+import baraco.semantics.utils.Expression.LazyNumber;
 import baraco.semantics.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -26,8 +28,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private String modifiedExp;
     private BigDecimal resultValue;
     private String stringResult = "";
-
-    private String prevFuncEvaluated;
 
     private boolean isNumeric;
 
@@ -56,6 +56,56 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         isNumeric = !this.modifiedExp.contains("\"") && !this.modifiedExp.contains("\'");
 
         if (!isNumeric) {
+
+            if (this.modifiedExp.contains("==") || this.modifiedExp.contains("!=")) {
+
+
+                String[] strings = {"", ""};
+
+                if (this.modifiedExp.contains("=="))
+                    strings = this.modifiedExp.split("==");
+
+                if (this.modifiedExp.contains("!="))
+                    strings = this.modifiedExp.split("!=");
+
+                String equalityFunction = "STREQ("+strings[0]+", " + strings[1] + ")";
+
+                if (this.modifiedExp.contains("!="))
+                    equalityFunction = "not(" + equalityFunction + ")";
+
+                Expression e = new Expression(equalityFunction);
+
+                e.addLazyFunction(e.new LazyFunction("STREQ", 2) {
+
+                    private LazyNumber ZERO = new LazyNumber() {
+                        public BigDecimal eval() {
+                            return BigDecimal.ZERO;
+                        }
+                        public String getString() {
+                            return "0";
+                        }
+                    };
+
+                    private LazyNumber ONE = new LazyNumber() {
+                        public BigDecimal eval() {
+                            return BigDecimal.ONE;
+                        }
+                        public String getString() {
+                            return null;
+                        }
+                    };
+
+                    public LazyNumber lazyEval(List<LazyNumber> lazyParams) {
+                        if (lazyParams.get(0).getString().equals(lazyParams.get(1).getString())) {
+                            return ONE;
+                        }
+                        return ZERO;
+                    }
+                });
+
+                this.resultValue = e.eval();
+                isNumeric = true;
+            }
 
             if (this.parentExprCtx.expression().size() != 0 &&
                     !isArrayElement(parentExprCtx) &&
