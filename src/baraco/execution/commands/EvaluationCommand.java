@@ -295,11 +295,15 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             baracoMethod.execute();
 
             //System.out.println(TAG + ": " + "Before modified EXP function call: " + this.modifiedExp);
-            this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
-                    baracoMethod.getReturnValue().getValue().toString());
 
-            if (baracoMethod.getReturnType() == BaracoMethod.MethodType.STRING_TYPE)
-                this.modifiedExp = "\"" + this.modifiedExp + "\"";
+
+            if (baracoMethod.getReturnType() == BaracoMethod.MethodType.STRING_TYPE) {
+                this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
+                        "\"" + baracoMethod.getReturnValue().getValue().toString() + "\"");
+            } else {
+                this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(),
+                        baracoMethod.getReturnValue().getValue().toString());
+            }
 
             //System.out.println(TAG + ": " + "After modified EXP function call: " + this.modifiedExp);
 
@@ -314,14 +318,16 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             return;
         }
 
-        this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                baracoValue.getValue().toString());
-
-        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING)
-            modifiedExp = "\"" + modifiedExp + "\"";
-
-        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR)
-            modifiedExp = "'" + modifiedExp + "'";
+        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                    "\"" + baracoValue.getValue().toString() + "\"");
+        } else if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
+            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                    "'" + baracoValue.getValue().toString() + "'");
+        } else {
+            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                    baracoValue.getValue().toString());
+        }
 
         //System.out.println("EVALUATED: " + modifiedExp);
     }
