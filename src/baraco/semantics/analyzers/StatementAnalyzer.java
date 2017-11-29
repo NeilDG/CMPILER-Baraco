@@ -124,6 +124,9 @@ public class StatementAnalyzer {
             System.out.println("Detected return expression: " +ctx.expression(0).getText());
             this.handleReturnStatement(ctx.expression(0));
         }
+        else if(isTRYStatement(ctx)) {
+
+        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
@@ -217,6 +220,24 @@ public class StatementAnalyzer {
             ExecutionManager.getInstance().addCommand(returnCommand);
         }
 
+    }
+
+    public static boolean isTRYStatement(StatementContext ctx) {
+        List<TerminalNode> tryTokenList = ctx.getTokens(BaracoLexer.TRY);
+
+        return (tryTokenList.size() != 0);
+    }
+
+    public static boolean isCATCHStatement(StatementContext ctx) {
+        List<TerminalNode> catchTokenList = ctx.getTokens(BaracoLexer.CATCH);
+
+        return (catchTokenList.size() != 0);
+    }
+
+    public static boolean isFINALLYStatement(StatementContext ctx) {
+        List<TerminalNode> finallyTokenList = ctx.getTokens(BaracoLexer.FINALLY);
+
+        return (finallyTokenList.size() != 0);
     }
 
     public static boolean isFORStatement(StatementContext ctx) {
