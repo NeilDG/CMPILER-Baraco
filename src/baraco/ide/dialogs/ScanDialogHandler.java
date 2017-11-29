@@ -1,4 +1,4 @@
-package baraco.ide;
+package baraco.ide.dialogs;
 
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;

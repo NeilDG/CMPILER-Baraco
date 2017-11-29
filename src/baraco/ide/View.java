@@ -4,21 +4,20 @@ import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
 import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
+import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
+import baraco.ide.dialogs.ErrorDialogHandler;
+import baraco.ide.dialogs.RefactorDialogHandler;
+import baraco.ide.dialogs.ScanDialogHandler;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import baraco.semantics.utils.LocalVarTracker;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -34,6 +33,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class View extends Application {
             "bool", "break", "case", "final", "do", "else", "decimal", "for",
             "if", "int", "return", "switch", "void", "while", "print", "println",
             "end", "and", "or", "class", "public", "private", "true", "false", "string",
-            "char", "final", "scan"
+            "char", "final", "scan", "new"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
@@ -156,7 +156,9 @@ public class View extends Application {
         gridPane.getRowConstraints().addAll(row1, row2, row3);
 
 
-        gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+        //gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+
+        gridPane.add(setupMenuBar(), 0, 0, GridPane.REMAINING, 1);
 
         // Credits to RichTextFX for the API
         editor = new CodeArea();
@@ -191,38 +193,84 @@ public class View extends Application {
         return scene;
     }
 
-    private ToolBar setupToolbar() {
-        // Setup toolbar
-        Button openButton = new Button("Open");
-        openButton.setOnAction(event -> {
-            openFile();
-        });
+    private MenuBar setupMenuBar() {
+        MenuBar menuBar = new MenuBar();
 
-        Button newButton = new Button("New");
-        newButton.setOnAction(event -> {
+        // File menu
+        Menu menuFile = new Menu("File");
+        // Setup file menu items
+        MenuItem newItem = new MenuItem("New");
+        newItem.setOnAction(event -> {
             newFile();
         });
-
-        Button saveButton = new Button("Save");
-        saveButton.setOnAction(event -> {
+        MenuItem openItem = new MenuItem("Open");
+        openItem.setOnAction(event -> {
+            openFile();
+        });
+        MenuItem saveItem = new MenuItem("Save");
+        saveItem.setOnAction(event -> {
             saveFile();
         });
-
-        Button saveAsButton = new Button("Save As");
-        saveAsButton.setOnAction(event -> {
+        MenuItem saveAsItem = new MenuItem("Save As");
+        saveAsItem.setOnAction(event -> {
             saveAsFile();
         });
+        menuFile.getItems().addAll(newItem, openItem, saveItem, saveAsItem);
 
-        Button runButton = new Button("Run");
-        runButton.setDefaultButton(true);
-        runButton.setOnAction(event -> {
+        // Edit menu
+        Menu menuEdit = new Menu("Edit");
+        // Setup edit menu items
+        MenuItem undoItem = new MenuItem("Undo");
+        undoItem.setOnAction(event -> {
+            editor.undo();
+        });
+        MenuItem redoItem = new MenuItem("Redo");
+        redoItem.setOnAction(event -> {
+            editor.redo();
+        });
+        MenuItem cutItem = new MenuItem("Cut");
+        cutItem.setOnAction(event -> {
+            editor.cut();
+        });
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(event -> {
+            editor.copy();
+        });
+        MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setOnAction(event -> {
+            editor.paste();
+        });
+        menuEdit.getItems().addAll(undoItem, redoItem, cutItem, copyItem, pasteItem);
+
+        // Code menu
+        Menu menuCode = new Menu("Code");
+        // Setup code menu items
+        MenuItem generateMethodItem = new MenuItem("Generate method...");
+        generateMethodItem.setOnAction(event -> {
+            this.generateMethod();
+        });
+        MenuItem generateStatementItem = new MenuItem("Generate statement...");
+        generateStatementItem.setOnAction(event -> {
+            this.generateStatement();
+        });
+        MenuItem refactorItem = new MenuItem("Refactor");
+        refactorItem.setOnAction(event -> {
+            this.refactor();
+        });
+        menuCode.getItems().addAll(generateMethodItem, generateStatementItem, refactorItem);
+
+        // Run button
+        Menu menuRun = new Menu();
+        Label runLabel = new Label("Run");
+        runLabel.setOnMouseClicked(event -> {
             controller.run(editor.getText(), this.currentFileName);
         });
+        menuRun.setGraphic(runLabel);
 
+        // Add menus to menubar
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuCode, menuRun);
 
-        ToolBar toolBar = new ToolBar(openButton, newButton, saveButton, saveAsButton, runButton);
-
-        return toolBar;
+        return menuBar;
     }
 
     public static void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
@@ -332,7 +380,7 @@ public class View extends Application {
         this.stage.setTitle("Baraco IDE - " + this.currentFileName);
     }
 
-    private void setCodeTemplate() {
+    private void setNewFileTemplate() {
         String className = this.currentFileName.replace(".bara", "");
         String content = "class " + className +
                 ": \n" +
@@ -365,8 +413,50 @@ public class View extends Application {
     private void newFile() {
         if (this.fileHandler.newFile()) {
             this.updateCurrentFileName();
-            this.setCodeTemplate();
+            this.setNewFileTemplate();
             this.saveFile();
         }
+    }
+
+    private void refactor() {
+        String highlighted = this.editor.getSelectedText();
+        System.out.println("Highlighted text: " + highlighted);
+
+        IndexRange range = this.editor.getSelection();
+        String highlightedWithParenthesis = this.editor.getText(range.getStart(), range.getEnd() + 1);
+
+        highlightedWithParenthesis = highlightedWithParenthesis.replaceAll("\\s+", "");
+        System.out.println();
+        // Add checking here
+        if (highlightedWithParenthesis.charAt(highlightedWithParenthesis.length() - 1) != '(' ||
+                !highlightedWithParenthesis.equals(highlighted + "(") ||
+                Arrays.asList(KEYWORDS).contains(highlighted) ||
+                !this.editor.getText(range.getStart() - 1, range.getStart()).equals(" ") ||
+                highlighted.contains(" ")) {
+            // Show error dialog
+            System.out.println("Invalid");
+            new ErrorDialogHandler().showErrorDialog("Invalid refactor selection!");
+            return;
+        }
+
+        RefactorDialogHandler refactorDialog = new RefactorDialogHandler();
+        String result = refactorDialog.showRefactorDialog(highlighted);
+
+        // Add more checking here
+
+        if (result != null) {
+            String refactoredText = this.editor.getText().replaceAll(highlighted + "\\(", result + "(");
+            this.editor.replaceText(refactoredText);
+
+
+        }
+    }
+
+    private void generateMethod() {
+
+    }
+
+    private void generateStatement() {
+
     }
 }
