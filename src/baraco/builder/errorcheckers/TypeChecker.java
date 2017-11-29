@@ -98,15 +98,44 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                     }
                 }
                 else if(this.baracoValue.getPrimitiveType() == PrimitiveType.STRING) {
-                    if(baracoMethod.getReturnType() != BaracoMethod.MethodType.STRING_TYPE) {
+                    if (baracoMethod.getReturnType() != BaracoMethod.MethodType.STRING_TYPE) {
                         String additionalMessage = "Expected string.";
-                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH, additionalMessage, this.lineNumber);
                     }
                 }
 
             }
+            else {
+                EvaluationCommand evaluationCommand = new EvaluationCommand(expCtx);
+                evaluationCommand.execute();
 
-        } else if(ctx instanceof LiteralContext) {
+                if(this.baracoValue.getPrimitiveType() == PrimitiveType.BOOL) {
+                    if(!evaluationCommand.getModifiedExp().equals("true") && !evaluationCommand.getStringResult().equals("false")) {
+                        String additionalMessage = "Expected boolean.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.INT) {
+                    if(!this.isInteger(evaluationCommand.getModifiedExp())) {
+                        String additionalMessage = "Expected int.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.DECIMAL) {
+                    if(!this.isDecimal(evaluationCommand.getModifiedExp())) {
+                        String additionalMessage = "Expected floating point or double.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+                else if(this.baracoValue.getPrimitiveType() == PrimitiveType.STRING) {
+                    if(evaluationCommand.isNumericResult()){
+                        String additionalMessage = "Expected string.";
+                        BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
+                    }
+                }
+            }
+
+        } /*else if(ctx instanceof LiteralContext) {
             if(this.baracoValue == null) {
                 return;
             }
@@ -142,7 +171,36 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                     BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
                 }
             }
+        }*/
+
+    }
+
+    private boolean isInteger(String text) {
+        try{
+            Integer.parseInt(text);
+
+            if(text.charAt(0) != '\"' && text.charAt(text.length() - 1) != '\"' && !text.contains("."))
+                return true;
         }
+        catch (Exception e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private boolean isDecimal(String text) {
+        try {
+            Float.parseFloat(text);
+
+            if(text.charAt(0) != '\"' && text.charAt(text.length() - 1) != '\"' && text.contains("."))
+                return true;
+        }
+        catch(Exception e) {
+            return false;
+        }
+
+        return false;
     }
 
     @Override

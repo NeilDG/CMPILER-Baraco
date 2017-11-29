@@ -300,6 +300,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         return stringResult;
     }
 
+    public String getModifiedExp() { return modifiedExp;}
+
     public boolean isNumericResult() {
         return isNumeric;
     }
