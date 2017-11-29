@@ -5,6 +5,8 @@ import baraco.controller.Controller;
 import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
 import baraco.file.FileHandler;
+import baraco.ide.dialogs.RefactorDialogHandler;
+import baraco.ide.dialogs.ScanDialogHandler;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
@@ -272,8 +274,13 @@ public class View extends Application {
         // Code menu
         Menu menuCode = new Menu("Code");
         // Setup code menu items
-        MenuItem generateCodeItem = new MenuItem("Generate...");
-        menuCode.getItems().addAll(generateCodeItem);
+        MenuItem generateMethodItem = new MenuItem("Generate method...");
+        MenuItem generateStatementItem = new MenuItem("Generate statement...");
+        MenuItem refactorItem = new MenuItem("Refactor");
+        refactorItem.setOnAction(event -> {
+            this.refactor();
+        });
+        menuCode.getItems().addAll(generateMethodItem, generateStatementItem, refactorItem);
 
         // Run button
         Menu menuRun = new Menu();
@@ -432,5 +439,21 @@ public class View extends Application {
             this.setNewFileTemplate();
             this.saveFile();
         }
+    }
+
+    private void refactor() {
+        String highlighted = this.editor.getText(this.editor.getSelection());
+        System.out.println("Highlighted text: " + highlighted);
+
+        // Add checking here
+
+        RefactorDialogHandler refactorDialog = new RefactorDialogHandler();
+        String result = refactorDialog.showRefactorDialog(highlighted);
+
+        // Add more checking here
+
+        String refactoredText = this.editor.getText().replaceAll(highlighted, result);
+        this.editor.replaceText(refactoredText);
+
     }
 }
