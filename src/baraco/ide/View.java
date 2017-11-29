@@ -4,7 +4,9 @@ import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
 import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
+import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
+import baraco.ide.dialogs.ErrorDialogHandler;
 import baraco.ide.dialogs.RefactorDialogHandler;
 import baraco.ide.dialogs.ScanDialogHandler;
 import baraco.semantics.statements.StatementControlOverseer;
@@ -30,6 +32,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -46,7 +49,7 @@ public class View extends Application {
             "bool", "break", "case", "final", "do", "else", "decimal", "for",
             "if", "int", "return", "switch", "void", "while", "print", "println",
             "end", "and", "or", "class", "public", "private", "true", "false", "string",
-            "char", "final", "scan"
+            "char", "final", "scan", "new"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
@@ -188,40 +191,6 @@ public class View extends Application {
         return scene;
     }
 
-    private ToolBar setupToolbar() {
-        // Setup toolbar
-        Button openButton = new Button("Open");
-        openButton.setOnAction(event -> {
-            openFile();
-        });
-
-        Button newButton = new Button("New");
-        newButton.setOnAction(event -> {
-            newFile();
-        });
-
-        Button saveButton = new Button("Save");
-        saveButton.setOnAction(event -> {
-            saveFile();
-        });
-
-        Button saveAsButton = new Button("Save As");
-        saveAsButton.setOnAction(event -> {
-            saveAsFile();
-        });
-
-        Button runButton = new Button("Run");
-        runButton.setDefaultButton(true);
-        runButton.setOnAction(event -> {
-            controller.run(editor.getText(), this.currentFileName);
-        });
-
-
-        ToolBar toolBar = new ToolBar(openButton, newButton, saveButton, saveAsButton, runButton);
-
-        return toolBar;
-    }
-
     private MenuBar setupMenuBar() {
         MenuBar menuBar = new MenuBar();
 
@@ -275,7 +244,13 @@ public class View extends Application {
         Menu menuCode = new Menu("Code");
         // Setup code menu items
         MenuItem generateMethodItem = new MenuItem("Generate method...");
+        generateMethodItem.setOnAction(event -> {
+            this.generateMethod();
+        });
         MenuItem generateStatementItem = new MenuItem("Generate statement...");
+        generateStatementItem.setOnAction(event -> {
+            this.generateStatement();
+        });
         MenuItem refactorItem = new MenuItem("Refactor");
         refactorItem.setOnAction(event -> {
             this.refactor();
@@ -442,18 +417,44 @@ public class View extends Application {
     }
 
     private void refactor() {
-        String highlighted = this.editor.getText(this.editor.getSelection());
+        String highlighted = this.editor.getSelectedText();
         System.out.println("Highlighted text: " + highlighted);
 
+        IndexRange range = this.editor.getSelection();
+        String highlightedWithParenthesis = this.editor.getText(range.getStart(), range.getEnd() + 1);
+
+        highlightedWithParenthesis = highlightedWithParenthesis.replaceAll("\\s+", "");
+        System.out.println();
         // Add checking here
+        if (highlightedWithParenthesis.charAt(highlightedWithParenthesis.length() - 1) != '(' ||
+                !highlightedWithParenthesis.equals(highlighted + "(") ||
+                Arrays.asList(KEYWORDS).contains(highlighted) ||
+                !this.editor.getText(range.getStart() - 1, range.getStart()).equals(" ") ||
+                highlighted.contains(" ")) {
+            // Show error dialog
+            System.out.println("Invalid");
+            new ErrorDialogHandler().showErrorDialog("Invalid refactor selection!");
+            return;
+        }
 
         RefactorDialogHandler refactorDialog = new RefactorDialogHandler();
         String result = refactorDialog.showRefactorDialog(highlighted);
 
         // Add more checking here
 
-        String refactoredText = this.editor.getText().replaceAll(highlighted, result);
-        this.editor.replaceText(refactoredText);
+        if (result != null) {
+            String refactoredText = this.editor.getText().replaceAll(highlighted + "\\(", result + "(");
+            this.editor.replaceText(refactoredText);
+
+
+        }
+    }
+
+    private void generateMethod() {
+
+    }
+
+    private void generateStatement() {
 
     }
 }

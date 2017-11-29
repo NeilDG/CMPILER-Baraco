@@ -20,11 +20,11 @@ public class RefactorDialogHandler {
     }
 
     public String showRefactorDialog(String originalName) {
-        dialog.setContentText("Set new name for function \"" + originalName + "\"");
+        dialog.setContentText("Set new name for method \"" + originalName + "\":");
 
         Optional<String> result = dialog.showAndWait();
 
-        if (result.isPresent()) {
+        if (result.isPresent() && !result.get().isEmpty()) {
             return result.get();
         }
 
