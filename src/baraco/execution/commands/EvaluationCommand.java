@@ -227,6 +227,16 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
         return false;
     }
 
+    public static boolean isArray(String s) {
+        BaracoValue value = BaracoValueSearcher.searchBaracoValue(s);
+
+        if (value != null) {
+            return value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY;
+        }
+
+        return false;
+    }
+
     private void evaluateFunctionCall(ExpressionContext exprCtx) {
 
         for (ExpressionContext eCtx : exprCtx.expression()) {

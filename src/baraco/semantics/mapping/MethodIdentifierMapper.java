@@ -2,8 +2,11 @@ package baraco.semantics.mapping;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.ParserHandler;
+import baraco.execution.commands.EvaluationCommand;
+import baraco.representations.BaracoArray;
 import baraco.representations.BaracoMethod;
 import baraco.representations.BaracoValue;
+import baraco.representations.BaracoValueSearcher;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
@@ -66,8 +69,20 @@ public class MethodIdentifierMapper implements ParseTreeListener, IValueMapper {
 
             if(primaryCtx.Identifier() != null) {
                 String variableKey = primaryCtx.getText();
-                this.searchVariable(variableKey);
+
+                if (!EvaluationCommand.isArray(variableKey))
+                    this.searchVariable(variableKey);
             }
+        } else if (ctx instanceof BaracoParser.ExpressionContext) {
+
+            BaracoParser.ExpressionContext exprCtx = (BaracoParser.ExpressionContext) ctx;
+
+            if (exprCtx.expression().size() == 2) {
+                if (EvaluationCommand.isArray(exprCtx.expression(0))) {
+                    searchArray(exprCtx);
+                }
+            }
+
         }
     }
 
@@ -89,6 +104,32 @@ public class MethodIdentifierMapper implements ParseTreeListener, IValueMapper {
                 this.modifiedExp = this.modifiedExp.replace(identifierString, this.baracoValue.getValue().toString());
             }
         }
+    }
+
+    private void searchArray(BaracoParser.ExpressionContext exprCtx) {
+        BaracoValue value = BaracoValueSearcher.searchBaracoValue(exprCtx.expression(0).getText());
+
+        if (value != null) {
+            if (value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
+
+                BaracoArray baracoArray = (BaracoArray) value.getValue();
+
+                EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
+                evCmd.execute();
+
+                BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
+
+                if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+                    //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
+                    this.modifiedExp = this.modifiedExp.replace(exprCtx.getText(), "\"" + arrayMobiValue.getValue().toString() + "\"");
+                } else {
+                    //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", arrayMobiValue.getValue().toString());
+                    this.modifiedExp = this.modifiedExp.replace(exprCtx.expression(0).getText() + "[" + evCmd.getResult().intValue() + "]", arrayMobiValue.getValue().toString());
+                }
+
+            }
+        }
+
     }
 
     @Override

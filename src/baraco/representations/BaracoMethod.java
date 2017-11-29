@@ -121,7 +121,7 @@ public class BaracoMethod implements IControlledCommand{
             return;
         }
 
-        BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+        /*BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
 
         BaracoArray newArray = new BaracoArray(baracoArray.getPrimitiveType(), identifier);
         BaracoValue newValue = new BaracoValue(newArray, PrimitiveType.ARRAY);
@@ -130,7 +130,7 @@ public class BaracoMethod implements IControlledCommand{
 
         for(int i = 0; i < newArray.getSize(); i++) {
             newArray.updateValueAt(baracoArray.getValueAt(i), i);
-        }
+        }*/
 
         this.parameterValues.put(this.getParameterKeyAt(index), baracoValue);
 
