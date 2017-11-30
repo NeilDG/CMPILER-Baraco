@@ -18,6 +18,7 @@ public class ScanDialogHandler implements NotificationListener {
 
     public ScanDialogHandler() {
         dialog = new TextInputDialog();
+        dialog.getDialogPane().
         dialog.setTitle("Scan Dialog");
         //dialog.setContentText("Please enter your name:");
 
@@ -25,6 +26,7 @@ public class ScanDialogHandler implements NotificationListener {
     }
 
     private void showScanDialog(Parameters params) throws InterruptedException {
+        dialog.getEditor().setText("");
         dialog.setContentText(params.getStringExtra(KeyNames.MESSAGE_DISPLAY_KEY, "Input: "));
 
         // Traditional way to get the response value.
