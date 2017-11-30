@@ -27,15 +27,11 @@ public class GenerateMethodDialog {
     private static final String TYPE_DECIMAL_ARRAY = "decimal[]";
     private static final String TYPE_BOOL_ARRAY = "bool[]";
 
-    BaracoMethodTemplate methodTemplate;
     Dialog<String> dialog;
-    int parameterIndex;
 
     public GenerateMethodDialog() {
         this.dialog = new Dialog<>();
         this.setupDialog();
-        this.parameterIndex = 0;
-        this.methodTemplate = new BaracoMethodTemplate();
     }
 
     private void setupDialog() {
@@ -109,14 +105,11 @@ public class GenerateMethodDialog {
             Button removeButton = new Button("X");
 
             HBox parameters = new HBox(dataTypes, parameterName, removeButton);
-            parameters.setId(parameterIndex + "");
-
 
             removeButton.setOnAction(value -> {
                 parametersHolder.getChildren().remove(parameters);
             });
 
-            incrementParameterIndex();
             parametersHolder.getChildren().add(parameters);
         });
         grid.add(addButton, 1, 2);
@@ -140,6 +133,7 @@ public class GenerateMethodDialog {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 // Create BaracoMethodTemplate then convert to string
+                BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
                 methodTemplate.setMethodName(methodName.getText().trim());
                 methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
 
@@ -165,21 +159,11 @@ public class GenerateMethodDialog {
             }
             return null;
         });
-
-        /*Optional<Pair<String, String>> result = dialog.showAndWait();
-
-        result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
-        });*/
     }
 
     public String showGenerateMethodDialog() {
         Optional<String> result = dialog.showAndWait();
 
         return result.get();
-    }
-
-    public void incrementParameterIndex() {
-        this.parameterIndex++;
     }
 }
