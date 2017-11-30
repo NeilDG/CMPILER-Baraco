@@ -132,6 +132,10 @@ public class View extends Application {
                 System.out.println("New shortcut");
                 newFile();
             }
+            else if(e.getCode() == KeyCode.R && e.isMetaDown()) {
+                System.out.println("Run");
+                controller.run(editor.getText(), this.currentFileName);
+            }
         });
 
 
