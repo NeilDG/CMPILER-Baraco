@@ -18,7 +18,7 @@ public class ScanDialogHandler implements NotificationListener {
 
     public ScanDialogHandler() {
         dialog = new TextInputDialog();
-        dialog.getDialogPane().
+        dialog.getDialogPane();
         dialog.setTitle("Scan Dialog");
         //dialog.setContentText("Please enter your name:");
 
