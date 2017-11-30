@@ -123,7 +123,7 @@ public class StatementControlOverseer {
 
 
             if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand) {
-                if (parentCommand instanceof IfCommand || parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
+                if (parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
                     IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                     controlledCommand.addCommand(childCommand);
                 }

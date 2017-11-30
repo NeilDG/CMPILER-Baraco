@@ -105,9 +105,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
                 this.resultValue = e.eval();
                 isNumeric = true;
-            }
-
-            if (this.parentExprCtx.expression().size() != 0 &&
+            }else if (this.parentExprCtx.expression().size() != 0 &&
                     !isArrayElement(parentExprCtx) &&
                     !isFunctionCall(parentExprCtx)) {
 
@@ -148,7 +146,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
             Expression evalEx = new Expression(this.modifiedExp);
 
-            this.resultValue = evalEx.eval();
+            this.resultValue = evalEx.eval(false);
             this.stringResult = this.resultValue.toEngineeringString();
 
         }
