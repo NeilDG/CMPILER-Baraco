@@ -180,11 +180,11 @@ public class View extends Application {
                 })
                 .subscribe(this::applyHighlighting);
 
-        editor.textProperty().addListener((observable, oldValue, newValue) -> {
+        /*editor.textProperty().addListener((observable, oldValue, newValue) -> {
             if (fileHandler.save(editor.getText())) {
                 updateCurrentFileName();
             }
-        });
+        });*/
 
         gridPane.add(new VirtualizedScrollPane<>(editor), 0, 1);
 
@@ -455,7 +455,19 @@ public class View extends Application {
 
     private void generateMethod() {
         GenerateMethodDialog generateMethodDialog = new GenerateMethodDialog();
-        generateMethodDialog.showGenerateMethodDialog();
+        String result = generateMethodDialog.showGenerateMethodDialog();
+
+        if (result != null) {
+            if (this.editor.getSelectedText() != null) {
+                //IndexRange bounds = this.editor.getSelection();
+                //this.editor.replaceText(bounds, result);
+                this.editor.replaceSelection(result);
+            }
+            else {
+                int pos = this.editor.getCaretPosition();
+                this.editor.replaceText(pos, pos, result);
+            }
+        }
     }
 
     private void generateStatement() {
