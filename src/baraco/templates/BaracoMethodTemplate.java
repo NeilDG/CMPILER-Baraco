@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class BaracoMethodTemplate {
 
     String methodName;
-    BaracoValue.PrimitiveType returnType;
+    String returnType;
     ArrayList<BaracoMethodTemplateParameter> parameters;
 
     public BaracoMethodTemplate() {
@@ -23,13 +23,8 @@ public class BaracoMethodTemplate {
         return this;
     }
 
-    public BaracoMethodTemplate setReturnType(BaracoValue.PrimitiveType returnType) {
+    public BaracoMethodTemplate setReturnType(String returnType) {
         this.returnType = returnType;
-        return this;
-    }
-
-    public BaracoMethodTemplate addParameter(String parameterName, BaracoValue.PrimitiveType dataType) {
-        this.parameters.add(new BaracoMethodTemplateParameter(parameterName, dataType));
         return this;
     }
 
@@ -37,33 +32,24 @@ public class BaracoMethodTemplate {
         this.parameters.add(parameter);
         return this;
     }
-}
 
-class BaracoMethodTemplateParameter {
+    @Override
+    public String toString() {
+        String method = "\tprivate " + returnType + " " + methodName + "(";
 
-    String parameterName;
-    BaracoValue.PrimitiveType dataType;
+        for (int i = 0; i < parameters.size() - 1; i++) {
+            method += parameters.get(i).toString() + ", ";
+        }
 
-    public BaracoMethodTemplateParameter(String parameterName, BaracoValue.PrimitiveType dataType) {
-        this.parameterName = parameterName;
-        this.dataType = dataType;
-    }
+        if (parameters.size() > 0) {
+            method += parameters.get(parameters.size() - 1).toString();
+        }
 
-    public String getParameterName() {
-        return parameterName;
-    }
+        method += "):\n\t\t\n\tend";
 
-    public BaracoMethodTemplateParameter setParameterName(String parameterName) {
-        this.parameterName = parameterName;
-        return this;
-    }
 
-    public BaracoValue.PrimitiveType getDataType() {
-        return dataType;
-    }
-
-    public BaracoMethodTemplateParameter setDataType(BaracoValue.PrimitiveType dataType) {
-        this.dataType = dataType;
-        return this;
+        return method;
     }
 }
+
+
