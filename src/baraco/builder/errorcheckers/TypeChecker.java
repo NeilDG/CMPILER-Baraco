@@ -135,7 +135,7 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                 }
             }*/
 
-        } /*else if(ctx instanceof LiteralContext) {
+        } else if(ctx instanceof LiteralContext) {
             if(this.baracoValue == null) {
                 return;
             }
@@ -171,7 +171,7 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
                     BuildChecker.reportCustomError(ErrorRepository.TYPE_MISMATCH,  additionalMessage, this.lineNumber);
                 }
             }
-        }*/
+        }
 
     }
 
