@@ -109,7 +109,9 @@ public class GenerateStatementDialog {
                     "\n\tend";
 
             if (selected.equals(TYPE_IF_ELSE)) {
-                sample += "\nelse:\n\t\t\n\tend";
+                sample += "\n\telse:\n\t\t" +
+                        "// More code goes here" +
+                        "\n\tend";
             }
         }
         else if (selected.equals(TYPE_FOR)) {

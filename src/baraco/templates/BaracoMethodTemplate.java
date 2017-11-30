@@ -46,7 +46,7 @@ public class BaracoMethodTemplate {
         }
 
         method += "):\n\t\t" +
-                "// Code goes here" + 
+                "// Code goes here" +
                 "\n\tend";
 
 
