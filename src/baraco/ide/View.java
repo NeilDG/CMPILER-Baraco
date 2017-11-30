@@ -6,10 +6,7 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
-import baraco.ide.dialogs.ErrorDialogHandler;
-import baraco.ide.dialogs.GenerateMethodDialog;
-import baraco.ide.dialogs.RefactorDialogHandler;
-import baraco.ide.dialogs.ScanDialogHandler;
+import baraco.ide.dialogs.*;
 import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
@@ -471,6 +468,17 @@ public class View extends Application {
     }
 
     private void generateStatement() {
+        GenerateStatementDialog generateStatementDialog = new GenerateStatementDialog();
+        String result = generateStatementDialog.showGenerateStatementDialog();
 
+        if (result != null) {
+            if (this.editor.getSelectedText() != null) {
+                this.editor.replaceSelection(result);
+            }
+            else {
+                int pos = this.editor.getCaretPosition();
+                this.editor.replaceText(pos, pos, result);
+            }
+        }
     }
 }

@@ -45,7 +45,9 @@ public class BaracoMethodTemplate {
             method += parameters.get(parameters.size() - 1).toString();
         }
 
-        method += "):\n\t\t\n\tend";
+        method += "):\n\t\t" +
+                "// Code goes here" + 
+                "\n\tend";
 
 
         return method;
