@@ -126,6 +126,13 @@ public class StatementControlOverseer {
                 if (parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
                     IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                     controlledCommand.addCommand(childCommand);
+                } else if (parentCommand instanceof IfCommand) {
+                    IConditionalCommand controlledCommand = (IConditionalCommand) parentCommand;
+
+                    if(isInPositiveRule())
+                        controlledCommand.addPositiveCommand(childCommand);
+                    else
+                        controlledCommand.addNegativeCommand(childCommand);
                 }
             }
         }
