@@ -2,9 +2,9 @@ grammar Baraco;
 
 // starting point for parsing a java file
 compilationUnit
-    //:   packageDeclaration? importDeclaration* typeDeclaration* EOF
+    :   packageDeclaration? importDeclaration* typeDeclaration* EOF
     //:   constDeclaration* methodDeclaration* statement*
-    :   typeDeclaration* constDeclaration* memberDeclaration* statement* EOF
+    //:   typeDeclaration* constDeclaration* memberDeclaration* statement* EOF
     ;
 
 packageDeclaration

@@ -97,4 +97,8 @@ public class BuildChecker implements ANTLRErrorListener {
     public void reportContextSensitivity(Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atnConfigSet) {
 
     }
+
+    public void setSuccessful(boolean b) {
+        successful = b;
+    }
 }

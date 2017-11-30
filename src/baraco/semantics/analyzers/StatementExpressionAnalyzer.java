@@ -2,6 +2,8 @@ package baraco.semantics.analyzers;
 
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser.*;
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
@@ -136,6 +138,45 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
             }
             else if(isFunctionCall(exprCtx))
                 handleFunctionCall(exprCtx);
+            else {
+
+                ParserRuleContext prCtx = exprCtx;
+
+                while(!(prCtx instanceof StatementExpressionContext)) {
+                    prCtx = prCtx.getParent();
+                }
+
+                StatementExpressionContext stExCtx = (StatementExpressionContext) prCtx;
+
+                if(stExCtx.expression() != null) {
+                    ExpressionContext expCtx = stExCtx.expression();
+
+                    /*boolean notStatement = false;
+
+                    for (ExpressionContext eCtx:
+                         expCtx.expression()) {
+                    }*/
+
+                    if (!(isAssignmentExpression(expCtx) ||
+                            isAddAssignExpression(expCtx) ||
+                            isSubAssignExpression(expCtx) ||
+                            isMulAssignExpression(expCtx) ||
+                            isDivAssignExpression(expCtx) ||
+                            isModAssignExpression(expCtx) ||
+                            isIncrementExpression(expCtx) ||
+                            isDecrementExpression(expCtx) ||
+                            isFunctionCall(expCtx))) {
+
+                        int lineNumber = expCtx.getStart().getLine();
+
+                        BuildChecker.reportCustomError(ErrorRepository.NOT_A_STATEMENT, "", expCtx.getText(), lineNumber);
+
+                        expCtx.children = null;
+
+                    }
+                }
+
+            }
 
             /*else if(this.isFunctionCallWithParams(exprCtx)) {
                 this.handleFunctionCallWithParams(exprCtx);

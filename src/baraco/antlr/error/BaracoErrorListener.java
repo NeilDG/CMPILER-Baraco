@@ -1,5 +1,6 @@
 package baraco.antlr.error;
 
+import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
 import baraco.ide.View;
 import org.antlr.v4.runtime.*;
@@ -153,6 +154,8 @@ public class BaracoErrorListener extends BaseErrorListener {
 
         View.appendErrorInConsole(error);
         errors.add(error);
+
+        BuildChecker.getInstance().setSuccessful(false);
     }
 
     public ArrayList<BaracoError> getErrors () {
