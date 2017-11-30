@@ -267,14 +267,15 @@ public class BaracoMethod implements IControlledCommand{
     private void popBackLocalVars() {
         for(String s : LocalVarTracker.getInstance().getCurrentSession()) {
 
-            BaracoValue value = VariableSearcher.searchVariable(s);
+            BaracoValue value = VariableSearcher.searchVariableInFunction(this, s);
 
-            if (value == null)
-                value = VariableSearcher.searchVariableInFunction(this, s);
+            if (value != null) {
 
-            if(value.stackSize() > 1) { // prevent from reaching null
-                if (value.getPrimitiveType() != PrimitiveType.ARRAY)
-                    value.popBack();
+                if (value.stackSize() > 1) { // prevent from reaching null
+                    if (value.getPrimitiveType() != PrimitiveType.ARRAY)
+                        value.popBack();
+                }
+                
             }
 
         }
