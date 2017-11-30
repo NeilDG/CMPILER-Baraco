@@ -20,7 +20,8 @@ public class ScanDialogHandler implements NotificationListener {
         dialog = new TextInputDialog();
         dialog.getDialogPane();
         dialog.setTitle("Scan Dialog");
-        //dialog.setContentText("Please enter your name:");
+        dialog.setHeaderText(null);
+        dialog.getDialogPane().getButtonTypes().remove(1);
 
         NotificationCenter.getInstance().addObserver(Notifications.ON_FOUND_SCAN_STATEMENT, this);
     }
@@ -34,7 +35,7 @@ public class ScanDialogHandler implements NotificationListener {
 
                 Optional<String> result = dialog.showAndWait();
 
-                if (result.isPresent()){
+                if (result.isPresent()) {
                     Parameters parameters = new Parameters();
                     parameters.putExtra(VALUE_ENTERED_KEY, result.get());
 
