@@ -1,6 +1,8 @@
 package baraco.ide.dialogs;
 
+import baraco.representations.BaracoValue;
 import baraco.templates.BaracoMethodTemplate;
+import baraco.templates.BaracoMethodTemplateParameter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,10 +22,10 @@ public class GenerateMethodDialog {
     private static final String TYPE_INT = "int";
     private static final String TYPE_DECIMAL = "decimal";
     private static final String TYPE_BOOL = "bool";
-    private static final String TYPE_STRING_ARRAY = "string[ ]";
-    private static final String TYPE_INT_ARRAY = "int[ ]";
-    private static final String TYPE_DECIMAL_ARRAY = "decimal[ ]";
-    private static final String TYPE_BOOL_ARRAY = "bool[ ]";
+    private static final String TYPE_STRING_ARRAY = "string[]";
+    private static final String TYPE_INT_ARRAY = "int[]";
+    private static final String TYPE_DECIMAL_ARRAY = "decimal[]";
+    private static final String TYPE_BOOL_ARRAY = "bool[]";
 
     BaracoMethodTemplate methodTemplate;
     Dialog<String> dialog;
@@ -69,11 +71,11 @@ public class GenerateMethodDialog {
                         TYPE_DECIMAL_ARRAY,
                         TYPE_BOOL_ARRAY
                 );
-        ComboBox comboBox = new ComboBox(options);
-        comboBox.getSelectionModel().selectFirst();
+        ComboBox returnTypeComboBox = new ComboBox(options);
+        returnTypeComboBox.getSelectionModel().selectFirst();
 
         grid.add(new Label("Return Type:"), 0, 1);
-        grid.add(comboBox, 1, 1);
+        grid.add(returnTypeComboBox, 1, 1);
 
         grid.add(new Label("Parameters:"), 0, 2);
 
@@ -134,20 +136,32 @@ public class GenerateMethodDialog {
         // Request focus on the username field by default.
         Platform.runLater(() -> methodName.requestFocus());
 
-        // Convert the result to a username-password-pair when the login button is clicked.
+        // Convert the result to a string
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 // Create BaracoMethodTemplate then convert to string
-                methodTemplate.setMethodName(methodName.getText());
-
+                methodTemplate.setMethodName(methodName.getText().trim());
+                methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
 
                 for (Node node : parametersHolder.getChildren()) {
                     HBox child = (HBox) node;
 
                     ObservableList<Node> parameterInfo = child.getChildren();
+
+                    String parameterName = ((TextField) parameterInfo.get(1)).getText().trim();
+
+                    if (parameterName.isEmpty()) {
+                        continue;
+                    }
+
                     String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
-                    System.out.println(dataType);
+                    BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
+
+                    methodTemplate.addParameter(parameter);
                 }
+
+                return methodTemplate.toString();
+
             }
             return null;
         });
