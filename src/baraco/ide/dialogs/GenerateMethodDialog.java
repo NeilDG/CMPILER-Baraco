@@ -1,6 +1,6 @@
 package baraco.ide.dialogs;
 
-import baraco.representations.BaracoValue;
+import baraco.execution.commands.MethodList;
 import baraco.templates.BaracoMethodTemplate;
 import baraco.templates.BaracoMethodTemplateParameter;
 import javafx.application.Platform;
@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import java.util.Optional;
 
@@ -54,6 +55,11 @@ public class GenerateMethodDialog {
 
         grid.add(new Label("Method Name:"), 0, 0);
         grid.add(methodName, 1, 0);
+
+        Label errorMessageLabel = new Label("Method name exists!");
+        errorMessageLabel.setTextFill(Color.RED);
+        errorMessageLabel.setVisible(false);
+        grid.add(errorMessageLabel, 2, 0);
 
         ObservableList<String> options =
                 FXCollections.observableArrayList(
@@ -121,7 +127,10 @@ public class GenerateMethodDialog {
 
         // Do some validation (using the Java 8 lambda syntax).
         methodName.textProperty().addListener((observable, oldValue, newValue) -> {
-            confirmButton.setDisable(newValue.trim().isEmpty());
+            boolean methodNameExists = MethodList.getInstance().methodNameExists(newValue);
+            boolean invalid = newValue.trim().isEmpty() || methodNameExists;
+            confirmButton.setDisable(invalid);
+            errorMessageLabel.setVisible(methodNameExists);
         });
 
         dialog.getDialogPane().setContent(grid);
@@ -150,6 +159,12 @@ public class GenerateMethodDialog {
 
                     String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
                     BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
+
+                    if (methodTemplate.hasParameter(parameter)) {
+                        ErrorDialogHandler errorDialogHandler = new ErrorDialogHandler();
+                        errorDialogHandler.showErrorDialog("Duplicate parameter! Try again!");
+                        return null;
+                    }
 
                     methodTemplate.addParameter(parameter);
                 }

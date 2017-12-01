@@ -105,4 +105,18 @@ public class Controller {
 
     }
 
+    public void buildOnly(String input, String fileName) {
+        ExecutionManager.reset();
+        LocalScopeCreator.reset();
+        SymbolTableManager.reset();
+        BuildChecker.reset();
+        StatementControlOverseer.reset();
+        MethodTracker.reset();
+        LocalVarTracker.reset();
+
+        System.out.println(input);
+
+        ParserHandler.getInstance().parseText(fileName, input);
+    }
+
 }

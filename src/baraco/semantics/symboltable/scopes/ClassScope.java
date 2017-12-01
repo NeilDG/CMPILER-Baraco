@@ -1,5 +1,6 @@
 package baraco.semantics.symboltable.scopes;
 
+import baraco.execution.commands.MethodList;
 import baraco.representations.BaracoMethod;
 import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
@@ -122,11 +123,13 @@ public class ClassScope implements IScope{
     public void addPrivateBaracoMethod(String identifier, BaracoMethod baracoMethod) {
         this.privateMethods.put(identifier, baracoMethod);
         System.out.println("Created private function " +identifier+ " with return type " + baracoMethod.getReturnType());
+        MethodList.getInstance().addMethodName(identifier);
     }
 
     public void addPublicBaracoMethod(String identifier, BaracoMethod baracoMethod) {
         this.publicMethods.put(identifier, baracoMethod);
         System.out.println("Created public function " +identifier+ " with return type " + baracoMethod.getReturnType());
+        MethodList.getInstance().addMethodName(identifier);
     }
 
     public void addBaracoValue(String accessControlModifier, String identifier, BaracoValue baracoValue) {
