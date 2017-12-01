@@ -1,7 +1,6 @@
 package baraco.ide.dialogs;
 
 import baraco.execution.commands.MethodList;
-import baraco.representations.BaracoValue;
 import baraco.templates.BaracoMethodTemplate;
 import baraco.templates.BaracoMethodTemplateParameter;
 import javafx.application.Platform;
@@ -14,7 +13,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import java.util.Optional;
 
@@ -161,6 +159,12 @@ public class GenerateMethodDialog {
 
                     String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
                     BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
+
+                    if (methodTemplate.hasParameter(parameter)) {
+                        ErrorDialogHandler errorDialogHandler = new ErrorDialogHandler();
+                        errorDialogHandler.showErrorDialog("Duplicate parameter! Try again!");
+                        return null;
+                    }
 
                     methodTemplate.addParameter(parameter);
                 }

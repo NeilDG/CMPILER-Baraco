@@ -33,6 +33,16 @@ public class BaracoMethodTemplate {
         return this;
     }
 
+    public boolean hasParameter(BaracoMethodTemplateParameter parameter) {
+        for (BaracoMethodTemplateParameter param : parameters) {
+            if (param.getParameterName().equals(parameter)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public String toString() {
         String method = "\tprivate " + returnType + " " + methodName + "(";
