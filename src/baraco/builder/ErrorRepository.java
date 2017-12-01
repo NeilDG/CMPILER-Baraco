@@ -13,6 +13,10 @@ public class ErrorRepository {
     public final static int PARAMETER_COUNT_MISMATCH = 6000;
     public final static int RUNTIME_ARRAY_OUT_OF_BOUNDS = 7000;
     public final static int MISSING_THIS_KEYWORD = 8000;
+    public final static int RETURN_IN_VOID = 9000;
+    public final static int INVALID_INDEX_ASSIGN = 9001;
+    public final static int NO_RETURN_STATEMENT = 9002;
+    public final static int NOT_A_STATEMENT = 9004;
 
     private static ErrorRepository sharedInstance = null;
 
@@ -34,6 +38,10 @@ public class ErrorRepository {
         this.errorMessageDictionary.put(PARAMETER_COUNT_MISMATCH, "Argument size for method call %s at line %d does not match with its declaration. ");
         this.errorMessageDictionary.put(RUNTIME_ARRAY_OUT_OF_BOUNDS, "Array %s out of bounds. Aborting operation. ");
         this.errorMessageDictionary.put(MISSING_THIS_KEYWORD, "Missing 'this' keyword for method call %s line %d.");
+        this.errorMessageDictionary.put(RETURN_IN_VOID, "You can't return a value in a void function in line %d.");
+        this.errorMessageDictionary.put(INVALID_INDEX_ASSIGN, "Invalid index in array assignment at line %d.");
+        this.errorMessageDictionary.put(NO_RETURN_STATEMENT, "No return statement in function %s at line %d.");
+        this.errorMessageDictionary.put(NOT_A_STATEMENT, "%s is not a statement at line %d.");
     }
 
     public static void initialize() {

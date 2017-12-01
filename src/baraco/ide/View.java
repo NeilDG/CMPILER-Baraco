@@ -1,16 +1,25 @@
 package baraco.ide;
 
+import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
+import baraco.execution.ExecutionManager;
+import baraco.execution.MethodTracker;
+import baraco.execution.commands.EvaluationCommand;
 import baraco.file.FileHandler;
+import baraco.ide.dialogs.*;
+import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import baraco.semantics.utils.LocalVarTracker;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -22,6 +31,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -35,9 +45,10 @@ import baraco.antlr.error.BaracoError;
 public class View extends Application {
 
     private static final String[] KEYWORDS = new String[] {
-            "bool", "break", "case", "const", "do", "else", "decimal", "for",
-            "if", "int", "return", "switch", "void", "while", "scanInt", "scanDec",
-            "scanStr", "print", "println", "end", "and", "or"
+            "bool", "break", "case", "final", "do", "else", "decimal", "for",
+            "if", "int", "return", "switch", "void", "while", "print", "println",
+            "end", "and", "or", "class", "public", "private", "true", "false", "string",
+            "char", "final", "scan", "new"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
@@ -59,12 +70,15 @@ public class View extends Application {
     );
 
     private Controller controller;
-    private CodeArea editor;
+    public static CodeArea editor;
     private GridPane gridPane;
     private ExecutorService executor;
-    private TextFlow console;
+    public static TextFlow console;
     private FileHandler fileHandler;
     private Stage stage;
+    private String currentFileName;
+
+    private ScanDialogHandler scanDialogHandler;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -72,10 +86,21 @@ public class View extends Application {
         executor = Executors.newSingleThreadExecutor();
         controller = new Controller(this);
 
+        this.currentFileName = "";
         this.fileHandler = new FileHandler(primaryStage);
         primaryStage.setTitle("Baraco IDE");
         primaryStage.setScene(setupComponents());
         primaryStage.show();
+
+        this.scanDialogHandler = new ScanDialogHandler();
+
+        SymbolTableManager.initialize();
+        BuildChecker.initialize();
+        ExecutionManager.initialize();
+        LocalScopeCreator.initialize();
+        StatementControlOverseer.initialize();
+        MethodTracker.initialize();
+        LocalVarTracker.initialize();
     }
 
     public static void main(String[] args) {
@@ -86,6 +111,29 @@ public class View extends Application {
         gridPane = new GridPane();
         Scene scene = new Scene(gridPane, 1024, 768);
         scene.getStylesheets().add(View.class.getResource("java-keywords.css").toExternalForm());
+
+        scene.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.S && e.isMetaDown() && e.isShiftDown()) {
+                System.out.println("Save As shortcut");
+                saveAsFile();
+            }
+            else if(e.getCode() == KeyCode.S && e.isMetaDown()) {
+                System.out.println("Save shortcut");
+                saveFile();
+            }
+            else if(e.getCode() == KeyCode.O && e.isMetaDown()) {
+                System.out.println("Open shortcut");
+                openFile();
+            }
+            else if(e.getCode() == KeyCode.N && e.isMetaDown()) {
+                System.out.println("New shortcut");
+                newFile();
+            }
+            else if(e.getCode() == KeyCode.R && e.isMetaDown()) {
+                System.out.println("Run");
+                controller.run(editor.getText(), this.currentFileName);
+            }
+        });
 
 
         // Set column constraints
@@ -110,7 +158,9 @@ public class View extends Application {
         gridPane.getRowConstraints().addAll(row1, row2, row3);
 
 
-        gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+        //gridPane.add(setupToolbar(), 0, 0, GridPane.REMAINING, 1);
+
+        gridPane.add(setupMenuBar(), 0, 0, GridPane.REMAINING, 1);
 
         // Credits to RichTextFX for the API
         editor = new CodeArea();
@@ -131,6 +181,12 @@ public class View extends Application {
                 })
                 .subscribe(this::applyHighlighting);
 
+        /*editor.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (fileHandler.save(editor.getText())) {
+                updateCurrentFileName();
+            }
+        });*/
+
         gridPane.add(new VirtualizedScrollPane<>(editor), 0, 1);
 
         // Setup console
@@ -139,66 +195,121 @@ public class View extends Application {
         return scene;
     }
 
-    private ToolBar setupToolbar() {
-        // Setup toolbar
-        Button openButton = new Button("Open");
-        openButton.setOnAction(event -> {
-            String content = this.fileHandler.open();
-            if (content != null) {
-                this.editor.replaceText(content);
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
-            }
+    private MenuBar setupMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        // File menu
+        Menu menuFile = new Menu("File");
+        // Setup file menu items
+        MenuItem newItem = new MenuItem("New");
+        newItem.setOnAction(event -> {
+            newFile();
         });
-
-        Button saveButton = new Button("Save");
-        saveButton.setOnAction(event -> {
-            if (this.fileHandler.save(editor.getText())) {
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
-            }
+        MenuItem openItem = new MenuItem("Open");
+        openItem.setOnAction(event -> {
+            openFile();
         });
-
-        Button saveAsButton = new Button("Save As");
-        saveAsButton.setOnAction(event -> {
-            if (this.fileHandler.saveAs(editor.getText())) {
-                this.stage.setTitle("Baraco IDE - " + this.fileHandler.getCurrentFileName());
-            }
+        MenuItem saveItem = new MenuItem("Save");
+        saveItem.setOnAction(event -> {
+            saveFile();
         });
-
-        Button runButton = new Button("Run");
-        runButton.setDefaultButton(true);
-        runButton.setOnAction(event -> {
-            controller.run(editor.getText());
+        MenuItem saveAsItem = new MenuItem("Save As");
+        saveAsItem.setOnAction(event -> {
+            saveAsFile();
         });
+        menuFile.getItems().addAll(newItem, openItem, saveItem, saveAsItem);
 
+        // Edit menu
+        Menu menuEdit = new Menu("Edit");
+        // Setup edit menu items
+        MenuItem undoItem = new MenuItem("Undo");
+        undoItem.setOnAction(event -> {
+            editor.undo();
+        });
+        MenuItem redoItem = new MenuItem("Redo");
+        redoItem.setOnAction(event -> {
+            editor.redo();
+        });
+        MenuItem cutItem = new MenuItem("Cut");
+        cutItem.setOnAction(event -> {
+            editor.cut();
+        });
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(event -> {
+            editor.copy();
+        });
+        MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setOnAction(event -> {
+            editor.paste();
+        });
+        menuEdit.getItems().addAll(undoItem, redoItem, cutItem, copyItem, pasteItem);
 
-        ToolBar toolBar = new ToolBar(openButton, saveButton, saveAsButton, runButton);
+        // Code menu
+        Menu menuCode = new Menu("Code");
+        // Setup code menu items
+        MenuItem generateMethodItem = new MenuItem("Generate method...");
+        generateMethodItem.setOnAction(event -> {
+            this.generateMethod();
+        });
+        MenuItem generateStatementItem = new MenuItem("Generate statement...");
+        generateStatementItem.setOnAction(event -> {
+            this.generateStatement();
+        });
+        MenuItem refactorItem = new MenuItem("Refactor");
+        refactorItem.setOnAction(event -> {
+            this.refactor();
+        });
+        menuCode.getItems().addAll(generateMethodItem, generateStatementItem, refactorItem);
 
-        return toolBar;
+        // Run button
+        Menu menuRun = new Menu();
+        Label runLabel = new Label("Run");
+        runLabel.setOnMouseClicked(event -> {
+            controller.run(editor.getText(), this.currentFileName);
+        });
+        menuRun.setGraphic(runLabel);
+
+        // Add menus to menubar
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuCode, menuRun);
+
+        return menuBar;
     }
 
-    public void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
+    public static void highlightLineInEditor(int startRow, int startCol, int endRow, int endCol) {
         int startPos = editor.position(startRow, startCol).toOffset();
         int endPos = editor.position(endRow, endCol).toOffset();
 
         editor.selectRange(startPos, endPos);
     }
 
-    public void printInConsole(String text) {
+    public static void printInConsole(String text) {
         Text error = new Text(text);
+        error.setFont(Font.font("Courier", 14));
 
-        console.getChildren().add(error);
+
+        Platform.runLater(() -> {
+            console.getChildren().add(error);
+        });
     }
 
-    public void appendErrorInConsole(BaracoError e) {
+    public static void appendErrorInConsole(BaracoError e) {
 
         Text errorPrefix = new Text(e.getErrorPrefix());
+        errorPrefix.setFont(Font.font("Courier", 14));
+
         Hyperlink line = new Hyperlink(e.getLineLayout());
+        line.setFont(Font.font("Courier", 14));
         Text errorSuffix = new Text(e.getErrorSuffix());
+        errorSuffix.setFont(Font.font("Courier", 14));
         errorPrefix.setFill(Color.RED);
         errorSuffix.setFill(Color.RED);
 
         line.setOnAction(event -> {
-            highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
+            if (e.getCharNumber() != -1)
+                highlightLineInEditor(e.getLineNumber() - 1, e.getCharNumber(), e.getLineNumber() - 1, e.getCharNumber() + 1);
+            else
+                highlightLineInEditor(e.getLineNumber() - 1, 1, e.getLineNumber() - 1, 1);
+
         });
 
         console.getChildren().add(errorPrefix);
@@ -209,8 +320,11 @@ public class View extends Application {
     }
 
     public void resetConsole() {
-        console = new TextFlow(new Text("Console: \n"));
+        Text consoleText = new Text("Console: \n");
+        consoleText.setFont(Font.font("Courier", 12));
+        console = new TextFlow(consoleText);
         ScrollPane consoleScroll = new ScrollPane(console);
+        consoleScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         gridPane.add(consoleScroll, 0, 2, GridPane.REMAINING, 1);
     }
 
@@ -261,5 +375,114 @@ public class View extends Application {
 
     public Controller getController() {
         return this.controller;
+    }
+
+    private void updateCurrentFileName() {
+        this.currentFileName = this.fileHandler.getCurrentFileName();
+        this.stage.setTitle("Baraco IDE - " + this.currentFileName);
+    }
+
+    private void setNewFileTemplate() {
+        String className = this.currentFileName.replace(".bara", "");
+        String content = "class " + className +
+                ": \n" +
+                "\tvoid main(): \n\n" +
+                "\tend\n" +
+                "end";
+        this.editor.replaceText(content);
+    }
+
+    private void saveFile() {
+        if (this.fileHandler.save(editor.getText())) {
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void saveAsFile() {
+        if (this.fileHandler.saveAs(editor.getText())) {
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void openFile() {
+        String content = this.fileHandler.open();
+        if (content != null) {
+            this.editor.replaceText(content);
+            this.updateCurrentFileName();
+        }
+    }
+
+    private void newFile() {
+        if (this.fileHandler.newFile()) {
+            this.updateCurrentFileName();
+            this.setNewFileTemplate();
+            this.saveFile();
+        }
+    }
+
+    private void refactor() {
+        String highlighted = this.editor.getSelectedText();
+        System.out.println("Highlighted text: " + highlighted);
+
+        IndexRange range = this.editor.getSelection();
+        String highlightedWithParenthesis = this.editor.getText(range.getStart(), range.getEnd() + 1);
+
+        highlightedWithParenthesis = highlightedWithParenthesis.replaceAll("\\s+", "");
+        System.out.println();
+        // Add checking here
+        if (highlightedWithParenthesis.charAt(highlightedWithParenthesis.length() - 1) != '(' ||
+                !highlightedWithParenthesis.equals(highlighted + "(") ||
+                Arrays.asList(KEYWORDS).contains(highlighted) ||
+                !this.editor.getText(range.getStart() - 1, range.getStart()).equals(" ") ||
+                highlighted.contains(" ")) {
+            // Show error dialog
+            System.out.println("Invalid");
+            new ErrorDialogHandler().showErrorDialog("Invalid refactor selection!");
+            return;
+        }
+
+        RefactorDialogHandler refactorDialog = new RefactorDialogHandler();
+        String result = refactorDialog.showRefactorDialog(highlighted);
+
+        // Add more checking here
+
+        if (result != null) {
+            String refactoredText = this.editor.getText().replaceAll(highlighted + "\\(", result + "(");
+            this.editor.replaceText(refactoredText);
+
+
+        }
+    }
+
+    private void generateMethod() {
+        GenerateMethodDialog generateMethodDialog = new GenerateMethodDialog();
+        String result = generateMethodDialog.showGenerateMethodDialog();
+
+        if (result != null) {
+            if (this.editor.getSelectedText() != null) {
+                //IndexRange bounds = this.editor.getSelection();
+                //this.editor.replaceText(bounds, result);
+                this.editor.replaceSelection(result);
+            }
+            else {
+                int pos = this.editor.getCaretPosition();
+                this.editor.replaceText(pos, pos, result);
+            }
+        }
+    }
+
+    private void generateStatement() {
+        GenerateStatementDialog generateStatementDialog = new GenerateStatementDialog();
+        String result = generateStatementDialog.showGenerateStatementDialog();
+
+        if (result != null) {
+            if (this.editor.getSelectedText() != null) {
+                this.editor.replaceSelection(result);
+            }
+            else {
+                int pos = this.editor.getCaretPosition();
+                this.editor.replaceText(pos, pos, result);
+            }
+        }
     }
 }

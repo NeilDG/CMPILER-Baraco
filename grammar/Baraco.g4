@@ -2,8 +2,9 @@ grammar Baraco;
 
 // starting point for parsing a java file
 compilationUnit
-    //:   packageDeclaration? importDeclaration* typeDeclaration* EOF
-    :   constDeclaration* methodDeclaration* statement*
+    :   packageDeclaration? importDeclaration* typeDeclaration* EOF
+    //:   constDeclaration* methodDeclaration* statement*
+    //:   typeDeclaration* constDeclaration* memberDeclaration* statement* EOF
     ;
 
 packageDeclaration
@@ -44,7 +45,7 @@ classOrInterfaceModifier
     ;
 
 variableModifier
-    :   'final'
+    :   FINAL
     |   annotation
     ;
 
@@ -93,11 +94,11 @@ typeList
     ;
 
 classBody
-    :   '{' classBodyDeclaration* '}'
+    :   ':' classBodyDeclaration* 'end'
     ;
 
 interfaceBody
-    :   '{' interfaceBodyDeclaration* '}'
+    :   ':' interfaceBodyDeclaration* 'end'
     ;
 
 classBodyDeclaration
@@ -116,6 +117,7 @@ memberDeclaration
     |   annotationTypeDeclaration
     |   classDeclaration
     |   enumDeclaration
+    |   mainDeclaration
     ;
 
 /* We use rule this even for void methods which cannot have [] after parameters.
@@ -129,13 +131,11 @@ mainDeclaration
     ;
 
 methodDeclaration
-    :   ((typeType|'void') Identifier formalParameters ('[' ']')*
+    :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
-        ))
-        |
-        mainDeclaration
+        )
     ;
 
 genericMethodDeclaration
@@ -385,22 +385,23 @@ statement
     |   ';'
     |   statementExpression ';'
     |   Identifier ':' statement
-    |   scanStatement ';'
-    |   printStatement ';'
+    |   PRINT '(' expression ')' ';'
+    |   PRINTLN '(' expression ')' ';'
+    |   scanStatement
     ;
 
 scanStatement
-    :   Identifier '=' 'scanInt' '(' ')'
-    |   Identifier '=' 'scanDecimal' '(' ')'
-    |   Identifier '=' 'scanString' '(' ')'
+    :   SCAN '(' expression ',' Identifier')' ';'
+    |   SCAN '(' expression ',' Identifier '[' expression ']' ')' ';'
     ;
+
 printStatement
     :   'print' '(' expression ')'
     |   'println' '(' expression ')'
     ;
 
 catchClause
-    :   'catch' '(' variableModifier* catchType Identifier ')' block
+    :   'catch' '(' ')' block
     ;
 
 catchType
@@ -474,7 +475,8 @@ constantExpression
 
 expression
     :   primary
-    //|   expression '.' Identifier
+    |   expression '(' arguments ')' ';'
+    |   expression '.' Identifier
     //|   expression '.' 'this'
     //|   expression '.' 'new' nonWildcardTypeArguments? innerCreator
     //|   expression '.' 'super' superSuffix
@@ -640,9 +642,7 @@ TRY           : 'try';
 VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
-SCANINT       : 'scanInt';
-SCANDEC       : 'scanDecimal';
-SCANSTR       : 'scanString';
+SCAN          : 'scan';
 PRINT         : 'print';
 PRINTLN       : 'println';
 END           : 'end';

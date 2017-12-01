@@ -2,8 +2,8 @@ package baraco.semantics.statements;
 
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.ICommand;
-import baraco.execution.commands.controlled.IConditionalCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
+import baraco.execution.commands.controlled.*;
+import baraco.execution.commands.simple.MethodCallCommand;
 
 import java.util.Stack;
 
@@ -121,10 +121,19 @@ public class StatementControlOverseer {
             ICommand parentCommand = this.procedureCallStack.peek();
             this.activeControlledCommand = parentCommand;
 
-            if(parentCommand instanceof IControlledCommand) {
-                IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
-                controlledCommand.addCommand(childCommand);
 
+            if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand) {
+                if (parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
+                    IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
+                    controlledCommand.addCommand(childCommand);
+                } else if (parentCommand instanceof IfCommand) {
+                    IConditionalCommand controlledCommand = (IConditionalCommand) parentCommand;
+
+                    if(isInPositiveRule())
+                        controlledCommand.addPositiveCommand(childCommand);
+                    else
+                        controlledCommand.addNegativeCommand(childCommand);
+                }
             }
         }
         else {

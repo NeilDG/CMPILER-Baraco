@@ -113,6 +113,23 @@ public class LocalScope implements IScope {
         baracoValue.setValue(valueString);
     }
 
+    public void addFinalEmptyVariableFromKeywords(String primitiveTypeString, String identifierString) {
+        this.initializeLocalVariableMap();
+
+        BaracoValue baracoValue = BaracoValue.createEmptyVariableFromKeywords(primitiveTypeString);
+        baracoValue.markFinal();
+        this.localVariables.put(identifierString, baracoValue);
+    }
+
+    public void addFinalInitVariableFromKeyWords(String primitiveTypeString, String identifierString, String valueString) {
+        this.initializeLocalVariableMap();
+
+        this.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
+        BaracoValue baracoValue = this.localVariables.get(identifierString);
+        baracoValue.setValue(valueString);
+        baracoValue.markFinal();
+    }
+
     public void addMobiValue(String identifier, BaracoValue baracoValue) {
         this.initializeLocalVariableMap();
         this.localVariables.put(identifier, baracoValue);

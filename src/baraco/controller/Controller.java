@@ -2,11 +2,19 @@ package baraco.controller;
 
 import baraco.antlr.error.BaracoError;
 import baraco.antlr.error.BaracoErrorListener;
-import baraco.ide.View;
+import baraco.builder.BuildChecker;
+import baraco.builder.ParserHandler;
+import baraco.execution.ExecutionManager;
+import baraco.execution.MethodTracker;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoBaseListener;
 import baraco.antlr.parser.BaracoListener;
 import baraco.antlr.parser.BaracoParser;
+import baraco.ide.View;
+import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.symboltable.SymbolTableManager;
+import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import baraco.semantics.utils.LocalVarTracker;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,6 +24,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Controller {
 
@@ -39,33 +49,31 @@ public class Controller {
 
     }
 
-    public void run(String input) {
+    public void run(String input, String fileName) {
         // Perform interpretation
+
+        ExecutionManager.reset();
+        LocalScopeCreator.reset();
+        SymbolTableManager.reset();
+        BuildChecker.reset();
+        StatementControlOverseer.reset();
+        MethodTracker.reset();
+        LocalVarTracker.reset();
 
         view.resetConsole();
 
-        CharStream cs = new ANTLRInputStream(input);
+        System.out.println(input);
 
-        BaracoLexer mokaLexer = new BaracoLexer(cs);
+        ParserHandler.getInstance().parseText(fileName, input);
 
-        CommonTokenStream tokenStream = new CommonTokenStream(mokaLexer);
-
-        tokenStream.fill();
-
-        List<Token> tokens = tokenStream.getTokens();
-
-        BaracoParser parser = new BaracoParser(tokenStream);
-
-        BaracoErrorListener baracoErrorListener = new BaracoErrorListener(this);
-
-        parser.removeErrorListeners();
-        parser.addErrorListener(baracoErrorListener);
-
-        ParseTree tree = parser.compilationUnit();
-
-        ParseTreeWalker walker = new ParseTreeWalker();
-        BaracoListener listener = new BaracoBaseListener();
-        walker.walk(listener, tree);
+        if(BuildChecker.getInstance().canExecute()) {
+            ExecutionManager.getInstance().executeAllActions();
+            System.out.println("BuildChecker executed");
+            //this.mViewPager.setCurrentItem(1);
+        }
+        else {
+            System.out.println("Fix identified errors before executing!");
+        }
 
         /*String output = "";
         for(int i = 0; i < tokens.size(); i++) {

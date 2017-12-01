@@ -4,15 +4,24 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.MethodTracker;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.controlled.ForCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
+import baraco.execution.commands.controlled.IfCommand;
+import baraco.execution.commands.evaluation.AssignmentCommand;
+import baraco.execution.commands.evaluation.MappingCommand;
+import baraco.execution.commands.simple.IncDecCommand;
+import baraco.execution.commands.simple.ReturnCommand;
 import baraco.representations.BaracoValue.PrimitiveType;
+import baraco.semantics.searching.VariableSearcher;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.antlr.parser.BaracoParser.ExpressionContext;
+import baraco.semantics.utils.LocalVarTracker;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class BaracoMethod implements IControlledCommand{
 
@@ -27,11 +36,6 @@ public class BaracoMethod implements IControlledCommand{
         VOID_TYPE
     }
 
-    private Object defaultValue; //this value will no longer change.
-    private Object value;
-    private PrimitiveType primitiveType = PrimitiveType.NOT_YET_IDENTIFIED;
-    private boolean finalFlag = false;
-
     private String methodName;
     private List<ICommand> commandSequences; //the list of commands execution by the function
 
@@ -41,6 +45,8 @@ public class BaracoMethod implements IControlledCommand{
     private LinkedHashMap<String, BaracoValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
     private BaracoValue returnValue; //the return value of the function. null if it's a void type
     private MethodType returnType = MethodType.VOID_TYPE; //the return type of the function
+
+    private boolean hasValidReturns = true;
 
     public BaracoMethod() {
         this.commandSequences = new ArrayList<ICommand>();
@@ -61,13 +67,22 @@ public class BaracoMethod implements IControlledCommand{
 
         //create an empty mobi value as a return value
         switch(this.returnType) {
-            case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); break;
-            case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); break;
-            case DECIMAL_TYPE: this.returnValue = new BaracoValue(' ', PrimitiveType.DECIMAL); break;
-            case STRING_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.STRING); break;
-            case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); break;
-            default:break;
+            case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); setValidReturns(false); break;
+            case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); setValidReturns(false); break;
+            case DECIMAL_TYPE: this.returnValue = new BaracoValue(0.0, PrimitiveType.DECIMAL); setValidReturns(false); break;
+            case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); setValidReturns(false); break;
+            case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); setValidReturns(false); break;
+            default:
+                break;
         }
+    }
+
+    public boolean hasValidReturns(){
+        return this.hasValidReturns;
+    }
+
+    public void setValidReturns(boolean b) {
+        hasValidReturns = b;
     }
 
     public MethodType getReturnType() {
@@ -99,6 +114,26 @@ public class BaracoMethod implements IControlledCommand{
 
         BaracoValue baracoValue = this.getParameterAt(index);
         baracoValue.setValue(value);
+    }
+
+    public void mapArrayAt(BaracoValue baracoValue, int index, String identifier) {
+        if(index >= this.parameterValues.size()) {
+            return;
+        }
+
+        /*BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+
+        BaracoArray newArray = new BaracoArray(baracoArray.getPrimitiveType(), identifier);
+        BaracoValue newValue = new BaracoValue(newArray, PrimitiveType.ARRAY);
+
+        newArray.initializeSize(baracoArray.getSize());
+
+        for(int i = 0; i < newArray.getSize(); i++) {
+            newArray.updateValueAt(baracoArray.getValueAt(i), i);
+        }*/
+
+        this.parameterValues.put(this.getParameterKeyAt(index), baracoValue);
+
     }
 
     public int getParameterValueSize() {
@@ -190,17 +225,60 @@ public class BaracoMethod implements IControlledCommand{
     public void execute() {
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
         MethodTracker.getInstance().reportEnterFunction(this);
+
+        LocalVarTracker.getInstance().startNewSession();
+
         try {
             for(ICommand command : this.commandSequences) {
                 executionMonitor.tryExecution();
                 command.execute();
-            }
 
+                LocalVarTracker.getInstance().populateLocalVars(command);
+
+                if (command instanceof ReturnCommand) {
+                    break;
+                } else if (command instanceof IfCommand) {
+                    if (((IfCommand) command).isReturned()) {
+                        ((IfCommand) command).resetReturnFlag();
+                        break;
+                    }
+                }
+            }
         } catch(InterruptedException e) {
             System.out.println(TAG + ": " + "Monitor block interrupted! " +e.getMessage());
         }
 
         MethodTracker.getInstance().reportExitFunction();
+        this.popBackParameters();
+        this.popBackLocalVars();
+
+        LocalVarTracker.getInstance().endCurrentSession();
+
+        //LocalVarTracker.resetLocalVars(localVars);
+    }
+
+    private void popBackParameters() {
+        for (BaracoValue bV : this.parameterValues.values()) {
+            if(bV.getPrimitiveType() != PrimitiveType.ARRAY)
+                bV.popBack();
+        }
+    }
+
+    private void popBackLocalVars() {
+        for(String s : LocalVarTracker.getInstance().getCurrentSession()) {
+
+            BaracoValue value = VariableSearcher.searchVariableInFunction(this, s);
+
+            if (value != null) {
+
+                if (value.stackSize() > 1) { // prevent from reaching null
+                    if (value.getPrimitiveType() != PrimitiveType.ARRAY)
+                        value.popBack();
+                }
+                
+            }
+
+        }
     }
 
     @Override

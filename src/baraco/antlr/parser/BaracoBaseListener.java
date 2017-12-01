@@ -1,5 +1,7 @@
 // Generated from Baraco.g4 by ANTLR 4.7
 package baraco.antlr.parser;
+import baraco.semantics.analyzers.ClassAnalyzer;
+import baraco.semantics.analyzers.MainAnalyzer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -99,7 +101,10 @@ public class BaracoBaseListener implements BaracoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterClassDeclaration(BaracoParser.ClassDeclarationContext ctx) { }
+	@Override public void enterClassDeclaration(BaracoParser.ClassDeclarationContext ctx) {
+		ClassAnalyzer classAnalyzer = new ClassAnalyzer();
+		classAnalyzer.analyze(ctx);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -268,7 +273,8 @@ public class BaracoBaseListener implements BaracoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterMainDeclaration(BaracoParser.MainDeclarationContext ctx) {
-		System.out.println("main");
+		MainAnalyzer mainAnalyzer = new MainAnalyzer();
+		mainAnalyzer.analyze(ctx);
 	}
 	/**
 	 * {@inheritDoc}

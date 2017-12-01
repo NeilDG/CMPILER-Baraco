@@ -1,11 +1,14 @@
 package baraco.execution.commands.simple;
 
+import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.antlr.parser.BaracoParser.*;
+import baraco.ide.View;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
+import baraco.semantics.utils.Expression;
 import baraco.semantics.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -13,21 +16,32 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class PrintCommand implements ICommand, ParseTreeListener {
 
-    private final static String TAG = "Mobi_PrintCommand";
+    private final static String TAG = "PrintCommand";
 
     private ExpressionContext expressionCtx;
 
     private String statementToPrint = "";
-    private boolean complexExpr = false;
-    private boolean arrayAccess = false;
+    private boolean isLN = false;
 
-    public PrintCommand(ExpressionContext expressionCtx) {
-        this.expressionCtx = expressionCtx;
+    private boolean evaluatedExp = false;
 
-        //UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.expressionCtx);
-        //undeclaredChecker.verify();
+    public PrintCommand(StatementContext sCtx) {
+
+        isLN = sCtx.PRINTLN() != null;
+
+        this.expressionCtx = sCtx.expression(0);
+
+        UndeclaredChecker undeclaredChecker = new UndeclaredChecker(expressionCtx);
+        undeclaredChecker.verify();
+
+        statementToPrint = "";
     }
 
     @Override
@@ -35,8 +49,13 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, this.expressionCtx);
 
-        System.out.println(this.statementToPrint);
-        this.statementToPrint = ""; //reset statement to print afterwards
+        if (isLN)
+            statementToPrint += "\n";
+
+        View.printInConsole(this.statementToPrint);
+
+        statementToPrint = "";
+        evaluatedExp = false;
     }
 
     @Override
@@ -52,61 +71,21 @@ public class PrintCommand implements ICommand, ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof LiteralContext) {
-            LiteralContext literalCtx = (LiteralContext) ctx;
 
-            if(literalCtx.StringLiteral() != null) {
-                String quotedString = literalCtx.StringLiteral().getText();
+        if (ctx instanceof ExpressionContext && !evaluatedExp) {
 
-                this.statementToPrint += StringUtils.removeQuotes(quotedString);
-            }
-			/*else if(literalCtx.IntegerLiteral() != null) {
-				int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
-				this.statementToPrint += value;
-			}
+            ExpressionContext expCtx = (ExpressionContext) ctx;
 
-			else if(literalCtx.FloatingPointLiteral() != null) {
-				float value = Float.parseFloat(literalCtx.FloatingPointLiteral().getText());
-				this.statementToPrint += value;
-			}
+            EvaluationCommand evComm = new EvaluationCommand(expCtx);
+            evComm.execute();
 
-			else if(literalCtx.BooleanLiteral() != null) {
-				this.statementToPrint += literalCtx.BooleanLiteral().getText();
-			}
+            if (evComm.isNumericResult())
+                statementToPrint += evComm.getResult().toEngineeringString();
+            else
+                statementToPrint += evComm.getStringResult();
 
-			else if(literalCtx.CharacterLiteral() != null) {
-				this.statementToPrint += literalCtx.CharacterLiteral().getText();
-			}*/
-        }
+            evaluatedExp = true;
 
-        else if(ctx instanceof PrimaryContext) {
-            PrimaryContext primaryCtx = (PrimaryContext) ctx;
-
-            if(primaryCtx.expression() != null) {
-                ExpressionContext exprCtx = primaryCtx.expression();
-                this.complexExpr = true;
-                System.out.println("Complex expression detected: " +exprCtx.getText());
-
-                EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
-                evaluationCommand.execute();
-
-                this.statementToPrint += evaluationCommand.getResult().toEngineeringString();
-            }
-
-            else if(primaryCtx.Identifier() != null && this.complexExpr == false) {
-                String identifier = primaryCtx.getText();
-
-                BaracoValue value = BaracoValueSearcher.searchBaracoValue(identifier);
-                if(value.getPrimitiveType() == BaracoValue.PrimitiveType.ARRAY) {
-                    this.arrayAccess = true;
-                    this.evaluateArrayPrint(value, primaryCtx);
-                }
-                else if(this.arrayAccess == false) {
-                    this.statementToPrint += value.getValue();
-                }
-
-
-            }
         }
     }
 
