@@ -5,6 +5,7 @@ import baraco.controller.Controller;
 import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
 import baraco.execution.commands.EvaluationCommand;
+import baraco.execution.commands.MethodList;
 import baraco.file.FileHandler;
 import baraco.ide.dialogs.*;
 import baraco.semantics.statements.StatementControlOverseer;
@@ -31,10 +32,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -456,6 +454,13 @@ public class View extends Application {
 
     private void generateMethod() {
         GenerateMethodDialog generateMethodDialog = new GenerateMethodDialog();
+        this.controller.buildOnly(this.editor.getText(), this.currentFileName);
+        ArrayList<String> methodNames = MethodList.getInstance().getMethodNames();
+
+        for (String methodName : methodNames) {
+            System.out.println(methodName);
+        }
+
         String result = generateMethodDialog.showGenerateMethodDialog();
 
         if (result != null) {
