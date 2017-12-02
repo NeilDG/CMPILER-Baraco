@@ -245,20 +245,6 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                     ParserHandler.getInstance().getCurrentClassName());
             BaracoMethod baracoMethod = classScope.searchMethod(functionName);
 
-        /*if (exprCtx.arguments().expressionList() != null) {
-            List<ExpressionContext> exprCtxList = exprCtx.arguments()
-                    .expressionList().expression();
-
-            for (int i = 0; i < exprCtxList.size(); i++) {
-                ExpressionContext parameterExprCtx = exprCtxList.get(i);
-
-                EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
-                evaluationCommand.execute();
-
-                baracoMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
-            }
-        }*/
-
             if (baracoMethod == null) {
                 return;
             }
