@@ -27,7 +27,7 @@ public class LocalVarTracker {
     }
 
     public static void reset() {
-
+        sharedInstance = new LocalVarTracker();
     }
 
     public LocalVarTracker () {
@@ -45,7 +45,7 @@ public class LocalVarTracker {
                     sessions.peek().add(((AssignmentCommand) command).getLeftHandExprCtx().getText());
             } else if (command instanceof IncDecCommand) {
                 sessions.peek().add(((IncDecCommand) command).getIdentifierString());
-            } else if (command instanceof ForCommand) {
+            }/* else if (command instanceof ForCommand) {
                 sessions.peek().addAll(((ForCommand) command).getLocalVars());
 
                 resetLocalVars(((ForCommand) command).getLocalVars());
@@ -64,7 +64,7 @@ public class LocalVarTracker {
                 sessions.peek().addAll(((IfCommand) command).getLocalVars());
 
                 resetLocalVars(((IfCommand) command).getLocalVars());
-            }
+            }*/
 
         }
 
