@@ -81,7 +81,7 @@ public class ExecutionManager implements NotificationListener {
             return;
         }
 
-        if (this.currentTryCommand.hasCatchFor(catchType))
+        if (this.currentTryCommand != null && this.currentTryCommand.hasCatchFor(catchType))
             this.currentCatchType = catchType;
         else {
 
