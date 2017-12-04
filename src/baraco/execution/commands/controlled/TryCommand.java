@@ -3,6 +3,7 @@ package baraco.execution.commands.controlled;
 import baraco.execution.ExecutionManager;
 import baraco.execution.ExecutionMonitor;
 import baraco.execution.commands.ICommand;
+import baraco.semantics.statements.StatementControlOverseer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +13,6 @@ public class TryCommand implements IAttemptCommand {
 
     private List<ICommand> tryCommands; //list of commands to execute if the condition holds true
     private HashMap<CatchTypeEnum, List<ICommand>> catchCommands; //list of commands to execute if the condition holds false
-
-    private boolean trying = true;
 
     @Override
     public IControlledCommand.ControlTypeEnum getControlType() {
@@ -49,41 +48,33 @@ public class TryCommand implements IAttemptCommand {
     @Override
     public void execute() {
 
-        /*ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
+        ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
         try {
             for (ICommand command: tryCommands) {
                 executionMonitor.tryExecution();
                 command.execute();
 
-                if (!trying)
+                if (StatementControlOverseer.getInstance().getCurrentCatchType() != null)
                     break;
             }
 
-            if (!trying) {
-                trying = false;
 
-                for (CatchTypeEnum catchTypeEnum: catchCommands.keySet()) {
-                    for (ICommand command:
-                         catchCommands.get(catchTypeEnum)) {
+            if (StatementControlOverseer.getInstance().getCurrentCatchType() != null) {
 
+                if (catchCommands.get(StatementControlOverseer.getInstance().getCurrentCatchType()) != null) {
+                    for (ICommand command : catchCommands.get(StatementControlOverseer.getInstance().getCurrentCatchType())) {
                         executionMonitor.tryExecution();
                         command.execute();
-
                     }
                 }
+
+                StatementControlOverseer.getInstance().setCurrentCatchClause(null);
+
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
 
-    }
-
-    public void setTrying(boolean bool) {
-        trying = bool;
-    }
-
-    public boolean isTrying(){
-        return trying;
     }
 }

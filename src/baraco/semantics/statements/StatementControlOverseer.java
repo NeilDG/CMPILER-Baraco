@@ -24,7 +24,7 @@ public class StatementControlOverseer {
     private boolean isInPositive = true; //used for conditional statements to indicate if the series of commands should go to the positive command list.
     private boolean isInTry = false;
 
-    private IAttemptCommand.CatchTypeEnum currentCatchType;
+    private IAttemptCommand.CatchTypeEnum currentCatchType = null;
 
     private StatementControlOverseer() {
         this.procedureCallStack = new Stack<ICommand>();
@@ -40,6 +40,7 @@ public class StatementControlOverseer {
         sharedInstance.procedureCallStack.clear();
         //sharedInstance.rootControlledCommand = null;
         sharedInstance.activeControlledCommand = null;
+        sharedInstance.currentCatchType = null;
     }
 
     public void openConditionalCommand(IConditionalCommand command) {

@@ -64,6 +64,7 @@ public class StatementAnalyzer {
 
             }
 
+            StatementControlOverseer.getInstance().setCurrentCatchClause(null);
             StatementControlOverseer.getInstance().compileControlledCommand();
         }
         else if(ctx.block() != null) {
@@ -291,7 +292,7 @@ public class StatementAnalyzer {
     */
     public static IAttemptCommand.CatchTypeEnum determineCatchType(CatchTypeContext ctx) {
         if (ctx.getTokens(BaracoLexer.ARITHMETIC_EXCEPTION).size() > 0) {
-            return IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXPRESSION;
+            return IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION;
         } else if (ctx.getTokens(BaracoLexer.ARRAY_BOUNDS_EXCEPTION).size() > 0) {
             return IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS;
         } else if (ctx.getTokens(BaracoLexer.NEGATIVE_ARRSIZE_EXCEPTION).size() > 0) {
