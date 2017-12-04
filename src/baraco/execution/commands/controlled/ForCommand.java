@@ -64,6 +64,8 @@ public class ForCommand implements IControlledCommand {
 
                     LocalVarTracker.getInstance().populateLocalVars(command);
 
+                    if (ExecutionManager.getInstance().isAborted())
+                        break;
                 }
 
                 executionMonitor.tryExecution();

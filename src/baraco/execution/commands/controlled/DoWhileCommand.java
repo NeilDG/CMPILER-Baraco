@@ -37,6 +37,9 @@ public class DoWhileCommand extends WhileCommand {
                 command.execute();
 
                 LocalVarTracker.getInstance().populateLocalVars(command);
+
+                if (ExecutionManager.getInstance().isAborted())
+                    break;
             }
 
         } catch(InterruptedException e) {

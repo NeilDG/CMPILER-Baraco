@@ -38,6 +38,8 @@ public class ExecutionManager implements NotificationListener {
     private IAttemptCommand.CatchTypeEnum currentCatchType = null;
     private IAttemptCommand currentTryCommand = null;
 
+    private boolean aborted = false;
+
     private ExecutionManager() {
         this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
         this.activeExecutionAdder = this.mainExecutionAdder;
@@ -52,6 +54,10 @@ public class ExecutionManager implements NotificationListener {
         sharedInstance.foundEntryPoint = false;
         sharedInstance.entryClassName = null;
         sharedInstance.clearAllActions();
+
+        sharedInstance.currentCatchType = null;
+        sharedInstance.currentTryCommand = null;
+        sharedInstance.aborted = false;
 
         NotificationCenter.getInstance().removeObserver(Notifications.ON_EXECUTION_FINISHED, sharedInstance);
     }
@@ -74,6 +80,8 @@ public class ExecutionManager implements NotificationListener {
             this.currentCatchType = catchType;
         else {
 
+            this.aborted = true;
+
             if (catchType == IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS) {
                 BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS, "");
             } else if (catchType == IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE) {
@@ -84,6 +92,10 @@ public class ExecutionManager implements NotificationListener {
 
             this.clearAllActions();
         }
+    }
+
+    public boolean isAborted () {
+        return aborted;
     }
 
     /*
