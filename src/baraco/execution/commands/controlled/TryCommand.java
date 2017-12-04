@@ -49,7 +49,7 @@ public class TryCommand implements IAttemptCommand {
     @Override
     public void execute() {
 
-        ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
+        /*ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
 
         try {
             for (ICommand command: tryCommands) {
@@ -75,7 +75,7 @@ public class TryCommand implements IAttemptCommand {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 

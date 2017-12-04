@@ -82,6 +82,10 @@ public class StatementControlOverseer {
         return this.isInTry;
     }
 
+    public IAttemptCommand.CatchTypeEnum getCurrentCatchType () {
+        return this.currentCatchType;
+    }
+
     public void reportExitTryBlock() {
         this.isInTry = false;
     }
@@ -177,6 +181,10 @@ public class StatementControlOverseer {
 
     public boolean isInControlledCommand() {
         return (this.activeControlledCommand!= null && this.activeControlledCommand instanceof IControlledCommand);
+    }
+
+    public boolean isInAttemptCommand() {
+        return (this.activeControlledCommand!= null && this.activeControlledCommand instanceof IAttemptCommand);
     }
 
     public ICommand getActiveControlledCommand() {
