@@ -1,6 +1,7 @@
 package baraco.representations;
 
 import baraco.builder.ErrorRepository;
+import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.BaracoValue.PrimitiveType;
 import baraco.semantics.statements.StatementControlOverseer;
@@ -40,7 +41,8 @@ public class BaracoArray {
         } catch (NegativeArraySizeException ex) {
             this.baracoValueArray = new BaracoValue[0];
 
-            StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE);
+            //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE);
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE);
         }
         System.out.println(TAG + ": Mobi array initialized to size " +this.baracoValueArray.length);
     }
@@ -60,7 +62,7 @@ public class BaracoArray {
     public BaracoValue getValueAt(int index) {
         if(index >= this.baracoValueArray.length) {
             System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
-            StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
 
             return this.baracoValueArray[this.baracoValueArray.length - 1];
         }

@@ -4,6 +4,7 @@ import baraco.execution.adders.IExecutionAdder;
 import baraco.execution.adders.MainExecutionAdder;
 import baraco.execution.adders.MethodExecutionAdder;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.BaracoMethod;
 import baraco.utils.notifications.NotificationCenter;
 import baraco.utils.notifications.Notifications;
@@ -32,6 +33,8 @@ public class ExecutionManager implements NotificationListener {
     private IExecutionAdder activeExecutionAdder;
     private MainExecutionAdder mainExecutionAdder;
 
+    private IAttemptCommand.CatchTypeEnum currentCatchType = null;
+
     private ExecutionManager() {
         this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
         this.activeExecutionAdder = this.mainExecutionAdder;
@@ -48,6 +51,14 @@ public class ExecutionManager implements NotificationListener {
         sharedInstance.clearAllActions();
 
         NotificationCenter.getInstance().removeObserver(Notifications.ON_EXECUTION_FINISHED, sharedInstance);
+    }
+
+    public IAttemptCommand.CatchTypeEnum getCurrentCatchType() {
+        return this.currentCatchType;
+    }
+
+    public void setCurrentCatchType(IAttemptCommand.CatchTypeEnum catchType) {
+        this.currentCatchType = catchType;
     }
 
     /*

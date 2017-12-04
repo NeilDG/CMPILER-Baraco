@@ -2,6 +2,7 @@ package baraco.execution.commands;
 
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.builder.ParserHandler;
+import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.*;
 import baraco.semantics.searching.VariableSearcher;
@@ -155,7 +156,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 this.resultValue = new BigDecimal(0);
                 this.stringResult = "";
             } catch (ArithmeticException ex) {
-                StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
+                //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
+                ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
 
                 this.resultValue = new BigDecimal(0);
                 this.stringResult = "";
