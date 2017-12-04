@@ -13,5 +13,6 @@ public interface IAttemptCommand extends ICommand {
     public abstract IControlledCommand.ControlTypeEnum getControlType();
     public abstract void addTryCommand(ICommand command);
     public abstract void addCatchCommand(CatchTypeEnum catchTypeEnum, ICommand command);
+    public abstract boolean hasCatchFor(CatchTypeEnum catchTypeEnum);
 
 }

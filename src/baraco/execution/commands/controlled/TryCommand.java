@@ -45,6 +45,10 @@ public class TryCommand implements IAttemptCommand {
         catchCommands.put(catchTypeEnum, commandList);
     }
 
+    public boolean hasCatchFor(CatchTypeEnum catchTypeEnum) {
+        return catchCommands.containsKey(catchTypeEnum);
+    }
+
     @Override
     public void execute() {
 
@@ -56,7 +60,8 @@ public class TryCommand implements IAttemptCommand {
                 executionMonitor.tryExecution();
                 command.execute();
 
-                if (ExecutionManager.getInstance().getCurrentCatchType() != null)
+                if (ExecutionManager.getInstance().getCurrentCatchType() != null ||
+                        ExecutionManager.getInstance().isAborted())
                     break;
             }
 
@@ -68,10 +73,10 @@ public class TryCommand implements IAttemptCommand {
                         executionMonitor.tryExecution();
                         command.execute();
                     }
-                }
 
-                ExecutionManager.getInstance().setCurrentCatchType(null);
-                ExecutionManager.getInstance().setCurrentTryCommand(null);
+                    ExecutionManager.getInstance().setCurrentCatchType(null);
+                    ExecutionManager.getInstance().setCurrentTryCommand(null);
+                }
 
             }
         } catch (InterruptedException e) {

@@ -76,7 +76,12 @@ public class ExecutionManager implements NotificationListener {
 
     public void setCurrentCatchType(IAttemptCommand.CatchTypeEnum catchType) {
 
-        if (this.currentTryCommand != null)
+        if (catchType == null) {
+            this.currentCatchType = null;
+            return;
+        }
+
+        if (this.currentTryCommand.hasCatchFor(catchType))
             this.currentCatchType = catchType;
         else {
 
