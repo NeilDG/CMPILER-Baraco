@@ -49,6 +49,7 @@ public class TryCommand implements IAttemptCommand {
     public void execute() {
 
         ExecutionMonitor executionMonitor = ExecutionManager.getInstance().getExecutionMonitor();
+        ExecutionManager.getInstance().setCurrentTryCommand(this);
 
         try {
             for (ICommand command: tryCommands) {
@@ -70,6 +71,7 @@ public class TryCommand implements IAttemptCommand {
                 }
 
                 ExecutionManager.getInstance().setCurrentCatchType(null);
+                ExecutionManager.getInstance().setCurrentTryCommand(null);
 
             }
         } catch (InterruptedException e) {

@@ -1,5 +1,7 @@
 package baraco.execution;
 
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.execution.adders.IExecutionAdder;
 import baraco.execution.adders.MainExecutionAdder;
 import baraco.execution.adders.MethodExecutionAdder;
@@ -34,6 +36,7 @@ public class ExecutionManager implements NotificationListener {
     private MainExecutionAdder mainExecutionAdder;
 
     private IAttemptCommand.CatchTypeEnum currentCatchType = null;
+    private IAttemptCommand currentTryCommand = null;
 
     private ExecutionManager() {
         this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
@@ -53,12 +56,34 @@ public class ExecutionManager implements NotificationListener {
         NotificationCenter.getInstance().removeObserver(Notifications.ON_EXECUTION_FINISHED, sharedInstance);
     }
 
+    public IAttemptCommand getCurrentTryCommand() {
+        return this.currentTryCommand;
+    }
+
+    public void setCurrentTryCommand(IAttemptCommand command) {
+        this.currentTryCommand = command;
+    }
+
     public IAttemptCommand.CatchTypeEnum getCurrentCatchType() {
         return this.currentCatchType;
     }
 
     public void setCurrentCatchType(IAttemptCommand.CatchTypeEnum catchType) {
-        this.currentCatchType = catchType;
+
+        if (this.currentTryCommand != null)
+            this.currentCatchType = catchType;
+        else {
+
+            if (catchType == IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS, "");
+            } else if (catchType == IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_NEGATIVE_ARRAY_SIZE, "");
+            } else if (catchType == IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARITHMETIC_EXCEPTION, "");
+            }
+
+            this.clearAllActions();
+        }
     }
 
     /*
