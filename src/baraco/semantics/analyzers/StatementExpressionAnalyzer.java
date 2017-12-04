@@ -151,12 +151,6 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 if(stExCtx.expression() != null) {
                     ExpressionContext expCtx = stExCtx.expression();
 
-                    /*boolean notStatement = false;
-
-                    for (ExpressionContext eCtx:
-                         expCtx.expression()) {
-                    }*/
-
                     if (!(isAssignmentExpression(expCtx) ||
                             isAddAssignExpression(expCtx) ||
                             isSubAssignExpression(expCtx) ||

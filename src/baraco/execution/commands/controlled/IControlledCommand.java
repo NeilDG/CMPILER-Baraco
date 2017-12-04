@@ -8,7 +8,8 @@ public interface IControlledCommand extends ICommand{
         DO_WHILE_CONTROL,
         WHILE_CONTROL,
         FOR_CONTROL,
-        FUNCTION_TYPE
+        FUNCTION_TYPE,
+        TRY_COMMAND
     }
 
     public abstract ControlTypeEnum getControlType();

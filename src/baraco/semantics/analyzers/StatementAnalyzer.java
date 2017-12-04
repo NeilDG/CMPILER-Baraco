@@ -126,6 +126,28 @@ public class StatementAnalyzer {
         }
         else if(isTRYStatement(ctx)) {
 
+            BlockContext blockContext = ctx.block();
+
+            TryCommand tryCommand = new TryCommand();
+            StatementControlOverseer.getInstance().openAttemptCommand(tryCommand);
+
+            BlockAnalyzer tryBlockAnalyzer = new BlockAnalyzer();
+            tryBlockAnalyzer.analyze(blockContext);
+
+            StatementControlOverseer.getInstance().reportExitTryBlock();
+
+            // loop through catch clauses available
+            for (CatchClauseContext cCContext:
+                 ctx.catchClause()) {
+
+                //StatementControlOverseer.getInstance().setCurrentCatchClause(); TODO when grammar for catch is fixed
+
+                BlockAnalyzer catchBlockAnalyzer = new BlockAnalyzer();
+                catchBlockAnalyzer.analyze(cCContext.block());
+
+            }
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
         }
     }
 

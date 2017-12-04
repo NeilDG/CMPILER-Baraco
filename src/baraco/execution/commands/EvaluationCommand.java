@@ -302,15 +302,28 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             return;
         }
 
-        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    "\"" + baracoValue.getValue().toString() + "\"");
-        } else if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    "'" + baracoValue.getValue().toString() + "'");
-        } else {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    baracoValue.getValue().toString());
+        try {
+
+            if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "\"" + baracoValue.getValue().toString() + "\"");
+            } else if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "'" + baracoValue.getValue().toString() + "'");
+            } else {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        baracoValue.getValue().toString());
+            }
+
+        } catch (NullPointerException e) {
+            if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.INT) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "0");
+            }else {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "null");
+            }
+
         }
 
         //System.out.println("EVALUATED: " + modifiedExp);

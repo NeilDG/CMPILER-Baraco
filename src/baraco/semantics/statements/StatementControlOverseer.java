@@ -22,6 +22,9 @@ public class StatementControlOverseer {
     private ICommand activeControlledCommand = null;
 
     private boolean isInPositive = true; //used for conditional statements to indicate if the series of commands should go to the positive command list.
+    private boolean isInTry = false;
+
+    private IAttemptCommand.CatchTypeEnum currentCatchType;
 
     private StatementControlOverseer() {
         this.procedureCallStack = new Stack<ICommand>();
@@ -60,12 +63,31 @@ public class StatementControlOverseer {
         this.activeControlledCommand = command;
     }
 
+    public void openAttemptCommand(IAttemptCommand command) {
+        this.procedureCallStack.push(command);
+        this.activeControlledCommand = command;
+
+        this.isInTry = true;
+    }
+
     public boolean isInPositiveRule() {
         return this.isInPositive;
     }
 
     public void reportExitPositiveRule() {
         this.isInPositive = false;
+    }
+
+    public boolean isInTryBlock() {
+        return this.isInTry;
+    }
+
+    public void reportExitTryBlock() {
+        this.isInTry = false;
+    }
+
+    public void setCurrentCatchClause(IAttemptCommand.CatchTypeEnum catchTypeEnum) {
+        this.currentCatchType = catchTypeEnum;
     }
 
     /*
@@ -133,6 +155,14 @@ public class StatementControlOverseer {
                         controlledCommand.addPositiveCommand(childCommand);
                     else
                         controlledCommand.addNegativeCommand(childCommand);
+                } else if (parentCommand instanceof TryCommand) {
+                    IAttemptCommand attemptCommand = (IAttemptCommand) parentCommand;
+
+                    if(isInTryBlock()) {
+                        attemptCommand.addTryCommand(childCommand);
+                    } else {
+                        attemptCommand.addCatchCommand(this.currentCatchType, childCommand);
+                    }
                 }
             }
         }
