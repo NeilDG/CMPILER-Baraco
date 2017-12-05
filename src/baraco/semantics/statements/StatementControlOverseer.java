@@ -22,6 +22,9 @@ public class StatementControlOverseer {
     private ICommand activeControlledCommand = null;
 
     private boolean isInPositive = true; //used for conditional statements to indicate if the series of commands should go to the positive command list.
+    private boolean isInTry = false;
+
+    private IAttemptCommand.CatchTypeEnum currentCatchType = null;
 
     private StatementControlOverseer() {
         this.procedureCallStack = new Stack<ICommand>();
@@ -37,6 +40,7 @@ public class StatementControlOverseer {
         sharedInstance.procedureCallStack.clear();
         //sharedInstance.rootControlledCommand = null;
         sharedInstance.activeControlledCommand = null;
+        sharedInstance.currentCatchType = null;
     }
 
     public void openConditionalCommand(IConditionalCommand command) {
@@ -60,12 +64,35 @@ public class StatementControlOverseer {
         this.activeControlledCommand = command;
     }
 
+    public void openAttemptCommand(IAttemptCommand command) {
+        this.procedureCallStack.push(command);
+        this.activeControlledCommand = command;
+
+        this.isInTry = true;
+    }
+
     public boolean isInPositiveRule() {
         return this.isInPositive;
     }
 
     public void reportExitPositiveRule() {
         this.isInPositive = false;
+    }
+
+    public boolean isInTryBlock() {
+        return this.isInTry;
+    }
+
+    public IAttemptCommand.CatchTypeEnum getCurrentCatchType () {
+        return this.currentCatchType;
+    }
+
+    public void reportExitTryBlock() {
+        this.isInTry = false;
+    }
+
+    public void setCurrentCatchClause(IAttemptCommand.CatchTypeEnum catchTypeEnum) {
+        this.currentCatchType = catchTypeEnum;
     }
 
     /*
@@ -122,7 +149,7 @@ public class StatementControlOverseer {
             this.activeControlledCommand = parentCommand;
 
 
-            if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand) {
+            if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand || childCommand instanceof TryCommand) {
                 if (parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
                     IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                     controlledCommand.addCommand(childCommand);
@@ -133,6 +160,14 @@ public class StatementControlOverseer {
                         controlledCommand.addPositiveCommand(childCommand);
                     else
                         controlledCommand.addNegativeCommand(childCommand);
+                } else if (parentCommand instanceof TryCommand) {
+                    IAttemptCommand attemptCommand = (IAttemptCommand) parentCommand;
+
+                    if(isInTryBlock()) {
+                        attemptCommand.addTryCommand(childCommand);
+                    } else {
+                        attemptCommand.addCatchCommand(this.currentCatchType, childCommand);
+                    }
                 }
             }
         }
@@ -147,6 +182,10 @@ public class StatementControlOverseer {
 
     public boolean isInControlledCommand() {
         return (this.activeControlledCommand!= null && this.activeControlledCommand instanceof IControlledCommand);
+    }
+
+    public boolean isInAttemptCommand() {
+        return (this.activeControlledCommand!= null && this.activeControlledCommand instanceof IAttemptCommand);
     }
 
     public ICommand getActiveControlledCommand() {

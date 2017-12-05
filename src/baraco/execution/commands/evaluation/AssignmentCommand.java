@@ -67,6 +67,9 @@ public class AssignmentCommand implements ICommand {
         EvaluationCommand evaluationCommand = new EvaluationCommand(this.rightHandExprCtx);
         evaluationCommand.execute();
 
+        if(evaluationCommand.hasException())
+            return;
+
         if(this.isLeftHandArrayAccessor()) {
 
             if(evaluationCommand.isNumericResult())
@@ -108,6 +111,8 @@ public class AssignmentCommand implements ICommand {
 
         EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
         evaluationCommand.execute();
+
+        ExecutionManager.getInstance().setCurrentCheckedLineNumber(arrayIndexExprCtx.getStart().getLine());
 
         //create a new array value to replace value at specified index
         BaracoValue newArrayValue = new BaracoValue(null, baracoArray.getPrimitiveType());

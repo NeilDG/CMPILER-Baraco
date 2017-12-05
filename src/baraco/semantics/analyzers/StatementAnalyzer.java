@@ -41,6 +41,32 @@ public class StatementAnalyzer {
         }
 
         //a block statement
+        else if(isTRYStatement(ctx)) {
+
+            BlockContext blockContext = ctx.block();
+
+            TryCommand tryCommand = new TryCommand();
+            StatementControlOverseer.getInstance().openAttemptCommand(tryCommand);
+
+            BlockAnalyzer tryBlockAnalyzer = new BlockAnalyzer();
+            tryBlockAnalyzer.analyze(blockContext);
+
+            StatementControlOverseer.getInstance().reportExitTryBlock();
+
+            // loop through catch clauses available
+            for (CatchClauseContext cCContext:
+                    ctx.catchClause()) {
+
+                StatementControlOverseer.getInstance().setCurrentCatchClause(determineCatchType(cCContext.catchType()));
+
+                BlockAnalyzer catchBlockAnalyzer = new BlockAnalyzer();
+                catchBlockAnalyzer.analyze(cCContext.block());
+
+            }
+
+            StatementControlOverseer.getInstance().compileControlledCommand();
+            StatementControlOverseer.getInstance().setCurrentCatchClause(null);
+        }
         else if(ctx.block() != null) {
             BlockContext blockCtx = ctx.block();
 
@@ -124,9 +150,6 @@ public class StatementAnalyzer {
             System.out.println("Detected return expression: " +ctx.expression(0).getText());
             this.handleReturnStatement(ctx.expression(0));
         }
-        else if(isTRYStatement(ctx)) {
-
-        }
     }
 
     private void handlePrintStatement(StatementContext ctx) {
@@ -150,6 +173,15 @@ public class StatementAnalyzer {
         else if(statementControl.isInControlledCommand()) {
             IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
             controlledCommand.addCommand(printCommand);
+        }
+        else if (statementControl.isInAttemptCommand()) {
+            IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInTryBlock()) {
+                attemptCommand.addTryCommand(printCommand);
+            } else {
+                attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), printCommand);
+            }
         }
         else {
             ExecutionManager.getInstance().addCommand(printCommand);
@@ -183,6 +215,15 @@ public class StatementAnalyzer {
             IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
             controlledCommand.addCommand(scanCommand);
         }
+        else if (statementControl.isInAttemptCommand()) {
+            IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInTryBlock()) {
+                attemptCommand.addTryCommand(scanCommand);
+            } else {
+                attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), scanCommand);
+            }
+        }
         else {
             ExecutionManager.getInstance().addCommand(scanCommand);
         }
@@ -214,6 +255,15 @@ public class StatementAnalyzer {
             IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
             controlledCommand.addCommand(returnCommand);
         }
+        else if (statementControl.isInAttemptCommand()) {
+            IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInTryBlock()) {
+                attemptCommand.addTryCommand(returnCommand);
+            } else {
+                attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), returnCommand);
+            }
+        }
         else {
             ExecutionManager.getInstance().getCurrentFunction().setValidReturns(true);
 
@@ -227,7 +277,7 @@ public class StatementAnalyzer {
 
         return (tryTokenList.size() != 0);
     }
-
+/*
     public static boolean isCATCHStatement(StatementContext ctx) {
         List<TerminalNode> catchTokenList = ctx.getTokens(BaracoLexer.CATCH);
 
@@ -238,6 +288,18 @@ public class StatementAnalyzer {
         List<TerminalNode> finallyTokenList = ctx.getTokens(BaracoLexer.FINALLY);
 
         return (finallyTokenList.size() != 0);
+    }
+    */
+    public static IAttemptCommand.CatchTypeEnum determineCatchType(CatchTypeContext ctx) {
+        if (ctx.getTokens(BaracoLexer.ARITHMETIC_EXCEPTION).size() > 0) {
+            return IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION;
+        } else if (ctx.getTokens(BaracoLexer.ARRAY_BOUNDS_EXCEPTION).size() > 0) {
+            return IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS;
+        } else if (ctx.getTokens(BaracoLexer.NEGATIVE_ARRSIZE_EXCEPTION).size() > 0) {
+            return IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE;
+        }
+
+        return null;
     }
 
     public static boolean isFORStatement(StatementContext ctx) {

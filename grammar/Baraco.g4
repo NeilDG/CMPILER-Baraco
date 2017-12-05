@@ -401,11 +401,13 @@ printStatement
     ;
 
 catchClause
-    :   'catch' '(' ')' block
+    :   'catch' '(' catchType ')' block
     ;
 
 catchType
-    :   qualifiedName ('|' qualifiedName)*
+    :   ARRAY_BOUNDS_EXCEPTION
+    |   ARITHMETIC_EXCEPTION
+    |   NEGATIVE_ARRSIZE_EXCEPTION
     ;
 
 finallyBlock
@@ -647,6 +649,9 @@ PRINT         : 'print';
 PRINTLN       : 'println';
 END           : 'end';
 
+ARRAY_BOUNDS_EXCEPTION : 'ARRAY_BOUNDS_EXCEPTION';
+NEGATIVE_ARRSIZE_EXCEPTION : 'NEGATIVE_ARRSIZE_EXCEPTION';
+ARITHMETIC_EXCEPTION : 'ARITHMETIC_EXCEPTION';
 
 // �3.10.1 Integer Literals
 

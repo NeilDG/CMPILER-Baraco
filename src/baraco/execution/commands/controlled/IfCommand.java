@@ -62,6 +62,9 @@ public class IfCommand implements IConditionalCommand {
                         returned = true;
                         break;
                     }
+
+                    if (ExecutionManager.getInstance().isAborted())
+                        break;
                 }
             }
             //execute the negative commands
@@ -76,6 +79,8 @@ public class IfCommand implements IConditionalCommand {
                         returned = true;
                         break;
                     }
+                    if (ExecutionManager.getInstance().isAborted())
+                        break;
                 }
             }
         } catch (InterruptedException e) {

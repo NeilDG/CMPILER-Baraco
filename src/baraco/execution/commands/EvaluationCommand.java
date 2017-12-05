@@ -2,8 +2,11 @@ package baraco.execution.commands;
 
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.builder.ParserHandler;
+import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.*;
 import baraco.semantics.searching.VariableSearcher;
+import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.Expression;
@@ -30,6 +33,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private String stringResult = "";
 
     private boolean isNumeric;
+    private boolean hasException = false;
 
     public EvaluationCommand(ExpressionContext exprCtx) {
         this.parentExprCtx = exprCtx;
@@ -146,8 +150,23 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
             Expression evalEx = new Expression(this.modifiedExp);
 
-            this.resultValue = evalEx.eval(false);
-            this.stringResult = this.resultValue.toEngineeringString();
+            try {
+                this.resultValue = evalEx.eval(false);
+                this.stringResult = this.resultValue.toEngineeringString();
+            } catch (Expression.ExpressionException ex) {
+                this.resultValue = new BigDecimal(0);
+                this.stringResult = "";
+                this.hasException = true;
+            } catch (ArithmeticException ex) {
+                //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
+
+                ExecutionManager.getInstance().setCurrentCheckedLineNumber(this.parentExprCtx.getStart().getLine());
+                ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
+
+                this.resultValue = new BigDecimal(0);
+                this.stringResult = "";
+                this.hasException = true;
+            }
 
         }
 
@@ -302,15 +321,28 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             return;
         }
 
-        if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    "\"" + baracoValue.getValue().toString() + "\"");
-        } else if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    "'" + baracoValue.getValue().toString() + "'");
-        } else {
-            this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-                    baracoValue.getValue().toString());
+        try {
+
+            if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "\"" + baracoValue.getValue().toString() + "\"");
+            } else if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.CHAR) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "'" + baracoValue.getValue().toString() + "'");
+            } else {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        baracoValue.getValue().toString());
+            }
+
+        } catch (NullPointerException e) {
+            if (baracoValue.getPrimitiveType() == BaracoValue.PrimitiveType.INT) {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "0");
+            }else {
+                this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+                        "null");
+            }
+
         }
 
         //System.out.println("EVALUATED: " + modifiedExp);
@@ -327,7 +359,11 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
+                ExecutionManager.getInstance().setCurrentCheckedLineNumber(exprCtx.getStart().getLine());
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
+
+                if (arrayMobiValue == null)
+                    return;
 
                 if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
                     //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");
@@ -357,5 +393,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     public boolean isNumericResult() {
         return isNumeric;
+    }
+
+    public boolean hasException() {
+        return hasException;
     }
 }

@@ -243,6 +243,9 @@ public class BaracoMethod implements IControlledCommand{
                         break;
                     }
                 }
+
+                if (ExecutionManager.getInstance().isAborted())
+                    break;
             }
         } catch(InterruptedException e) {
             System.out.println(TAG + ": " + "Monitor block interrupted! " +e.getMessage());

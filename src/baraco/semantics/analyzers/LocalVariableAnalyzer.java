@@ -5,6 +5,7 @@ import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.builder.errorcheckers.TypeChecker;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.evaluation.MappingCommand;
@@ -181,6 +182,15 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
             else if(statementControl.isInControlledCommand()) {
                 IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
                 controlledCommand.addCommand(mappingCommand);
+            }
+            else if (statementControl.isInAttemptCommand()) {
+                IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+                if(statementControl.isInTryBlock()) {
+                    attemptCommand.addTryCommand(mappingCommand);
+                } else {
+                    attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), mappingCommand);
+                }
             }
             else {
                 ExecutionManager.getInstance().addCommand(mappingCommand);

@@ -52,7 +52,12 @@ public class WhileCommand implements IControlledCommand {
 
                     LocalVarTracker.getInstance().populateLocalVars(command);
 
+                    if (ExecutionManager.getInstance().isAborted())
+                        break;
                 }
+
+                if (ExecutionManager.getInstance().isAborted())
+                    break;
 
                 executionMonitor.tryExecution();
                 this.identifyVariables(); //identify variables again to detect changes to such variables used.

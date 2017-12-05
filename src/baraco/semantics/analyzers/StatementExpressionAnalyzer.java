@@ -7,6 +7,7 @@ import baraco.builder.ErrorRepository;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.execution.commands.controlled.IConditionalCommand;
 import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.evaluation.AssignmentCommand;
@@ -151,12 +152,6 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
                 if(stExCtx.expression() != null) {
                     ExpressionContext expCtx = stExCtx.expression();
 
-                    /*boolean notStatement = false;
-
-                    for (ExpressionContext eCtx:
-                         expCtx.expression()) {
-                    }*/
-
                     if (!(isAssignmentExpression(expCtx) ||
                             isAddAssignExpression(expCtx) ||
                             isSubAssignExpression(expCtx) ||
@@ -219,6 +214,15 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
         else if(statementControl.isInControlledCommand()) {
             IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
             controlledCommand.addCommand(command);
+        }
+        else if (statementControl.isInAttemptCommand()) {
+            IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInTryBlock()) {
+                attemptCommand.addTryCommand(command);
+            } else {
+                attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), command);
+            }
         }
         else {
             ExecutionManager.getInstance().addCommand(command);

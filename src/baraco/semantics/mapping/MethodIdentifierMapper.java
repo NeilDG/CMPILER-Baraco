@@ -2,6 +2,7 @@ package baraco.semantics.mapping;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.ParserHandler;
+import baraco.execution.ExecutionManager;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoMethod;
@@ -117,7 +118,11 @@ public class MethodIdentifierMapper implements ParseTreeListener, IValueMapper {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
+                ExecutionManager.getInstance().setCurrentCheckedLineNumber(exprCtx.getStart().getLine());
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
+
+                if (arrayMobiValue == null)
+                    return;
 
                 if (arrayMobiValue.getPrimitiveType() == BaracoValue.PrimitiveType.STRING) {
                     //this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.expression(0).getText() + "\\[([a-zA-Z0-9]*)]", "\"" + arrayMobiValue.getValue().toString() + "\"");

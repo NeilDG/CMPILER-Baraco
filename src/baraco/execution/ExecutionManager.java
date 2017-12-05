@@ -1,9 +1,12 @@
 package baraco.execution;
 
+import baraco.builder.BuildChecker;
+import baraco.builder.ErrorRepository;
 import baraco.execution.adders.IExecutionAdder;
 import baraco.execution.adders.MainExecutionAdder;
 import baraco.execution.adders.MethodExecutionAdder;
 import baraco.execution.commands.ICommand;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.BaracoMethod;
 import baraco.utils.notifications.NotificationCenter;
 import baraco.utils.notifications.Notifications;
@@ -32,6 +35,12 @@ public class ExecutionManager implements NotificationListener {
     private IExecutionAdder activeExecutionAdder;
     private MainExecutionAdder mainExecutionAdder;
 
+    private IAttemptCommand.CatchTypeEnum currentCatchType = null;
+    private IAttemptCommand currentTryCommand = null;
+
+    private boolean aborted = false;
+    private int currentCheckedLineNumber = -1;
+
     private ExecutionManager() {
         this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
         this.activeExecutionAdder = this.mainExecutionAdder;
@@ -47,9 +56,57 @@ public class ExecutionManager implements NotificationListener {
         sharedInstance.entryClassName = null;
         sharedInstance.clearAllActions();
 
+        sharedInstance.currentCatchType = null;
+        sharedInstance.currentTryCommand = null;
+        sharedInstance.aborted = false;
+
         NotificationCenter.getInstance().removeObserver(Notifications.ON_EXECUTION_FINISHED, sharedInstance);
     }
 
+    public IAttemptCommand getCurrentTryCommand() {
+        return this.currentTryCommand;
+    }
+
+    public void setCurrentTryCommand(IAttemptCommand command) {
+        this.currentTryCommand = command;
+    }
+
+    public IAttemptCommand.CatchTypeEnum getCurrentCatchType() {
+        return this.currentCatchType;
+    }
+
+    public void setCurrentCatchType(IAttemptCommand.CatchTypeEnum catchType) {
+
+        if (catchType == null) {
+            this.currentCatchType = null;
+            return;
+        }
+
+        if (this.currentTryCommand != null && this.currentTryCommand.hasCatchFor(catchType))
+            this.currentCatchType = catchType;
+        else {
+
+            this.aborted = true;
+
+            if (catchType == IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS, "", this.currentCheckedLineNumber);
+            } else if (catchType == IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_NEGATIVE_ARRAY_SIZE, "", this.currentCheckedLineNumber);
+            } else if (catchType == IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION) {
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARITHMETIC_EXCEPTION, "", this.currentCheckedLineNumber);
+            }
+
+            this.clearAllActions();
+        }
+    }
+
+    public boolean isAborted () {
+        return aborted;
+    }
+
+    public void setCurrentCheckedLineNumber (int n) {
+        this.currentCheckedLineNumber = n;
+    }
     /*
 	 * Reported by the parser walker if void main() has been found which means that an entry point for execution has been found.
 	 * Required the class name in which main() has been found

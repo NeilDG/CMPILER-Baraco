@@ -3,9 +3,13 @@ package baraco.semantics.analyzers;
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.IAttemptCommand;
+import baraco.execution.commands.controlled.IConditionalCommand;
+import baraco.execution.commands.controlled.IControlledCommand;
 import baraco.execution.commands.evaluation.ArrayInitializeCommand;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
+import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.semantics.utils.IdentifiedTokens;
@@ -122,6 +126,38 @@ public class ArrayAnalyzer implements ParseTreeListener {
 
     private void createInitializeCommand(BaracoParser.ArrayCreatorRestContext arrayCreatorCtx) {
         ArrayInitializeCommand arrayInitializeCommand = new ArrayInitializeCommand(this.declaredArray, arrayCreatorCtx);
-        ExecutionManager.getInstance().addCommand(arrayInitializeCommand);
+
+        //ExecutionManager.getInstance().addCommand(arrayInitializeCommand);
+
+        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+        //add to conditional controlled command
+        if(statementControl.isInConditionalCommand()) {
+            IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInPositiveRule()) {
+                conditionalCommand.addPositiveCommand(arrayInitializeCommand);
+            }
+            else {
+                conditionalCommand.addNegativeCommand(arrayInitializeCommand);
+            }
+        }
+
+        else if(statementControl.isInControlledCommand()) {
+            IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
+            controlledCommand.addCommand(arrayInitializeCommand);
+        }
+        else if (statementControl.isInAttemptCommand()) {
+            IAttemptCommand attemptCommand = (IAttemptCommand) statementControl.getActiveControlledCommand();
+
+            if(statementControl.isInTryBlock()) {
+                attemptCommand.addTryCommand(arrayInitializeCommand);
+            } else {
+                attemptCommand.addCatchCommand(statementControl.getCurrentCatchType(), arrayInitializeCommand);
+            }
+        }
+        else {
+            ExecutionManager.getInstance().addCommand(arrayInitializeCommand);
+        }
+
     }
 }

@@ -1,7 +1,10 @@
 package baraco.representations;
 
 import baraco.builder.ErrorRepository;
+import baraco.execution.ExecutionManager;
+import baraco.execution.commands.controlled.IAttemptCommand;
 import baraco.representations.BaracoValue.PrimitiveType;
+import baraco.semantics.statements.StatementControlOverseer;
 
 public class BaracoArray {
     private final static String TAG = "BaracoArray";
@@ -33,8 +36,15 @@ public class BaracoArray {
     }
 
     public void initializeSize(int size) {
-        this.baracoValueArray = new BaracoValue[size];
-        System.out.println(TAG + ": Mobi array initialized to size " +this.baracoValueArray.length);
+        try {
+            this.baracoValueArray = new BaracoValue[size];
+        } catch (NegativeArraySizeException ex) {
+            this.baracoValueArray = null;
+
+            //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE);
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE);
+        }
+        //System.out.println(TAG + ": Mobi array initialized to size " +this.baracoValueArray.length);
     }
 
     public int getSize() {
@@ -42,17 +52,21 @@ public class BaracoArray {
     }
 
     public void updateValueAt(BaracoValue mobiValue, int index) {
-        if(index >= this.baracoValueArray.length) {
-            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+        if(index >= this.baracoValueArray.length || index <= -1) {
+            //System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
+
             return;
         }
         this.baracoValueArray[index] = mobiValue;
     }
 
     public BaracoValue getValueAt(int index) {
-        if(index >= this.baracoValueArray.length) {
-            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
-            return this.baracoValueArray[this.baracoValueArray.length - 1];
+        if(index >= this.baracoValueArray.length || index <= -1) {
+//            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
+
+            return null;
         }
         else {
             return this.baracoValueArray[index];

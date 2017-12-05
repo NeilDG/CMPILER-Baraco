@@ -310,10 +310,12 @@ public class View extends Application {
 
         });
 
-        console.getChildren().add(errorPrefix);
-        console.getChildren().add(line);
-        console.getChildren().add(errorSuffix);
-        console.getChildren().add(new Text("\n"));
+        Platform.runLater(() -> {
+            console.getChildren().add(errorPrefix);
+            console.getChildren().add(line);
+            console.getChildren().add(errorSuffix);
+            console.getChildren().add(new Text("\n"));
+        });
 
     }
 
