@@ -67,6 +67,9 @@ public class AssignmentCommand implements ICommand {
         EvaluationCommand evaluationCommand = new EvaluationCommand(this.rightHandExprCtx);
         evaluationCommand.execute();
 
+        if(evaluationCommand.hasException())
+            return;
+
         if(this.isLeftHandArrayAccessor()) {
 
             if(evaluationCommand.isNumericResult())

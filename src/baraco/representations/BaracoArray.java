@@ -64,7 +64,7 @@ public class BaracoArray {
             System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
             ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
 
-            return this.baracoValueArray[this.baracoValueArray.length - 1];
+            return null;
         }
         else {
             return this.baracoValueArray[index];

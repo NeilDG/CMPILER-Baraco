@@ -98,18 +98,4 @@ public class PrintCommand implements ICommand, ParseTreeListener {
         return this.statementToPrint;
     }
 
-    private void evaluateArrayPrint(BaracoValue baracoValue, PrimaryContext primaryCtx) {
-
-        //move up and determine expression contexts
-        ExpressionContext parentExprCtx = (ExpressionContext) primaryCtx.getParent().getParent();
-        ExpressionContext arrayIndexExprCtx = parentExprCtx.expression(1);
-
-        EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
-        evaluationCommand.execute();
-
-        BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
-        BaracoValue arrayMobiValue = baracoArray.getValueAt(evaluationCommand.getResult().intValue());
-
-        this.statementToPrint += arrayMobiValue.getValue().toString();
-    }
 }

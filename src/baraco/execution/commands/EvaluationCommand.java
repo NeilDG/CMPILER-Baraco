@@ -33,6 +33,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
     private String stringResult = "";
 
     private boolean isNumeric;
+    private boolean hasException = false;
 
     public EvaluationCommand(ExpressionContext exprCtx) {
         this.parentExprCtx = exprCtx;
@@ -155,12 +156,14 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
             } catch (Expression.ExpressionException ex) {
                 this.resultValue = new BigDecimal(0);
                 this.stringResult = "";
+                this.hasException = true;
             } catch (ArithmeticException ex) {
                 //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
                 ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
 
                 this.resultValue = new BigDecimal(0);
                 this.stringResult = "";
+                this.hasException = true;
             }
 
         }
@@ -387,5 +390,9 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 
     public boolean isNumericResult() {
         return isNumeric;
+    }
+
+    public boolean hasException() {
+        return hasException;
     }
 }
