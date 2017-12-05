@@ -58,10 +58,6 @@ public class IfCommand implements IConditionalCommand {
 
                     LocalVarTracker.getInstance().populateLocalVars(command);
 
-                    if (ExecutionManager.getInstance().getCurrentFunction() != null) {
-                        System.out.println(ExecutionManager.getInstance().getCurrentFunction().getMethodName());
-                    }
-
                     if (command instanceof ReturnCommand) {
                         returned = true;
                         break;
