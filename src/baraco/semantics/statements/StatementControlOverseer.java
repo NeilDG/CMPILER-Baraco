@@ -149,7 +149,7 @@ public class StatementControlOverseer {
             this.activeControlledCommand = parentCommand;
 
 
-            if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand) {
+            if (childCommand instanceof ForCommand || childCommand instanceof WhileCommand || childCommand instanceof TryCommand) {
                 if (parentCommand instanceof ForCommand || parentCommand instanceof WhileCommand) {
                     IControlledCommand controlledCommand = (IControlledCommand) parentCommand;
                     controlledCommand.addCommand(childCommand);

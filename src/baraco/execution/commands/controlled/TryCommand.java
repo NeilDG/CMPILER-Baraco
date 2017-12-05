@@ -68,14 +68,16 @@ public class TryCommand implements IAttemptCommand {
 
             if (ExecutionManager.getInstance().getCurrentCatchType() != null) {
 
-                if (catchCommands.get(ExecutionManager.getInstance().getCurrentCatchType()) != null) {
-                    for (ICommand command : catchCommands.get(ExecutionManager.getInstance().getCurrentCatchType())) {
+                List<ICommand> currentCatchCommands = catchCommands.get(ExecutionManager.getInstance().getCurrentCatchType());
+
+                if (currentCatchCommands != null) {
+                    ExecutionManager.getInstance().setCurrentCatchType(null);
+                    ExecutionManager.getInstance().setCurrentTryCommand(null);
+
+                    for (ICommand command : currentCatchCommands) {
                         executionMonitor.tryExecution();
                         command.execute();
                     }
-
-                    ExecutionManager.getInstance().setCurrentCatchType(null);
-                    ExecutionManager.getInstance().setCurrentTryCommand(null);
                 }
 
             }

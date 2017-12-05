@@ -64,8 +64,8 @@ public class StatementAnalyzer {
 
             }
 
-            StatementControlOverseer.getInstance().setCurrentCatchClause(null);
             StatementControlOverseer.getInstance().compileControlledCommand();
+            StatementControlOverseer.getInstance().setCurrentCatchClause(null);
         }
         else if(ctx.block() != null) {
             BlockContext blockCtx = ctx.block();
