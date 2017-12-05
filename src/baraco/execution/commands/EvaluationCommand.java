@@ -159,6 +159,8 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 this.hasException = true;
             } catch (ArithmeticException ex) {
                 //StatementControlOverseer.getInstance().setCurrentCatchClause(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
+
+                ExecutionManager.getInstance().setCurrentCheckedLineNumber(this.parentExprCtx.getStart().getLine());
                 ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION);
 
                 this.resultValue = new BigDecimal(0);
@@ -357,6 +359,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
                 EvaluationCommand evCmd = new EvaluationCommand(exprCtx.expression(1));
                 evCmd.execute();
 
+                ExecutionManager.getInstance().setCurrentCheckedLineNumber(exprCtx.getStart().getLine());
                 BaracoValue arrayMobiValue = baracoArray.getValueAt(evCmd.getResult().intValue());
 
                 if (arrayMobiValue == null)

@@ -3,6 +3,7 @@ package baraco.execution.commands.evaluation;
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.BuildChecker;
 import baraco.builder.ErrorRepository;
+import baraco.execution.ExecutionManager;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.representations.BaracoArray;
@@ -38,6 +39,7 @@ public class ArrayInitializeCommand implements ICommand {
             EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
             evaluationCommand.execute();
 
+            ExecutionManager.getInstance().setCurrentCheckedLineNumber(exprCtx.getStart().getLine());
             this.assignedBaracoArray.initializeSize(evaluationCommand.getResult().intValue());
         }
 

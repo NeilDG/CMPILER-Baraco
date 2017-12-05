@@ -52,16 +52,18 @@ public class BaracoArray {
     }
 
     public void updateValueAt(BaracoValue mobiValue, int index) {
-        if(index >= this.baracoValueArray.length) {
-            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+        if(index >= this.baracoValueArray.length || index <= -1) {
+            //System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+            ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
+
             return;
         }
         this.baracoValueArray[index] = mobiValue;
     }
 
     public BaracoValue getValueAt(int index) {
-        if(index >= this.baracoValueArray.length) {
-            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
+        if(index >= this.baracoValueArray.length || index <= -1) {
+//            System.out.println("ERROR: " + String.format(ErrorRepository.getErrorMessage(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS), this.arrayIdentifier));
             ExecutionManager.getInstance().setCurrentCatchType(IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS);
 
             return null;

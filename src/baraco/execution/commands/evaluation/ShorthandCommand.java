@@ -111,6 +111,8 @@ public class ShorthandCommand implements ICommand {
         EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
         evaluationCommand.execute();
 
+        ExecutionManager.getInstance().setCurrentCheckedLineNumber(identifierNode.getSymbol().getLine());
+
         //create a new array value to replace value at specified index
         BaracoValue newArrayValue = new BaracoValue(null, baracoArray.getPrimitiveType());
         newArrayValue.setValue(resultString);

@@ -38,7 +38,7 @@ public class ErrorRepository {
         this.errorMessageDictionary.put(MULTIPLE_VARIABLE, "Duplicate declaration of variable %s at line %d. ");
         this.errorMessageDictionary.put(MULTIPLE_FUNCTION, "Duplicate method declaration %s at line %d. ");
         this.errorMessageDictionary.put(PARAMETER_COUNT_MISMATCH, "Argument size for method call %s at line %d does not match with its declaration. ");
-        this.errorMessageDictionary.put(RUNTIME_ARRAY_OUT_OF_BOUNDS, "Array %s out of bounds. Aborting operation. ");
+        this.errorMessageDictionary.put(RUNTIME_ARRAY_OUT_OF_BOUNDS, "Array out of bounds at line %d. Aborting operation. ");
         this.errorMessageDictionary.put(RUNTIME_ARITHMETIC_EXCEPTION, "Arithmetic exception at line %d. Aborting operation. ");
         this.errorMessageDictionary.put(RUNTIME_NEGATIVE_ARRAY_SIZE, "Negative array size at line %d. Aborting operation. ");
         this.errorMessageDictionary.put(MISSING_THIS_KEYWORD, "Missing 'this' keyword for method call %s line %d.");

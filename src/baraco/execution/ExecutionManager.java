@@ -39,6 +39,7 @@ public class ExecutionManager implements NotificationListener {
     private IAttemptCommand currentTryCommand = null;
 
     private boolean aborted = false;
+    private int currentCheckedLineNumber = -1;
 
     private ExecutionManager() {
         this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
@@ -88,11 +89,11 @@ public class ExecutionManager implements NotificationListener {
             this.aborted = true;
 
             if (catchType == IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS) {
-                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS, "");
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARRAY_OUT_OF_BOUNDS, "", this.currentCheckedLineNumber);
             } else if (catchType == IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE) {
-                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_NEGATIVE_ARRAY_SIZE, "");
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_NEGATIVE_ARRAY_SIZE, "", this.currentCheckedLineNumber);
             } else if (catchType == IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION) {
-                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARITHMETIC_EXCEPTION, "");
+                BuildChecker.reportCustomError(ErrorRepository.RUNTIME_ARITHMETIC_EXCEPTION, "", this.currentCheckedLineNumber);
             }
 
             this.clearAllActions();
@@ -103,6 +104,9 @@ public class ExecutionManager implements NotificationListener {
         return aborted;
     }
 
+    public void setCurrentCheckedLineNumber (int n) {
+        this.currentCheckedLineNumber = n;
+    }
     /*
 	 * Reported by the parser walker if void main() has been found which means that an entry point for execution has been found.
 	 * Required the class name in which main() has been found
