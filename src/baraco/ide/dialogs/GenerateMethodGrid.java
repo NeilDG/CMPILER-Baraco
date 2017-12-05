@@ -14,8 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import java.util.Optional;
-
 public class GenerateMethodGrid extends GridPane{
 
     private static final String TYPE_VOID = "void";
@@ -35,12 +33,17 @@ public class GenerateMethodGrid extends GridPane{
     private ComboBox<String> returnTypeComboBox;
     private RadioButton publicRadio;
     private RadioButton privateRadio;
-    private Node confirmButton;
+    private Node addThisButton;
+    private Node addAllButton;
+    private Label parameterErrorMessageLabel;
+    private Label errorMessageLabel;
 
-    public GenerateMethodGrid(TabPane tabPane, Node confirmButton) {
+    public GenerateMethodGrid(TabPane tabPane, Node addThisButton, Node addAllButton) {
         this.tabPane = tabPane;
-        this.confirmButton = confirmButton;
-        this.confirmButton.setDisable(true);
+        this.addThisButton = addThisButton;
+        this.addThisButton.setDisable(true);
+        this.addAllButton = addAllButton;
+        this.addAllButton.setDisable(true);
         this.setup();
     }
 
@@ -74,7 +77,7 @@ public class GenerateMethodGrid extends GridPane{
         this.add(new Label("Method Name:"), 0, 1);
         this.add(methodName, 1, 1);
 
-        Label errorMessageLabel = new Label("Method name exists!");
+        errorMessageLabel = new Label("Method name exists!");
         errorMessageLabel.setTextFill(Color.RED);
         errorMessageLabel.setVisible(false);
         this.add(errorMessageLabel, 2, 1);
@@ -109,7 +112,7 @@ public class GenerateMethodGrid extends GridPane{
         parametersScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         this.add(parametersScroll, 0, 4, GridPane.REMAINING, 1);
 
-        Label parameterErrorMessageLabel = new Label("Method contains invalid parameter names!");
+        parameterErrorMessageLabel = new Label("Method contains invalid parameter names!");
         parameterErrorMessageLabel.setTextFill(Color.RED);
         parameterErrorMessageLabel.setVisible(false);
         this.add(parameterErrorMessageLabel, 0, 5);
@@ -128,7 +131,8 @@ public class GenerateMethodGrid extends GridPane{
 
         Button addButton = new Button("Add");
         addButton.setOnAction(event -> {
-            confirmButton.setDisable(true);
+            addThisButton.setDisable(true);
+            addAllButton.setDisable(true);
             parameterErrorMessageLabel.setVisible(true);
             ComboBox dataTypes = new ComboBox(dataTypeOptions);
             dataTypes.setOnAction(chooseEvent -> {
@@ -141,18 +145,21 @@ public class GenerateMethodGrid extends GridPane{
             parameterName.textProperty().addListener((observable, oldValue, newValue) -> {
                 /*System.out.println("Parameter Name: " + newValue);
                 if (hasInvalidParameters()) {
-                    confirmButton.setDisable(true);
+                    addAllButton.setDisable(true);
                     parameterErrorMessageLabel.setVisible(true);
                     System.out.println("Found duplicate parameter name");
                 }
                 else {
-                    confirmButton.setDisable(false);
+                    addAllButton.setDisable(false);
                     parameterErrorMessageLabel.setVisible(false);
                 }*/
-                boolean valid = inputIsValid();
+                /*boolean valid = inputIsValid();
 
-                confirmButton.setDisable(!valid);
-                parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+                addThisButton.setDisable(!valid);
+                addAllButton.setDisable(!valid);
+                parameterErrorMessageLabel.setVisible(hasInvalidParameters());*/
+
+                validateInput();
                 updateSampleArea();
             });
 
@@ -162,8 +169,11 @@ public class GenerateMethodGrid extends GridPane{
 
             removeButton.setOnAction(value -> {
                 parametersHolder.getChildren().remove(parameters);
-                confirmButton.setDisable(!inputIsValid());
-                parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+                /*boolean invalid = !inputIsValid();
+                addThisButton.setDisable(invalid);
+                addAllButton.setDisable(invalid);
+                parameterErrorMessageLabel.setVisible(hasInvalidParameters());*/
+                validateInput();
                 updateSampleArea();
             });
 
@@ -181,10 +191,12 @@ public class GenerateMethodGrid extends GridPane{
 
         // Do some validation (using the Java 8 lambda syntax).
         methodName.textProperty().addListener((observable, oldValue, newValue) -> {
-            boolean methodNameExists = methodNameExists();
-            //boolean invalid = newValue.trim().isEmpty() || methodNameExists;
-            confirmButton.setDisable(!inputIsValid());
-            errorMessageLabel.setVisible(methodNameExists);
+            /*boolean methodNameExists = methodNameExists();
+            boolean invalid = !inputIsValid();
+            addThisButton.setDisable(invalid);
+            addAllButton.setDisable(invalid);
+            errorMessageLabel.setVisible(methodNameExists);*/
+            validateInput();
             updateSampleArea();
         });
 
@@ -262,7 +274,7 @@ public class GenerateMethodGrid extends GridPane{
         this.sampleArea.setText(generateSampleString());
     }
 
-    private String generateSampleString() {
+    public String generateSampleString() {
         BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
         methodTemplate.setMethodName(methodName.getText().trim());
         methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
@@ -292,5 +304,13 @@ public class GenerateMethodGrid extends GridPane{
         }
 
         return methodTemplate.toString();
+    }
+
+    public void validateInput() {
+        boolean invalid = !inputIsValid();
+        addThisButton.setDisable(invalid);
+        addAllButton.setDisable(invalid);
+        parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+        errorMessageLabel.setVisible(methodNameExists());
     }
 }

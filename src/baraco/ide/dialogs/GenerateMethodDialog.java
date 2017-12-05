@@ -33,6 +33,8 @@ public class GenerateMethodDialog {
 
     private Dialog<String> dialog;
     private TabPane tabPane;
+    private Node addThisButton;
+    private Node addAllButton;
 
     public GenerateMethodDialog() {
         this.dialog = new Dialog<>();
@@ -49,27 +51,28 @@ public class GenerateMethodDialog {
         ButtonType addThisButtonType = new ButtonType("Add This", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, addAllButtonType, addThisButtonType);
 
-        Node confirmButton = dialog.getDialogPane().lookupButton(addThisButtonType);
-        //confirmButton.setDisable(true);
+        addThisButton = dialog.getDialogPane().lookupButton(addThisButtonType);
+        addAllButton = dialog.getDialogPane().lookupButton(addAllButtonType);
+        //addThisButton.setDisable(true);
 
         VBox root = new VBox();
 
         TabPane tabPane = new TabPane();
         Tab tab = new Tab();
         tab.setText("Function 1");
-        tab.setContent(new GenerateMethodGrid(tabPane, confirmButton));
+        tab.setContent(new GenerateMethodGrid(tabPane, addThisButton, addAllButton));
         tabPane.getTabs().add(tab);
 
-        tab = new Tab();
-        tab.setText("Function 2");
-        tab.setContent(new GenerateMethodGrid(tabPane, confirmButton));
-        tabPane.getTabs().add(tab);
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            GenerateMethodGrid grid = (GenerateMethodGrid) newValue.getContent();
+            grid.validateInput();
+        });
 
 
-        Button addButton = new Button("Add Another");
+        Button addButton = new Button("Anotha One. DJ KHALED!");
         addButton.setOnAction(event -> {
             Tab newTab = new Tab("Function " + (tabPane.getTabs().size() + 1));
-            newTab.setContent(new GenerateMethodGrid(tabPane, confirmButton));
+            newTab.setContent(new GenerateMethodGrid(tabPane, addThisButton, addAllButton));
             tabPane.getTabs().add(newTab);
             tabPane.getSelectionModel().select(newTab);
         });
@@ -85,10 +88,20 @@ public class GenerateMethodDialog {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addThisButtonType) {
                 //return generateSampleString();
-                System.out.println("Add One Pressed");
+                System.out.println("Add This Pressed");
+                GenerateMethodGrid grid = (GenerateMethodGrid) tabPane.getSelectionModel().getSelectedItem().getContent();
+                return grid.generateSampleString();
             }
             else if (dialogButton == addAllButtonType) {
+                String output = "";
                 System.out.println("Add All Pressed");
+                for (Tab functionTab : tabPane.getTabs()) {
+                    GenerateMethodGrid grid = (GenerateMethodGrid) functionTab.getContent();
+                    output += grid.generateSampleString();
+                    output += "\n\n";
+                }
+
+                return output;
             }
             return null;
         });
