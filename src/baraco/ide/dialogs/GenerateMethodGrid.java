@@ -260,8 +260,7 @@ public class GenerateMethodGrid extends GridPane{
                 }
                 TextField methodNameTextField = (TextField) tabGrid.lookup("#method-name");
                 String text = methodNameTextField.getText();
-                System.out.println("At Tab: " + tab.getText() + " found: " + text);
-
+                
                 if (tabGrid != this && text.equals(methodName.getText())) {
                     return true;
                 }
@@ -306,10 +305,22 @@ public class GenerateMethodGrid extends GridPane{
         return methodTemplate.toString();
     }
 
+    public boolean validateGlobally() {
+        for (Tab tab : tabPane.getTabs()) {
+            GenerateMethodGrid tabGrid = (GenerateMethodGrid) tab.getContent();
+
+            if (!tabGrid.inputIsValid()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public void validateInput() {
         boolean invalid = !inputIsValid();
         addThisButton.setDisable(invalid);
-        addAllButton.setDisable(invalid);
+        addAllButton.setDisable(!validateGlobally());
         parameterErrorMessageLabel.setVisible(hasInvalidParameters());
         errorMessageLabel.setVisible(methodNameExists());
     }
