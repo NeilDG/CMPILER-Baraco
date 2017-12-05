@@ -47,22 +47,33 @@ public class GenerateMethodDialog {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.FINISH);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, confirmButtonType);
 
-        // Create the username and password labels and fields.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
+        ToggleGroup radioButtons = new ToggleGroup();
+        RadioButton publicRadio = new RadioButton("public");
+        publicRadio.setToggleGroup(radioButtons);
+        publicRadio.setSelected(true);
+        RadioButton privateRadio = new RadioButton("private");
+        privateRadio.setToggleGroup(radioButtons);
+
+        HBox radioButtonHolder = new HBox(10);
+        radioButtonHolder.getChildren().addAll(publicRadio, privateRadio);
+
+        grid.add(radioButtonHolder, 0, 0);
+
         methodName = new TextField();
         methodName.setPromptText("Method Name");
 
-        grid.add(new Label("Method Name:"), 0, 0);
-        grid.add(methodName, 1, 0);
+        grid.add(new Label("Method Name:"), 0, 1);
+        grid.add(methodName, 1, 1);
 
         Label errorMessageLabel = new Label("Method name exists!");
         errorMessageLabel.setTextFill(Color.RED);
         errorMessageLabel.setVisible(false);
-        grid.add(errorMessageLabel, 2, 0);
+        grid.add(errorMessageLabel, 2, 1);
 
         ObservableList<String> options =
                 FXCollections.observableArrayList(
@@ -79,22 +90,22 @@ public class GenerateMethodDialog {
         ComboBox returnTypeComboBox = new ComboBox(options);
         returnTypeComboBox.getSelectionModel().selectFirst();
 
-        grid.add(new Label("Return Type:"), 0, 1);
-        grid.add(returnTypeComboBox, 1, 1);
+        grid.add(new Label("Return Type:"), 0, 2);
+        grid.add(returnTypeComboBox, 1, 2);
 
-        grid.add(new Label("Parameters:"), 0, 2);
+        grid.add(new Label("Parameters:"), 0, 3);
 
         parametersHolder = new VBox();
         parametersHolder.setPrefHeight(200);
         parametersHolder.setPrefWidth(350);
         ScrollPane parametersScroll = new ScrollPane(parametersHolder);
         parametersScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        grid.add(parametersScroll, 0, 3, GridPane.REMAINING, 1);
+        grid.add(parametersScroll, 0, 4, GridPane.REMAINING, 1);
 
         Label parameterErrorMessageLabel = new Label("Method contains invalid parameter names!");
         parameterErrorMessageLabel.setTextFill(Color.RED);
         parameterErrorMessageLabel.setVisible(false);
-        grid.add(parameterErrorMessageLabel, 0, 4);
+        grid.add(parameterErrorMessageLabel, 0, 5);
 
         ObservableList<String> dataTypeOptions =
                 FXCollections.observableArrayList(
@@ -150,7 +161,7 @@ public class GenerateMethodDialog {
 
             parametersHolder.getChildren().add(parameters);
         });
-        grid.add(addButton, 1, 2);
+        grid.add(addButton, 1, 3);
 
 
 
@@ -175,6 +186,7 @@ public class GenerateMethodDialog {
                 BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
                 methodTemplate.setMethodName(methodName.getText().trim());
                 methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
+                methodTemplate.setIsPublic(publicRadio.isSelected());
 
                 for (Node node : parametersHolder.getChildren()) {
                     HBox child = (HBox) node;

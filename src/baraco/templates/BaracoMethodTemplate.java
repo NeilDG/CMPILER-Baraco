@@ -8,6 +8,7 @@ public class BaracoMethodTemplate {
 
     String methodName;
     String returnType;
+    boolean isPublic;
     ArrayList<BaracoMethodTemplateParameter> parameters;
 
     public BaracoMethodTemplate() {
@@ -28,6 +29,11 @@ public class BaracoMethodTemplate {
         return this;
     }
 
+    public BaracoMethodTemplate setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+        return this;
+    }
+
     public BaracoMethodTemplate addParameter(BaracoMethodTemplateParameter parameter) {
         this.parameters.add(parameter);
         return this;
@@ -45,7 +51,7 @@ public class BaracoMethodTemplate {
 
     @Override
     public String toString() {
-        String method = "\tprivate " + returnType + " " + methodName + "(";
+        String method = "\t" + (isPublic ? "public " : "private ") + returnType + " " + methodName + "(";
 
         for (int i = 0; i < parameters.size() - 1; i++) {
             method += parameters.get(i).toString() + ", ";
@@ -56,8 +62,9 @@ public class BaracoMethodTemplate {
         }
 
         method += "):\n\t\t" +
-                "// Code goes here" +
-                "\n\tend";
+                "// Code goes here";
+
+        method += "\n\tend";
 
 
         return method;
