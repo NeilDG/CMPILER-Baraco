@@ -32,6 +32,10 @@ public class GenerateMethodDialog {
     private Dialog<String> dialog;
     private VBox parametersHolder;
     private TextField methodName;
+    private TextArea sampleArea;
+    private ComboBox<String> returnTypeComboBox;
+    private RadioButton publicRadio;
+    private RadioButton privateRadio;
 
     public GenerateMethodDialog() {
         this.dialog = new Dialog<>();
@@ -53,11 +57,17 @@ public class GenerateMethodDialog {
         grid.setPadding(new Insets(20, 150, 10, 10));
 
         ToggleGroup radioButtons = new ToggleGroup();
-        RadioButton publicRadio = new RadioButton("public");
+        publicRadio = new RadioButton("public");
         publicRadio.setToggleGroup(radioButtons);
         publicRadio.setSelected(true);
-        RadioButton privateRadio = new RadioButton("private");
+        publicRadio.setOnAction(event -> {
+            updateSampleArea();
+        });
+        privateRadio = new RadioButton("private");
         privateRadio.setToggleGroup(radioButtons);
+        privateRadio.setOnAction(event -> {
+            updateSampleArea();
+        });
 
         HBox radioButtonHolder = new HBox(10);
         radioButtonHolder.getChildren().addAll(publicRadio, privateRadio);
@@ -87,8 +97,11 @@ public class GenerateMethodDialog {
                         TYPE_DECIMAL_ARRAY,
                         TYPE_BOOL_ARRAY
                 );
-        ComboBox returnTypeComboBox = new ComboBox(options);
+        returnTypeComboBox = new ComboBox(options);
         returnTypeComboBox.getSelectionModel().selectFirst();
+        returnTypeComboBox.setOnAction(event -> {
+            updateSampleArea();
+        });
 
         grid.add(new Label("Return Type:"), 0, 2);
         grid.add(returnTypeComboBox, 1, 2);
@@ -128,6 +141,9 @@ public class GenerateMethodDialog {
             confirmButton.setDisable(true);
             parameterErrorMessageLabel.setVisible(true);
             ComboBox dataTypes = new ComboBox(dataTypeOptions);
+            dataTypes.setOnAction(chooseEvent -> {
+                updateSampleArea();
+            });
             dataTypes.getSelectionModel().selectFirst();
 
             TextField parameterName = new TextField();
@@ -147,6 +163,7 @@ public class GenerateMethodDialog {
 
                 confirmButton.setDisable(!valid);
                 parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+                updateSampleArea();
             });
 
             Button removeButton = new Button("X");
@@ -157,13 +174,19 @@ public class GenerateMethodDialog {
                 parametersHolder.getChildren().remove(parameters);
                 confirmButton.setDisable(!inputIsValid());
                 parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+                updateSampleArea();
             });
 
             parametersHolder.getChildren().add(parameters);
         });
         grid.add(addButton, 1, 3);
 
+        sampleArea = new TextArea();
+        sampleArea.setEditable(false);
+        sampleArea.setPrefWidth(200);
+        updateSampleArea();
 
+        grid.add(sampleArea, 0, 6, GridPane.REMAINING, 1);
 
 
         // Do some validation (using the Java 8 lambda syntax).
@@ -172,6 +195,7 @@ public class GenerateMethodDialog {
             boolean invalid = newValue.trim().isEmpty() || methodNameExists;
             confirmButton.setDisable(!inputIsValid());
             errorMessageLabel.setVisible(methodNameExists);
+            updateSampleArea();
         });
 
         dialog.getDialogPane().setContent(grid);
@@ -182,36 +206,7 @@ public class GenerateMethodDialog {
         // Convert the result to a string
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                // Create BaracoMethodTemplate then convert to string
-                BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
-                methodTemplate.setMethodName(methodName.getText().trim());
-                methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
-                methodTemplate.setIsPublic(publicRadio.isSelected());
-
-                for (Node node : parametersHolder.getChildren()) {
-                    HBox child = (HBox) node;
-
-                    ObservableList<Node> parameterInfo = child.getChildren();
-
-                    String parameterName = ((TextField) parameterInfo.get(1)).getText().trim();
-
-                    if (parameterName.isEmpty()) {
-                        continue;
-                    }
-
-                    String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
-                    BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
-
-                    if (methodTemplate.hasParameter(parameter)) {
-                        ErrorDialogHandler errorDialogHandler = new ErrorDialogHandler();
-                        errorDialogHandler.showErrorDialog("Duplicate parameter! Try again!");
-                        return null;
-                    }
-
-                    methodTemplate.addParameter(parameter);
-                }
-
-                return methodTemplate.toString();
+                return generateSampleString();
 
             }
             return null;
@@ -256,5 +251,41 @@ public class GenerateMethodDialog {
         hasInvalidParameters();
 
         return !methodNameExists && !invalidMethodName && !hasInvalidParameters();
+    }
+
+    private void updateSampleArea() {
+        this.sampleArea.setText(generateSampleString());
+    }
+
+    private String generateSampleString() {
+        BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
+        methodTemplate.setMethodName(methodName.getText().trim());
+        methodTemplate.setReturnType(returnTypeComboBox.getValue().toString());
+        methodTemplate.setIsPublic(publicRadio.isSelected());
+
+        for (Node node : parametersHolder.getChildren()) {
+            HBox child = (HBox) node;
+
+            ObservableList<Node> parameterInfo = child.getChildren();
+
+            String parameterName = ((TextField) parameterInfo.get(1)).getText().trim();
+
+            if (parameterName.isEmpty()) {
+                continue;
+            }
+
+            String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
+            BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
+
+            /*if (methodTemplate.hasParameter(parameter)) {
+                ErrorDialogHandler errorDialogHandler = new ErrorDialogHandler();
+                errorDialogHandler.showErrorDialog("Duplicate parameter! Try again!");
+                return null;
+            }*/ 
+
+            methodTemplate.addParameter(parameter);
+        }
+
+        return methodTemplate.toString();
     }
 }
