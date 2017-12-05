@@ -57,11 +57,15 @@ public class GenerateMethodDialog {
 
         VBox root = new VBox();
 
-        TabPane tabPane = new TabPane();
+        tabPane = new TabPane();
         Tab tab = new Tab();
         tab.setText("Function 1");
         tab.setContent(new GenerateMethodGrid(tabPane, addThisButton, addAllButton));
         tabPane.getTabs().add(tab);
+
+        tab.setOnClosed(event -> {
+            validateInput();
+        });
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             GenerateMethodGrid grid = (GenerateMethodGrid) newValue.getContent();
@@ -73,6 +77,9 @@ public class GenerateMethodDialog {
         addButton.setOnAction(event -> {
             Tab newTab = new Tab("Function " + (tabPane.getTabs().size() + 1));
             newTab.setContent(new GenerateMethodGrid(tabPane, addThisButton, addAllButton));
+            newTab.setOnClosed(closeEvent -> {
+                validateInput();
+            });
             tabPane.getTabs().add(newTab);
             tabPane.getSelectionModel().select(newTab);
         });
@@ -112,5 +119,18 @@ public class GenerateMethodDialog {
         Optional<String> result = dialog.showAndWait();
 
         return result.get();
+    }
+
+    public void validateInput() {
+        addThisButton.setDisable(true);
+        addAllButton.setDisable(true);
+
+        for (Tab tab : tabPane.getTabs()) {
+            if (tab == null)
+                continue;
+
+            GenerateMethodGrid grid = (GenerateMethodGrid) tab.getContent();
+            grid.validateInput();
+        }
     }
 }
