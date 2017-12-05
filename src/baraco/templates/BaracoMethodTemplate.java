@@ -35,12 +35,12 @@ public class BaracoMethodTemplate {
 
     public boolean hasParameter(BaracoMethodTemplateParameter parameter) {
         for (BaracoMethodTemplateParameter param : parameters) {
-            if (param.getParameterName().equals(parameter)) {
-                return false;
+            if (param.getParameterName().equals(parameter.getParameterName())) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     @Override

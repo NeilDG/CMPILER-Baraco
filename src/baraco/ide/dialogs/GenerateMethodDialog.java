@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class GenerateMethodDialog {
@@ -28,7 +29,9 @@ public class GenerateMethodDialog {
     private static final String TYPE_DECIMAL_ARRAY = "decimal[]";
     private static final String TYPE_BOOL_ARRAY = "bool[]";
 
-    Dialog<String> dialog;
+    private Dialog<String> dialog;
+    private VBox parametersHolder;
+    private TextField methodName;
 
     public GenerateMethodDialog() {
         this.dialog = new Dialog<>();
@@ -50,7 +53,7 @@ public class GenerateMethodDialog {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        TextField methodName = new TextField();
+        methodName = new TextField();
         methodName.setPromptText("Method Name");
 
         grid.add(new Label("Method Name:"), 0, 0);
@@ -81,12 +84,17 @@ public class GenerateMethodDialog {
 
         grid.add(new Label("Parameters:"), 0, 2);
 
-        VBox parametersHolder = new VBox();
+        parametersHolder = new VBox();
         parametersHolder.setPrefHeight(200);
         parametersHolder.setPrefWidth(350);
         ScrollPane parametersScroll = new ScrollPane(parametersHolder);
         parametersScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         grid.add(parametersScroll, 0, 3, GridPane.REMAINING, 1);
+
+        Label parameterErrorMessageLabel = new Label("Method contains invalid parameter names!");
+        parameterErrorMessageLabel.setTextFill(Color.RED);
+        parameterErrorMessageLabel.setVisible(false);
+        grid.add(parameterErrorMessageLabel, 0, 4);
 
         ObservableList<String> dataTypeOptions =
                 FXCollections.observableArrayList(
@@ -100,13 +108,35 @@ public class GenerateMethodDialog {
                         TYPE_BOOL_ARRAY
                 );
 
+        // Enable/Disable login button depending on whether a username was entered.
+        Node confirmButton = dialog.getDialogPane().lookupButton(confirmButtonType);
+        confirmButton.setDisable(true);
+
         Button addButton = new Button("Add");
         addButton.setOnAction(event -> {
+            confirmButton.setDisable(true);
+            parameterErrorMessageLabel.setVisible(true);
             ComboBox dataTypes = new ComboBox(dataTypeOptions);
             dataTypes.getSelectionModel().selectFirst();
 
             TextField parameterName = new TextField();
             parameterName.setPromptText("Parameter Name");
+            parameterName.textProperty().addListener((observable, oldValue, newValue) -> {
+                /*System.out.println("Parameter Name: " + newValue);
+                if (hasInvalidParameters()) {
+                    confirmButton.setDisable(true);
+                    parameterErrorMessageLabel.setVisible(true);
+                    System.out.println("Found duplicate parameter name");
+                }
+                else {
+                    confirmButton.setDisable(false);
+                    parameterErrorMessageLabel.setVisible(false);
+                }*/
+                boolean valid = inputIsValid();
+
+                confirmButton.setDisable(!valid);
+                parameterErrorMessageLabel.setVisible(hasInvalidParameters());
+            });
 
             Button removeButton = new Button("X");
 
@@ -114,6 +144,8 @@ public class GenerateMethodDialog {
 
             removeButton.setOnAction(value -> {
                 parametersHolder.getChildren().remove(parameters);
+                confirmButton.setDisable(!inputIsValid());
+                parameterErrorMessageLabel.setVisible(hasInvalidParameters());
             });
 
             parametersHolder.getChildren().add(parameters);
@@ -121,15 +153,13 @@ public class GenerateMethodDialog {
         grid.add(addButton, 1, 2);
 
 
-        // Enable/Disable login button depending on whether a username was entered.
-        Node confirmButton = dialog.getDialogPane().lookupButton(confirmButtonType);
-        confirmButton.setDisable(true);
+
 
         // Do some validation (using the Java 8 lambda syntax).
         methodName.textProperty().addListener((observable, oldValue, newValue) -> {
             boolean methodNameExists = MethodList.getInstance().methodNameExists(newValue);
             boolean invalid = newValue.trim().isEmpty() || methodNameExists;
-            confirmButton.setDisable(invalid);
+            confirmButton.setDisable(!inputIsValid());
             errorMessageLabel.setVisible(methodNameExists);
         });
 
@@ -176,9 +206,43 @@ public class GenerateMethodDialog {
         });
     }
 
+    public boolean hasInvalidParameters() {
+        BaracoMethodTemplate methodTemplate = new BaracoMethodTemplate();
+        for (Node node : parametersHolder.getChildren()) {
+            HBox child = (HBox) node;
+
+            ObservableList<Node> parameterInfo = child.getChildren();
+
+            String parameterName = ((TextField) parameterInfo.get(1)).getText().trim();
+
+            if (parameterName.isEmpty()) {
+                return true;
+            }
+
+            String dataType = ((ComboBox) parameterInfo.get(0)).getValue().toString();
+            BaracoMethodTemplateParameter parameter = new BaracoMethodTemplateParameter(parameterName, dataType);
+
+            if (methodTemplate.hasParameter(parameter)) {
+                return true;
+            }
+
+            methodTemplate.addParameter(parameter);
+        }
+        return false;
+    }
+
     public String showGenerateMethodDialog() {
         Optional<String> result = dialog.showAndWait();
 
         return result.get();
+    }
+
+    public boolean inputIsValid() {
+        boolean methodNameExists = MethodList.getInstance().methodNameExists(methodName.getText());
+        boolean invalidMethodName = methodName.getText().trim().isEmpty() || methodNameExists;
+
+        hasInvalidParameters();
+
+        return !methodNameExists && !invalidMethodName && !hasInvalidParameters();
     }
 }
