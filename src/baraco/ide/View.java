@@ -47,7 +47,7 @@ public class View extends Application {
             "if", "int", "return", "switch", "void", "while", "print", "println",
             "end", "and", "or", "class", "public", "private", "true", "false", "string",
             "char", "final", "scan", "new", ":", "try", "catch", "ARRAY_BOUNDS_EXCEPTION",
-            "NEGATIVE_ARRSIZE_EXCEPTION", "ARITHMETIC_EXPRESSION"
+            "NEGATIVE_ARRSIZE_EXCEPTION", "ARITHMETIC_EXCEPTION"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
