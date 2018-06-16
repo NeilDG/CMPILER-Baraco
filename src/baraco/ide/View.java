@@ -24,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -164,7 +165,6 @@ public class View extends Application {
         // Credits to RichTextFX for the API
         editor = new CodeArea();
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-
         editor.richChanges()
                 .filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
                 .successionEnds(Duration.ofMillis(500))
