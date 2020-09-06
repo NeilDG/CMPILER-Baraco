@@ -1,5 +1,11 @@
 package baraco.semantics.analyzers;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.BuildChecker;
 import baraco.builder.ErrorRepository;
@@ -7,27 +13,19 @@ import baraco.builder.errorcheckers.MultipleMethodDeclarationChecker;
 import baraco.execution.ExecutionManager;
 import baraco.representations.BaracoMethod;
 import baraco.representations.RecognizedKeywords;
+import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import baraco.semantics.utils.IdentifiedTokens;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class MethodAnalyzer implements ParseTreeListener {
+public class BasicMethodAnalyzer implements ParseTreeListener {
 
-    private ClassScope declaredClassScope;
-    private IdentifiedTokens identifiedTokens;
+	private ClassScope declaredClassScope;
     private BaracoMethod declaredBaracoFunction;
-
     private boolean paramsFlag = false;
-
-    public MethodAnalyzer(IdentifiedTokens identifiedTokens, ClassScope declaredClassScope) {
-        this.identifiedTokens = identifiedTokens;
-        this.declaredClassScope = declaredClassScope;
+    
+    public BasicMethodAnalyzer() {
+        this.declaredClassScope = SymbolTableManager.getInstance().getLatestScope();
         this.declaredBaracoFunction = new BaracoMethod();
     }
 
@@ -37,56 +35,55 @@ public class MethodAnalyzer implements ParseTreeListener {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, ctx);
     }
+    
+	@Override
+	public void visitTerminal(TerminalNode node) {
+		// TODO Auto-generated method stub
 
-    @Override
-    public void visitTerminal(TerminalNode node) {
-        // TODO Auto-generated method stub
+	}
 
-    }
+	@Override
+	public void visitErrorNode(ErrorNode node) {
+		// TODO Auto-generated method stub
 
-    @Override
-    public void visitErrorNode(ErrorNode node) {
-        // TODO Auto-generated method stub
+	}
 
-    }
+	@Override
+	public void enterEveryRule(ParserRuleContext ctx) {
+		 if(ctx instanceof BaracoParser.MethodDeclarationContext) {
+	            BaracoParser.MethodDeclarationContext methodDecCtx = (BaracoParser.MethodDeclarationContext) ctx;
+	            MultipleMethodDeclarationChecker funcDecChecker = new MultipleMethodDeclarationChecker(methodDecCtx);
+	            funcDecChecker.verify();
 
-    @Override
-    public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.MethodDeclarationContext) {
-            BaracoParser.MethodDeclarationContext methodDecCtx = (BaracoParser.MethodDeclarationContext) ctx;
-            MultipleMethodDeclarationChecker funcDecChecker = new MultipleMethodDeclarationChecker(methodDecCtx);
-            funcDecChecker.verify();
+	            this.analyzeIdentifier(methodDecCtx.Identifier()); //get the function identifier
+	        }
+	        else {
+	            this.analyzeMethod(ctx);
+	        }
+	}
 
-            this.analyzeIdentifier(methodDecCtx.Identifier()); //get the function identifier
-        }
-        else {
-            this.analyzeMethod(ctx);
-        }
+	@Override
+	public void exitEveryRule(ParserRuleContext ctx) {
+		 if(ctx instanceof BaracoParser.MethodDeclarationContext) {
 
-    }
+	            BaracoParser.MethodDeclarationContext mdCtx = (BaracoParser.MethodDeclarationContext) ctx;
 
-    @Override
-    public void exitEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.MethodDeclarationContext) {
+	            if (!this.declaredBaracoFunction.hasValidReturns()) {
 
-            BaracoParser.MethodDeclarationContext mdCtx = (BaracoParser.MethodDeclarationContext) ctx;
+	                int lineNumber = 0;
 
-            if (!this.declaredBaracoFunction.hasValidReturns()) {
+	                if (mdCtx.Identifier() != null)
+	                    lineNumber = mdCtx.Identifier().getSymbol().getLine();
 
-                int lineNumber = 0;
-
-                if (mdCtx.Identifier() != null)
-                    lineNumber = mdCtx.Identifier().getSymbol().getLine();
-
-                BuildChecker.reportCustomError(ErrorRepository.NO_RETURN_STATEMENT, "", this.declaredBaracoFunction.getMethodName(), lineNumber);
-            }
+	                BuildChecker.reportCustomError(ErrorRepository.NO_RETURN_STATEMENT, "", this.declaredBaracoFunction.getMethodName(), lineNumber);
+	            }
 
 
-            ExecutionManager.getInstance().closeFunctionExecution();
-        }
-    }
-
-    private void analyzeMethod(ParserRuleContext ctx) {
+	            ExecutionManager.getInstance().closeFunctionExecution();
+	        }
+	}
+	
+	private void analyzeMethod(ParserRuleContext ctx) {
 
         if(ctx instanceof BaracoParser.TypeTypeContext && !paramsFlag) {
             BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
@@ -149,17 +146,7 @@ public class MethodAnalyzer implements ParseTreeListener {
      * Stores the created function in its corresponding class scope
      */
     private void storeMobiFunction() {
-        if(this.identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY)) {
-            String accessToken = this.identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
-
-            if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PRIVATE, accessToken)) {
-                this.declaredClassScope.addPrivateBaracoMethod(this.declaredBaracoFunction.getMethodName(), this.declaredBaracoFunction);
-            }
-            else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PUBLIC, accessToken)) {
-                this.declaredClassScope.addPublicBaracoMethod(this.declaredBaracoFunction.getMethodName(), this.declaredBaracoFunction);
-            }
-
-            this.identifiedTokens.clearTokens(); //clear tokens for reuse
-        }
+    	this.declaredClassScope.addPrivateBaracoMethod(this.declaredBaracoFunction.getMethodName(), this.declaredBaracoFunction);
     }
+
 }

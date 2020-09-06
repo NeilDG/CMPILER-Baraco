@@ -4,7 +4,6 @@ import baraco.builder.BuildChecker;
 import baraco.controller.Controller;
 import baraco.execution.ExecutionManager;
 import baraco.execution.MethodTracker;
-import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.MethodList;
 import baraco.file.FileHandler;
 import baraco.ide.dialogs.*;

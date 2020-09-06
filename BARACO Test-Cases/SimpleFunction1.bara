@@ -1,0 +1,29 @@
+public class SimpleFunction1:
+	void test3():
+		int x = 1;
+		int y = x + 5;
+		println("X and Y combined is: " + y);
+	end
+
+	void test2():
+		println("Just printing function");
+		test3();
+	end;
+	void test():
+		int num = 0;
+		int total = 0;
+
+		scan("Gimme number: ", num);
+
+		while(num > -1):
+			total = total + num;
+			scan("Gimme number: ", num);
+			test2();		
+		end
+		println("Total: " + total);
+		test3();
+	end
+	void main():
+		test();
+	end
+end
