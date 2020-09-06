@@ -1,0 +1,46 @@
+public class SimpleProgram2:
+	void main():
+		decimal assignment1;
+		decimal assignment2;
+		decimal assignment3;
+		decimal total = 0.0;
+		string	grade = "";
+
+		scan("Enter Assignment 1 grade: ", assignment1);
+		scan("Enter Assignment 2 grade: ", assignment2);
+		scan("Enter Assignment 3 grade: ", assignment3);
+
+		assignment1 = assignment1 * 0.40;
+		assignment2 = assignment2 * 0.35;
+		assignment3 = assignment3 * 0.25;
+
+		total = assignment1 + assignment2 + assignment3;
+
+		if (total >= 94):
+			grade = "4.0";
+		end
+		else if (total >= 89):
+			grade = "3.5";
+		end
+		else if (total >= 83):
+			grade = "3.0";
+		end
+		else if (total >= 78):
+			grade = "2.5";
+		end
+		else if (total >= 72):
+			grade = "2.0";
+		end
+		else if (total >= 66):
+			grade = "1.5";
+		end
+		else if (total >= 60):
+			grade = "1.0";
+		end
+		else:
+			grade = "0.0";
+		end
+
+		print("Your grade is: " + total + ".  Your DLSU grade is: " + grade + ".");
+	end
+end

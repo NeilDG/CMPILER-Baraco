@@ -1,0 +1,18 @@
+public class VariableConst2:
+	void main():
+		final decimal MULTIPLIER = 2.0f;
+		
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		
+		x++;
+		y += 2;
+		z += 3;
+		
+		println("Value of X: "+x);
+		println("Value of Y: "+y);
+		println("Value of Z: "+z);
+		println("MULTIPLIER: " +MULTIPLIER);
+	end
+end

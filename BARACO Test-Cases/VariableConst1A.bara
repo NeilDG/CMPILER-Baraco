@@ -1,0 +1,11 @@
+public class VariableConst1A:
+	void main():
+		final int NOT_FOUND = 404;
+		final int BAD_REQUEST = 400;
+		final int REQUEST_TIMEOUT = 408;
+	
+		println("HTTP error code of NOT_FOUND: " +NOT_FOUND);
+		println("HTTP error code of BAD_REQUEST: " +BAD_REQUEST);
+		println("HTTP error code of REQUEST_TIMEOUT: " +REQUEST_TIMEOUT);
+	end
+end

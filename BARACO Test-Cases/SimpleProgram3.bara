@@ -1,0 +1,14 @@
+public class SimpleProgram3:
+	void main():
+		int num = 0;
+		int total = 0;
+
+		scan("Gimme number: ", num);
+
+		while(num > -1):
+			total = total + num;
+			scan("Gimme number: ", num);			
+		end
+		print("Total: " + total);
+	end
+end

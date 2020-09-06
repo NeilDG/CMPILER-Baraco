@@ -1,0 +1,17 @@
+public class SimpleProgram1:
+	void main():
+		decimal temperature;
+
+		scan("Enter temperature: ", temperature);
+
+		if (temperature < 20):
+			print("IT'S COLD!");
+		end
+		else if (temperature > 30):
+			print("IT'S HOT!");
+		end
+		else:
+			print("COOL CLIMATE!");
+		end
+	end
+end

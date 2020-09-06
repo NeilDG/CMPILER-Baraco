@@ -1,0 +1,55 @@
+public class SemanticTest:
+
+	bool assertNonZero(int x):]
+		if(x > 0):
+			return true;
+		end
+		
+		//error #1
+	end
+
+	void sayHelloWorld():
+		print("Hello World");
+	end
+
+	//error #2
+	void sayHelloWorld():
+		print("Hello World"); 
+	end
+
+	void arrayTest(int size_1, int size_2):
+		int[] simpleArray = new int[size_1];
+		int[] simpleArray = new int[size_2]; //error #3
+		int[] simpleArray_2 = new int[2.0f]; //error #4
+		
+		int complexArraySize = (size_1 * 2) - size_2 - 4;
+		int[] complexArray = new int[complexArraySize];
+		
+		for(int i = 0; i < complexArraySize; i++):
+			complexArraySize[i] = i;
+		end
+		
+		return complexArray; //error #5
+	end
+
+	void main():
+		const int ERROR_CODE = 404;
+		
+		int x = 0, y = 5;
+		decimal z = 0.0;
+		
+		z = assertNonZero(x); //error #6
+		print("Test error print of code " +ERROR_CODE);
+		ERROR_CODE = 500; //error #7
+		
+		if(z > 0):
+			print("Computated value: " + someValue()); //error #8
+		end
+		
+		int z = 0, x = 0; //syntax error #9, #10
+		
+		
+		
+	end
+
+end

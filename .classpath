@@ -3,7 +3,7 @@
 	<classpathentry excluding="baraco/antlr/parser/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src/baraco/antlr/parser"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/NeilDG/Documents/MSCSGithubProjects/CMPILER_Baraco/antlr-4.7.1-complete.jar"/>
-	<classpathentry kind="lib" path="C:/Users/NeilDG/Documents/MSCSGithubProjects/CMPILER_Baraco/richtextfx-fat-0.9.0.jar"/>
+	<classpathentry kind="lib" path="antlr-4.7.1-complete.jar"/>
+	<classpathentry kind="lib" path="richtextfx-fat-0.9.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

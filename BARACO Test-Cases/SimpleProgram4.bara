@@ -1,0 +1,23 @@
+public class SimpleProgram4:
+	void main():
+		int num1;
+		int num2;
+		int num3;
+
+		scan("Gimme number: ", num1);
+		scan("Gimme number: ", num2);
+		scan("Gimme number: ", num3);
+
+		int highest = num1;
+
+		if (num2 > highest):
+			highest = num2;
+		end
+
+		if (num3 > highest):
+			highest = num3;
+		end
+
+		print("Highest number entered is " + highest + "!");
+	end
+end

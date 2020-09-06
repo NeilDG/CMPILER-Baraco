@@ -1,0 +1,37 @@
+public class VariableConst3:
+	void main():
+		final int JUNGLE_CUBES = 1;
+		final int DRAGON_CUBES = 2;
+		final int JUICE_CUBES = 3;
+		final int BUBBLE_CUBES = 4;
+		final int FARM_CUBES = 5;
+		final int LOST_CUBES = 6;
+		
+		int number = 0;
+		scan("Enter number: ", number);
+		
+		if(JUNGLE_CUBES == number):
+			print("Jungle Cubes!");
+		end
+
+		if(DRAGON_CUBES == number):
+			print("Dragon Cubes!");
+		end
+
+		if(JUICE_CUBES == number):
+			print("Juice Cubes");
+		end
+
+		if(BUBBLE_CUBES == number):
+			print("Bubble Cubes");
+		end
+
+		if(FARM_CUBES == number):
+			print("Farm Cubes");
+		end
+
+		if(LOST_CUBES == number):
+			print("Lost Cubes");
+		end
+	end
+end

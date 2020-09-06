@@ -1,0 +1,35 @@
+public class ScanPrint2:
+
+	void main():
+		/*string[] names = new string[5];
+
+		for (int i = 0; i < 5; i++):
+			scan("Enter Name: ", names[i]);
+		end
+		
+		print("*****Names entered*****);
+		for (int j = 0; j < 5; j++):
+			println(names[i]);
+		end*/
+
+		string name1 = "";
+		string name2 = "";
+		string name3 = "";
+		string name4 = "";
+		string name5 = "";
+
+		scan("Enter Name: ", name1);
+		scan("Enter Name: ", name2);
+		scan("Enter Name: ", name3);
+		scan("Enter Name: ", name4);
+		scan("Enter Name: ", name5);
+
+		println("*****Names entered*****");
+		println(name1);
+		println(name2);
+		println(name3);
+		println(name4);
+		println(name5);
+	end
+
+end
