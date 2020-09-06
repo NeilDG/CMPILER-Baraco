@@ -104,6 +104,7 @@ public class BaracoBaseListener implements BaracoListener {
 	@Override public void enterClassDeclaration(BaracoParser.ClassDeclarationContext ctx) {
 		ClassAnalyzer classAnalyzer = new ClassAnalyzer();
 		classAnalyzer.analyze(ctx);
+		
 	}
 	/**
 	 * {@inheritDoc}

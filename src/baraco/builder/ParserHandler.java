@@ -3,6 +3,7 @@ package baraco.builder;
 import baraco.antlr.error.BaracoErrorListener;
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoBaseListener;
+import baraco.antlr.parser.BaracoBaseVisitor;
 import baraco.antlr.parser.BaracoParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -42,8 +43,11 @@ public class ParserHandler {
         ParserRuleContext parserRuleContext = this.sharedParser.compilationUnit();
         System.out.println("DEBUG: " + parserRuleContext.toStringTree(this.sharedParser));
 
-        ParseTreeWalker treeWalker = new ParseTreeWalker();
-        treeWalker.walk(new BaracoBaseListener(), parserRuleContext);
+        //ParseTreeWalker treeWalker = new ParseTreeWalker();
+        //treeWalker.walk(new BaracoBaseListener(), parserRuleContext);
+        
+        BaracoBaseVisitor baseVisitor = new BaracoBaseVisitor<Void>();
+        baseVisitor.visit(parserRuleContext);
 
         System.out.println("Finished parsing. Compiled executables. Click RUN to execute");
     }

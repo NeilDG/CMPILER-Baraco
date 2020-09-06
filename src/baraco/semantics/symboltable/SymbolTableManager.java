@@ -15,6 +15,7 @@ public class SymbolTableManager {
     }
 
     private HashMap<String, ClassScope> classTable;
+    private ClassScope latestClassScope;
 
     private SymbolTableManager() {
         this.classTable = new HashMap<String, ClassScope>();
@@ -30,6 +31,7 @@ public class SymbolTableManager {
 
     public void addClassScope(String className, ClassScope classScope) {
         this.classTable.put(className, classScope);
+        this.latestClassScope = classScope;
     }
 
     public ClassScope getClassScope(String className) {
@@ -40,6 +42,10 @@ public class SymbolTableManager {
             System.out.println(TAG + ": " + className + " is not found!");
             return null;
         }
+    }
+    
+    public ClassScope getLatestScope() {
+    	return this.latestClassScope;
     }
 
     public boolean containsClassScope(String className) {

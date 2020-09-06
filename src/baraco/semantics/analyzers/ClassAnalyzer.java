@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
-public class ClassAnalyzer implements ParseTreeListener {
+public class ClassAnalyzer {
 
     private ClassScope declaredClassScope;
     private IdentifiedTokens identifiedTokens;
@@ -35,43 +35,18 @@ public class ClassAnalyzer implements ParseTreeListener {
     public void analyze(BaracoParser.ClassDeclarationContext ctx) {
         String className = ctx.Identifier().getText();
 
-        //Console.log(LogType.DEBUG, "Class name is " +className);
+        System.out.println("Class name is " +className);
         ClassNameChecker classNameChecker = new ClassNameChecker(className);
         classNameChecker.verify();
 
         this.declaredClassScope = new ClassScope(classNameChecker.correctClassName());
         this.identifiedTokens = new IdentifiedTokens();
 
-        ParseTreeWalker treeWalker = new ParseTreeWalker();
-        treeWalker.walk(this, ctx);
-    }
-
-    @Override
-    public void visitTerminal(TerminalNode node) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void visitErrorNode(ErrorNode node) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.ClassDeclarationContext) {
-            SymbolTableManager.getInstance().addClassScope(this.declaredClassScope.getClassName(), this.declaredClassScope);
-        }
-
+        SymbolTableManager.getInstance().addClassScope(this.declaredClassScope.getClassName(), this.declaredClassScope);
         this.analyzeClassMembers(ctx);
     }
-
-    @Override
-    public void exitEveryRule(ParserRuleContext ctx) {
-
-    }
-
+    
+    //TODO: Discontinued OOP method
     private void analyzeClassMembers(ParserRuleContext ctx) {
         if(ctx instanceof BaracoParser.ClassOrInterfaceModifierContext) {
             BaracoParser.ClassOrInterfaceModifierContext classModifierCtx = (BaracoParser.ClassOrInterfaceModifierContext) ctx;
@@ -126,7 +101,7 @@ public class ClassAnalyzer implements ParseTreeListener {
 
         else if(ctx instanceof BaracoParser.MethodDeclarationContext) {
             BaracoParser.MethodDeclarationContext methodDecCtx = (BaracoParser.MethodDeclarationContext) ctx;
-            MethodAnalyzer methodAnalyzer = new MethodAnalyzer(this.identifiedTokens, this.declaredClassScope);
+            OOPMethodAnalyzer methodAnalyzer = new OOPMethodAnalyzer(this.identifiedTokens, this.declaredClassScope);
             methodAnalyzer.analyze(methodDecCtx);
 
             //reuse tokens
